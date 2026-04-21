@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgs.mapper.TeacherMapper">
+
+    <select id="selectAll" resultType="com.lgs.entity.Teacher">
+        select * from teacher
+        <where>
+            <if test="name != null"> and (name like concat('%', #{name}, '%') or username like concat('%', #{name}, '%'))</if>
+            <if test="username != null"> and username = #{username}</if>
+        </where>
+        order by username asc
+    </select>
+
+    <insert id="insert" parameterType="com.lgs.entity.Teacher" useGeneratedKeys="true">
+        insert into teacher(id, username, password, name, avatar, gender, phone, email, role, status)
+        values (#{id}, #{username}, #{password}, #{name}, #{avatar},#{gender},#{phone},#{email},#{role}, #{status})
+    </insert>
+
+    <update id="updateById" parameterType="com.lgs.entity.Teacher">
+        update teacher
+        <set>
+            <if test="username != null">username = #{username},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="role != null">role = #{role},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

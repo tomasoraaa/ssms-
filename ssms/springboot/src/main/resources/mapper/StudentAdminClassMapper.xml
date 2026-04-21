@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lgs.mapper.StudentAdminClassMapper">
+    <insert id="insert" parameterType="com.lgs.entity.StudentAdminClass" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO student_admin_class (student_id, admin_class_id, enroll_year, status)
+        VALUES (#{studentId}, #{adminClassId}, #{enrollYear}, #{status})
+    </insert>
+
+    <update id="updateById" parameterType="com.lgs.entity.StudentAdminClass">
+        UPDATE student_admin_class
+        SET student_id = #{studentId},
+            admin_class_id = #{adminClassId},
+            enroll_year = #{enrollYear},
+            status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        DELETE FROM student_admin_class WHERE id = #{id}
+    </delete>
+
+    <select id="selectById" parameterType="java.lang.Integer" resultType="com.lgs.entity.StudentAdminClass">
+        SELECT sac.*, s.name as student_name, ac.class_name, ac.class_code
+        FROM student_admin_class sac
+        LEFT JOIN student s ON sac.student_id COLLATE utf8mb4_unicode_ci = s.username COLLATE utf8mb4_unicode_ci
+        LEFT JOIN admin_class ac ON sac.admin_class_id = ac.id
+        WHERE sac.id = #{id}
+    </select>
+
+    <select id="selectAll" parameterType="com.lgs.entity.StudentAdminClass" resultType="com.lgs.entity.StudentAdminClass">
+        SELECT sac.*, s.name as student_name, ac.class_name, ac.class_code
+        FROM student_admin_class sac
+        LEFT JOIN student s ON sac.student_id COLLATE utf8mb4_unicode_ci = s.username COLLATE utf8mb4_unicode_ci
+        LEFT JOIN admin_class ac ON sac.admin_class_id = ac.id
+        <where>
+            <if test="studentId != null and studentId != ''">
+                AND sac.student_id LIKE CONCAT('%', #{studentId}, '%')
+            </if>
+            <if test="adminClassId != null">
+                AND sac.admin_class_id = #{adminClassId}
+            </if>
+            <if test="enrollYear != null and enrollYear != ''">
+                AND sac.enroll_year = #{enrollYear}
+            </if>
+            <if test="status != null">
+                AND sac.status = #{status}
+            </if>
+        </where>
+        ORDER BY sac.enroll_year DESC, ac.class_name
+    </select>
+
+    <delete id="deleteByStudentIdAndClassId">
+        DELETE FROM student_admin_class WHERE student_id = #{studentId} AND admin_class_id = #{adminClassId}
+    </delete>
+</mapper>

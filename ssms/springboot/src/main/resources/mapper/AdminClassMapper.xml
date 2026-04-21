@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lgs.mapper.AdminClassMapper">
+    <insert id="insert" parameterType="com.lgs.entity.AdminClass" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO admin_class (grade, major, class_name, class_code, counselor_id)
+        VALUES (#{grade}, #{major}, #{className}, #{classCode}, #{counselorId})
+    </insert>
+
+    <update id="updateById" parameterType="com.lgs.entity.AdminClass">
+        UPDATE admin_class
+        SET grade = #{grade},
+            major = #{major},
+            class_name = #{className},
+            class_code = #{classCode},
+            counselor_id = #{counselorId}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        DELETE FROM admin_class WHERE id = #{id}
+    </delete>
+
+    <select id="selectById" parameterType="java.lang.Integer" resultType="com.lgs.entity.AdminClass">
+        SELECT ac.*, t.name as counselor_name
+        FROM admin_class ac
+        LEFT JOIN teacher t ON ac.counselor_id COLLATE utf8mb4_unicode_ci = t.username COLLATE utf8mb4_unicode_ci
+        WHERE ac.id = #{id}
+    </select>
+
+    <select id="selectAll" parameterType="com.lgs.entity.AdminClass" resultType="com.lgs.entity.AdminClass">
+        SELECT ac.*, t.name as counselor_name
+        FROM admin_class ac
+        LEFT JOIN teacher t ON ac.counselor_id COLLATE utf8mb4_unicode_ci = t.username COLLATE utf8mb4_unicode_ci
+        <where>
+            <if test="grade != null and grade != ''">
+                AND ac.grade = #{grade}
+            </if>
+            <if test="major != null and major != ''">
+                AND ac.major LIKE CONCAT('%', #{major}, '%')
+            </if>
+            <if test="className != null and className != ''">
+                AND ac.class_name LIKE CONCAT('%', #{className}, '%')
+            </if>
+            <if test="classCode != null and classCode != ''">
+                AND ac.class_code LIKE CONCAT('%', #{classCode}, '%')
+            </if>
+        </where>
+        ORDER BY ac.grade DESC, ac.major, ac.class_name
+    </select>
+</mapper>

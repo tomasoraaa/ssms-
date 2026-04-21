@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgs.mapper.CourseEvaluationMapper">
+    <insert id="insert" parameterType="com.lgs.entity.CourseEvaluation">
+        insert into course_evaluation (student_id, student_name, course_id, course_name, teacher_id, rating, content, teacher_evaluation, evaluation_time)
+        values (#{studentId}, #{studentName}, #{courseId}, #{courseName}, #{teacherId}, #{rating}, #{content}, #{teacherEvaluation}, #{evaluationTime})
+    </insert>
+    
+    <update id="update" parameterType="com.lgs.entity.CourseEvaluation">
+        update course_evaluation
+        set rating = #{rating}, content = #{content}, teacher_evaluation = #{teacherEvaluation}, evaluation_time = #{evaluationTime}
+        where student_id = #{studentId} and course_id = #{courseId}
+    </update>
+    
+    <delete id="deleteById" parameterType="int">
+        delete from course_evaluation where id = #{id}
+    </delete>
+    
+    <select id="selectAll" resultType="com.lgs.entity.CourseEvaluation">
+        select * from course_evaluation
+        order by evaluation_time desc
+    </select>
+    
+    <select id="selectByStudentAndCourse" resultType="com.lgs.entity.CourseEvaluation">
+        select * from course_evaluation
+        where student_id = #{studentId} and course_id = #{courseId}
+    </select>
+    
+    <select id="selectByCourseId" resultType="com.lgs.entity.CourseEvaluation">
+        select * from course_evaluation
+        where course_id = #{courseId}
+        order by evaluation_time desc
+    </select>
+    
+    <select id="selectByTeacherId" resultType="com.lgs.entity.CourseEvaluation">
+        select * from course_evaluation
+        where teacher_id = #{teacherId}
+        order by evaluation_time desc
+    </select>
+</mapper>

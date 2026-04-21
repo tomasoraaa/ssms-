@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgs.mapper.CourseSelectionMapper">
+
+    <select id="selectAll" resultType="com.lgs.entity.CourseSelection">
+        select * from course_selection
+        <where>
+            <if test="id != null"> and id = #{id}</if>
+            <if test="userId != null"> and userId = #{userId}</if>
+            <if test="userType != null and userType != ''"> and userType = #{userType}</if>
+            <if test="status != null and status != ''"> and status = #{status}</if>
+        </where>
+        order by createTime desc
+    </select>
+
+    <insert id="insert" parameterType="com.lgs.entity.CourseSelection" useGeneratedKeys="true">
+        insert into course_selection(id, userId, userName, userType, courseId, courseName, teacherId, teacherName, status, createTime)
+        values (#{id}, #{userId}, #{userName}, #{userType}, #{courseId}, #{courseName}, #{teacherId}, #{teacherName}, #{status}, NOW())
+    </insert>
+
+    <update id="updateById" parameterType="com.lgs.entity.CourseSelection">
+        update course_selection
+        <set>
+            <if test="status != null">status = #{status}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from course_selection where id = #{id}
+    </delete>
+
+</mapper>

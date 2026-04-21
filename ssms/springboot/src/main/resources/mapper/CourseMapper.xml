@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgs.mapper.CourseMapper">
+
+    <select id="selectAll" resultType="com.lgs.entity.Course">
+        select * from course
+        <where>
+            <if test="courseName != null"> and (courseName like concat('%', #{courseName}, '%') or courseCode like concat('%', #{courseName}, '%'))</if>
+        </where>
+        order by courseCode asc
+    </select>
+
+    <insert id="insert" parameterType="com.lgs.entity.Course" useGeneratedKeys="true">
+        insert into course(id, courseName, courseCode, credit, description)
+        values (#{id}, #{courseName}, #{courseCode}, #{credit}, #{description})
+    </insert>
+
+    <update id="updateById" parameterType="com.lgs.entity.Course">
+        update course
+        <set>
+            <if test="courseName != null">courseName = #{courseName},</if>
+            <if test="courseCode != null">courseCode = #{courseCode},</if>
+            <if test="credit != null">credit = #{credit},</if>
+            <if test="description != null">description = #{description},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from course where id = #{id}
+    </delete>
+
+    <select id="selectById" resultType="com.lgs.entity.Course">
+        select * from course where id = #{id}
+    </select>
+
+    <select id="selectWithTeachers" resultType="com.lgs.entity.Course">
+        select c.*, 
+               GROUP_CONCAT(ct.teacher_name SEPARATOR '、') as teacherName
+        from course c
+        left join course_teacher ct on c.id = ct.course_id
+        where c.id = #{id}
+        group by c.id
+    </select>
+
+</mapper>

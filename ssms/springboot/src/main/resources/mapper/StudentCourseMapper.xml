@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgs.mapper.StudentCourseMapper">
+
+    <select id="selectAll" resultType="com.lgs.entity.StudentCourse">
+        select * from student_course
+        <where>
+            <if test="studentId != null"> and studentId = #{studentId}</if>
+            <if test="courseId != null"> and courseId = #{courseId}</if>
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="com.lgs.entity.StudentCourse" useGeneratedKeys="true">
+        insert into student_course(id, studentId, courseId, teacherId, teacherName, status, score)
+        values (#{id}, #{studentId}, #{courseId}, #{teacherId}, #{teacherName}, #{status}, #{score})
+    </insert>
+
+    <update id="updateScore" parameterType="com.lgs.entity.StudentCourse">
+        update student_course set score = #{score} where studentId = #{studentId} and courseId = #{courseId}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from student_course where id = #{id}
+    </delete>
+
+    <delete id="deleteByStudentIdAndCourseId" parameterType="com.lgs.entity.StudentCourse">
+        delete from student_course where studentId = #{studentId} and courseId = #{courseId}
+    </delete>
+
+    <select id="selectByCourseId" resultType="com.lgs.entity.StudentCourse">
+        select * from student_course where courseId = #{courseId}
+    </select>
+
+    <select id="selectByStudentId" resultType="com.lgs.entity.StudentCourse">
+        select * from student_course where studentId = #{studentId}
+    </select>
+
+</mapper>

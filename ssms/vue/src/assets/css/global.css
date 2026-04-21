@@ -1,0 +1,57 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+a {
+    color: #1967e3;
+    text-decoration: none;
+}
+
+.card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.1);
+    margin-bottom: 15px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+h1 {
+    font-size: 24px;
+}
+
+h2 {
+    font-size: 20px;
+}
+
+h3 {
+    font-size: 18px;
+}
+
+p {
+    margin: 0 0 10px 0;
+}
+
+.el-button {
+    font-size: 14px;
+}
+
+.el-table {
+    font-size: 14px;
+}
+
+.el-card {
+    margin-bottom: 10px;
+}
