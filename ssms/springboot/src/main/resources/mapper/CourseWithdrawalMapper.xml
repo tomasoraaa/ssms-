@@ -5,23 +5,23 @@
 <mapper namespace="com.lgs.mapper.CourseWithdrawalMapper">
 
     <insert id="insert" parameterType="com.lgs.entity.CourseWithdrawal" useGeneratedKeys="true">
-        insert into course_withdrawal(studentId, courseId, teacherId, teacherName, reason, status)
-        values (#{studentId}, #{courseId}, #{teacherId}, #{teacherName}, #{reason}, #{status})
+        insert into course_withdrawal(student_id, course_id, teacher_id, teacher_name, reason, status)
+        values (#{student_id}, #{course_id}, #{teacher_id}, #{teacher_name}, #{reason}, #{status})
     </insert>
 
     <select id="selectAll" resultType="com.lgs.entity.CourseWithdrawal">
         select * from course_withdrawal
         <where>
-            <if test="studentId != null and studentId != ''"> and studentId = #{studentId}</if>
-            <if test="courseId != null and courseId != ''"> and courseId = #{courseId}</if>
+            <if test="student_id != null and student_id != ''"> and student_id = #{student_id}</if>
+            <if test="course_id != null and course_id != ''"> and course_id = #{course_id}</if>
             <if test="status != null"> and status = #{status}</if>
         </where>
-        order by withdrawalTime desc
+        order by withdrawal_time desc
     </select>
 
     <select id="selectByStudentId" parameterType="java.lang.String" resultType="com.lgs.entity.CourseWithdrawal">
-        select * from course_withdrawal where studentId = #{studentId}
-        order by withdrawalTime desc
+        select * from course_withdrawal where student_id = #{student_id}
+        order by withdrawal_time desc
     </select>
 
     <update id="updateById" parameterType="com.lgs.entity.CourseWithdrawal">

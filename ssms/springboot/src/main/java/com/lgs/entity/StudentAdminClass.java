@@ -2,13 +2,13 @@ package com.lgs.entity;
 
 public class StudentAdminClass {
     private Integer id;
-    private String studentId;
-    private Integer adminClassId;
-    private String enrollYear;
+    private String student_id;
+    private Integer admin_class_id;
+    private String enroll_year;
     private Integer status;
-    private String studentName;
-    private String className;
-    private String classCode;
+    private String student_name;
+    private String class_name;
+    private String class_code;
 
     public Integer getId() {
         return id;
@@ -18,28 +18,28 @@ public class StudentAdminClass {
         this.id = id;
     }
 
-    public String getStudentId() {
-        return studentId;
+    public String getStudent_id() {
+        return student_id;
     }
 
-    public void setStudentId(String studentId) {
-        this.studentId = studentId;
+    public void setStudent_id(String student_id) {
+        this.student_id = student_id;
     }
 
-    public Integer getAdminClassId() {
-        return adminClassId;
+    public Integer getAdmin_class_id() {
+        return admin_class_id;
     }
 
-    public void setAdminClassId(Integer adminClassId) {
-        this.adminClassId = adminClassId;
+    public void setAdmin_class_id(Integer admin_class_id) {
+        this.admin_class_id = admin_class_id;
     }
 
-    public String getEnrollYear() {
-        return enrollYear;
+    public String getEnroll_year() {
+        return enroll_year;
     }
 
-    public void setEnrollYear(String enrollYear) {
-        this.enrollYear = enrollYear;
+    public void setEnroll_year(String enroll_year) {
+        this.enroll_year = enroll_year;
     }
 
     public Integer getStatus() {
@@ -50,27 +50,27 @@ public class StudentAdminClass {
         this.status = status;
     }
 
-    public String getStudentName() {
-        return studentName;
+    public String getStudent_name() {
+        return student_name;
     }
 
-    public void setStudentName(String studentName) {
-        this.studentName = studentName;
+    public void setStudent_name(String student_name) {
+        this.student_name = student_name;
     }
 
-    public String getClassName() {
-        return className;
+    public String getClass_name() {
+        return class_name;
     }
 
-    public void setClassName(String className) {
-        this.className = className;
+    public void setClass_name(String class_name) {
+        this.class_name = class_name;
     }
 
-    public String getClassCode() {
-        return classCode;
+    public String getClass_code() {
+        return class_code;
     }
 
-    public void setClassCode(String classCode) {
-        this.classCode = classCode;
+    public void setClass_code(String class_code) {
+        this.class_code = class_code;
     }
 }

@@ -17,8 +17,8 @@ public class TeachingClassServiceImpl implements TeachingClassService {
 
     @Override
     public void add(TeachingClass teachingClass) {
-        if (teachingClass.getSelectedCount() == null) {
-            teachingClass.setSelectedCount(0);
+        if (teachingClass.getSelected_count() == null) {
+            teachingClass.setSelected_count(0);
         }
         if (teachingClass.getStatus() == null) {
             teachingClass.setStatus(1);
@@ -54,12 +54,12 @@ public class TeachingClassServiceImpl implements TeachingClassService {
     }
 
     @Override
-    public List<TeachingClass> selectByAcademicYearId(Integer academicYearId) {
-        return teachingClassMapper.selectByAcademicYearId(academicYearId);
+    public List<TeachingClass> selectByAcademicYearId(Integer academic_year_id) {
+        return teachingClassMapper.selectByAcademicYearId(academic_year_id);
     }
 
     @Override
-    public List<TeachingClass> selectAvailable(Integer academicYearId) {
-        return teachingClassMapper.selectAvailable(academicYearId);
+    public List<TeachingClass> selectAvailable(Integer academic_year_id) {
+        return teachingClassMapper.selectAvailable(academic_year_id);
     }
 }

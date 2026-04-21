@@ -2,14 +2,14 @@ package com.lgs.entity;
 
 public class ModifyRequest {
     private Integer id;
-    private String userId;
-    private String userName;
-    private String userType;
-    private String fieldName;
-    private String oldValue;
-    private String newValue;
+    private String user_id;
+    private String user_name;
+    private String user_type;
+    private String field_name;
+    private String old_value;
+    private String new_value;
     private Integer status; // 0-待审核，1-已通过，2-已拒绝
-    private String createTime;
+    private String create_time;
 
     public Integer getId() {
         return id;
@@ -19,52 +19,52 @@ public class ModifyRequest {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getUser_id() {
+        return user_id;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUser_name() {
+        return user_name;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
     }
 
-    public String getUserType() {
-        return userType;
+    public String getUser_type() {
+        return user_type;
     }
 
-    public void setUserType(String userType) {
-        this.userType = userType;
+    public void setUser_type(String user_type) {
+        this.user_type = user_type;
     }
 
-    public String getFieldName() {
-        return fieldName;
+    public String getField_name() {
+        return field_name;
     }
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
+    public void setField_name(String field_name) {
+        this.field_name = field_name;
     }
 
-    public String getOldValue() {
-        return oldValue;
+    public String getOld_value() {
+        return old_value;
     }
 
-    public void setOldValue(String oldValue) {
-        this.oldValue = oldValue;
+    public void setOld_value(String old_value) {
+        this.old_value = old_value;
     }
 
-    public String getNewValue() {
-        return newValue;
+    public String getNew_value() {
+        return new_value;
     }
 
-    public void setNewValue(String newValue) {
-        this.newValue = newValue;
+    public void setNew_value(String new_value) {
+        this.new_value = new_value;
     }
 
     public Integer getStatus() {
@@ -75,11 +75,11 @@ public class ModifyRequest {
         this.status = status;
     }
 
-    public String getCreateTime() {
-        return createTime;
+    public String getCreate_time() {
+        return create_time;
     }
 
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
+    public void setCreate_time(String create_time) {
+        this.create_time = create_time;
     }
 }

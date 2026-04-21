@@ -19,37 +19,37 @@
     <div class="card" style="margin-bottom: 5px">
       <el-table :data="data.tableData" stripe>
         <el-table-column label="申请ID" prop="id"></el-table-column>
-        <el-table-column label="用户ID" prop="userId"></el-table-column>
-        <el-table-column label="用户姓名" prop="userName"></el-table-column>
-        <el-table-column label="用户类型" prop="userType">
+        <el-table-column label="用户ID" prop="user_id"></el-table-column>
+        <el-table-column label="用户姓名" prop="user_name"></el-table-column>
+        <el-table-column label="用户类型" prop="user_type">
           <template #default="scope">
-            {{ scope.row.userType === 'STUDENT' ? '学生' : '教师' }}
+            {{ scope.row.user_type === 'STUDENT' ? '学生' : '教师' }}
           </template>
         </el-table-column>
-        <el-table-column label="修改字段" prop="fieldName">
+        <el-table-column label="修改字段" prop="field_name">
           <template #default="scope">
-            {{ getFieldName(scope.row.fieldName) }}
+            {{ getFieldName(scope.row.field_name) }}
           </template>
         </el-table-column>
-        <el-table-column label="原值" prop="oldValue">
+        <el-table-column label="原值" prop="old_value">
           <template #default="scope">
-            <div v-if="scope.row.fieldName === 'avatar'">
-              <el-image v-if="scope.row.oldValue" :src="scope.row.oldValue" style="width: 100px; height: 100px" fit="cover" />
+            <div v-if="scope.row.field_name === 'avatar'">
+              <el-image v-if="scope.row.old_value" :src="scope.row.old_value" style="width: 100px; height: 100px" fit="cover" />
               <span v-else>无</span>
             </div>
-            <span v-else>{{ scope.row.oldValue || '无' }}</span>
+            <span v-else>{{ scope.row.old_value || '无' }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="新值" prop="newValue">
+        <el-table-column label="新值" prop="new_value">
           <template #default="scope">
-            <div v-if="scope.row.fieldName === 'avatar'">
-              <el-image v-if="scope.row.newValue" :src="scope.row.newValue" style="width: 100px; height: 100px" fit="cover" />
+            <div v-if="scope.row.field_name === 'avatar'">
+              <el-image v-if="scope.row.new_value" :src="scope.row.new_value" style="width: 100px; height: 100px" fit="cover" />
               <span v-else>无</span>
             </div>
-            <span v-else>{{ scope.row.newValue || '无' }}</span>
+            <span v-else>{{ scope.row.new_value || '无' }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="申请时间" prop="createTime"></el-table-column>
+        <el-table-column label="申请时间" prop="create_time"></el-table-column>
         <el-table-column label="状态" prop="status">
           <template #default="scope">
             <el-tag v-if="scope.row.status === 0" type="warning">待审核</el-tag>

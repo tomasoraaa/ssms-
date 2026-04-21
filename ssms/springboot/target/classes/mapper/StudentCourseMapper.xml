@@ -7,18 +7,18 @@
     <select id="selectAll" resultType="com.lgs.entity.StudentCourse">
         select * from student_course
         <where>
-            <if test="studentId != null"> and studentId = #{studentId}</if>
-            <if test="courseId != null"> and courseId = #{courseId}</if>
+            <if test="student_id != null"> and student_id = #{student_id}</if>
+            <if test="course_id != null"> and course_id = #{course_id}</if>
         </where>
     </select>
 
     <insert id="insert" parameterType="com.lgs.entity.StudentCourse" useGeneratedKeys="true">
-        insert into student_course(id, studentId, courseId, teacherId, teacherName, status, score)
-        values (#{id}, #{studentId}, #{courseId}, #{teacherId}, #{teacherName}, #{status}, #{score})
+        insert into student_course(id, student_id, course_id, teacher_id, teacher_name, status, score, teaching_class_id, academic_year_id)
+        values (#{id}, #{student_id}, #{course_id}, #{teacher_id}, #{teacher_name}, #{status}, #{score}, #{teaching_class_id}, #{academic_year_id})
     </insert>
 
     <update id="updateScore" parameterType="com.lgs.entity.StudentCourse">
-        update student_course set score = #{score} where studentId = #{studentId} and courseId = #{courseId}
+        update student_course set score = #{score} where student_id = #{student_id} and course_id = #{course_id}
     </update>
 
     <delete id="deleteById" parameterType="java.lang.Integer">
@@ -26,15 +26,15 @@
     </delete>
 
     <delete id="deleteByStudentIdAndCourseId" parameterType="com.lgs.entity.StudentCourse">
-        delete from student_course where studentId = #{studentId} and courseId = #{courseId}
+        delete from student_course where student_id = #{student_id} and course_id = #{course_id}
     </delete>
 
     <select id="selectByCourseId" resultType="com.lgs.entity.StudentCourse">
-        select * from student_course where courseId = #{courseId}
+        select * from student_course where course_id = #{course_id}
     </select>
 
     <select id="selectByStudentId" resultType="com.lgs.entity.StudentCourse">
-        select * from student_course where studentId = #{studentId}
+        select * from student_course where student_id = #{student_id}
     </select>
 
 </mapper>

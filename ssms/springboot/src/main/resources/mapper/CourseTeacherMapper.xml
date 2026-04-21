@@ -3,38 +3,38 @@
 <mapper namespace="com.lgs.mapper.CourseTeacherMapper">
     <insert id="insert" parameterType="com.lgs.entity.CourseTeacher">
         INSERT INTO course_teacher (course_id, teacher_id, teacher_name, teaching_class_id, is_main_teacher)
-        VALUES (#{courseId}, #{teacherId}, #{teacherName}, #{teachingClassId}, #{isMainTeacher})
+        VALUES (#{course_id}, #{teacher_id}, #{teacher_name}, #{teaching_class_id}, #{is_main_teacher})
     </insert>
 
     <select id="selectByCourseId" parameterType="java.lang.Integer" resultType="com.lgs.entity.CourseTeacher">
-        SELECT * FROM course_teacher WHERE course_id = #{courseId}
+        SELECT * FROM course_teacher WHERE course_id = #{course_id}
         ORDER BY id ASC
     </select>
 
     <select id="selectByTeacherId" parameterType="java.lang.String" resultType="com.lgs.entity.CourseTeacher">
-        SELECT * FROM course_teacher WHERE teacher_id = #{teacherId}
+        SELECT * FROM course_teacher WHERE teacher_id = #{teacher_id}
         ORDER BY course_id
     </select>
 
     <select id="selectByTeachingClassId" parameterType="java.lang.Integer" resultType="com.lgs.entity.CourseTeacher">
-        SELECT * FROM course_teacher WHERE teaching_class_id = #{teachingClassId}
+        SELECT * FROM course_teacher WHERE teaching_class_id = #{teaching_class_id}
         ORDER BY is_main_teacher DESC, id ASC
     </select>
 
     <delete id="deleteByCourseIdAndTeacherId" parameterType="java.util.Map">
-        DELETE FROM course_teacher WHERE course_id = #{courseId} AND teacher_id = #{teacherId}
+        DELETE FROM course_teacher WHERE course_id = #{course_id} AND teacher_id = #{teacher_id}
     </delete>
 
     <delete id="deleteByTeachingClassId" parameterType="java.lang.Integer">
-        DELETE FROM course_teacher WHERE teaching_class_id = #{teachingClassId}
+        DELETE FROM course_teacher WHERE teaching_class_id = #{teaching_class_id}
     </delete>
 
     <update id="updateById" parameterType="com.lgs.entity.CourseTeacher">
         UPDATE course_teacher
-        SET teacher_id = #{teacherId},
-            teacher_name = #{teacherName},
-            teaching_class_id = #{teachingClassId},
-            is_main_teacher = #{isMainTeacher}
+        SET teacher_id = #{teacher_id},
+            teacher_name = #{teacher_name},
+            teaching_class_id = #{teaching_class_id},
+            is_main_teacher = #{is_main_teacher}
         WHERE id = #{id}
     </update>
 </mapper>

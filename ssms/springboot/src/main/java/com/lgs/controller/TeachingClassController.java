@@ -27,14 +27,14 @@ public class TeachingClassController {
     @PostMapping("/add")
     public Result add(@RequestBody TeachingClass teachingClass) {
         teachingClassService.add(teachingClass);
-        activityLogService.recordLog("系统", "admin", "新增教学班 " + teachingClass.getClassCode(), "ADMIN");
+        activityLogService.recordLog("系统", "admin", "新增教学班 " + teachingClass.getClass_code(), "ADMIN");
         return Result.success(teachingClass.getId());
     }
 
     @PutMapping("/update")
     public Result update(@RequestBody TeachingClass teachingClass) {
         teachingClassService.updateById(teachingClass);
-        activityLogService.recordLog("系统", "admin", "修改教学班 " + teachingClass.getClassCode(), "ADMIN");
+        activityLogService.recordLog("系统", "admin", "修改教学班 " + teachingClass.getClass_code(), "ADMIN");
         return Result.success();
     }
 
@@ -44,7 +44,7 @@ public class TeachingClassController {
         courseTeacherService.deleteByTeachingClassId(id);
         teachingClassService.deleteById(id);
         if (teachingClass != null) {
-            activityLogService.recordLog("系统", "admin", "删除教学班 " + teachingClass.getClassCode(), "ADMIN");
+            activityLogService.recordLog("系统", "admin", "删除教学班 " + teachingClass.getClass_code(), "ADMIN");
         }
         return Result.success();
     }
@@ -69,15 +69,15 @@ public class TeachingClassController {
         return Result.success(tc);
     }
 
-    @GetMapping("/selectByAcademicYearId/{academicYearId}")
-    public Result selectByAcademicYearId(@PathVariable Integer academicYearId) {
-        List<TeachingClass> list = teachingClassService.selectByAcademicYearId(academicYearId);
+    @GetMapping("/selectByAcademicYearId/{academic_year_id}")
+    public Result selectByAcademicYearId(@PathVariable Integer academic_year_id) {
+        List<TeachingClass> list = teachingClassService.selectByAcademicYearId(academic_year_id);
         return Result.success(list);
     }
 
-    @GetMapping("/selectAvailable/{academicYearId}")
-    public Result selectAvailable(@PathVariable Integer academicYearId) {
-        List<TeachingClass> list = teachingClassService.selectAvailable(academicYearId);
+    @GetMapping("/selectAvailable/{academic_year_id}")
+    public Result selectAvailable(@PathVariable Integer academic_year_id) {
+        List<TeachingClass> list = teachingClassService.selectAvailable(academic_year_id);
         return Result.success(list);
     }
 }

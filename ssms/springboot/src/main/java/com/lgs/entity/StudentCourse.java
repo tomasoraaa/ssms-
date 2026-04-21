@@ -2,16 +2,16 @@ package com.lgs.entity;
 
 public class StudentCourse {
     private Integer id;
-    private String studentId;
-    private String courseId;
-    private Integer teachingClassId; // 教学班ID
-    private Integer academicYearId; // 学年学期ID
-    private String teacherId;
-    private String teacherName;
+    private String student_id;
+    private String course_id;
+    private Integer teaching_class_id;
+    private Integer academic_year_id;
+    private String teacher_id;
+    private String teacher_name;
     private Integer status;
     private Double score;
-    private Integer isMakeup; // 是否补考：0-否，1-是
-    private Double originalScore; // 原始成绩（补考前）
+    private Integer is_makeup;
+    private Double original_score;
 
     public Integer getId() {
         return id;
@@ -21,52 +21,52 @@ public class StudentCourse {
         this.id = id;
     }
 
-    public String getStudentId() {
-        return studentId;
+    public String getStudent_id() {
+        return student_id;
     }
 
-    public void setStudentId(String studentId) {
-        this.studentId = studentId;
+    public void setStudent_id(String student_id) {
+        this.student_id = student_id;
     }
 
-    public String getCourseId() {
-        return courseId;
+    public String getCourse_id() {
+        return course_id;
     }
 
-    public void setCourseId(String courseId) {
-        this.courseId = courseId;
+    public void setCourse_id(String course_id) {
+        this.course_id = course_id;
     }
 
-    public Integer getTeachingClassId() {
-        return teachingClassId;
+    public Integer getTeaching_class_id() {
+        return teaching_class_id;
     }
 
-    public void setTeachingClassId(Integer teachingClassId) {
-        this.teachingClassId = teachingClassId;
+    public void setTeaching_class_id(Integer teaching_class_id) {
+        this.teaching_class_id = teaching_class_id;
     }
 
-    public Integer getAcademicYearId() {
-        return academicYearId;
+    public Integer getAcademic_year_id() {
+        return academic_year_id;
     }
 
-    public void setAcademicYearId(Integer academicYearId) {
-        this.academicYearId = academicYearId;
+    public void setAcademic_year_id(Integer academic_year_id) {
+        this.academic_year_id = academic_year_id;
     }
 
-    public String getTeacherId() {
-        return teacherId;
+    public String getTeacher_id() {
+        return teacher_id;
     }
 
-    public void setTeacherId(String teacherId) {
-        this.teacherId = teacherId;
+    public void setTeacher_id(String teacher_id) {
+        this.teacher_id = teacher_id;
     }
 
-    public String getTeacherName() {
-        return teacherName;
+    public String getTeacher_name() {
+        return teacher_name;
     }
 
-    public void setTeacherName(String teacherName) {
-        this.teacherName = teacherName;
+    public void setTeacher_name(String teacher_name) {
+        this.teacher_name = teacher_name;
     }
 
     public Integer getStatus() {
@@ -85,19 +85,19 @@ public class StudentCourse {
         this.score = score;
     }
 
-    public Integer getIsMakeup() {
-        return isMakeup;
+    public Integer getIs_makeup() {
+        return is_makeup;
     }
 
-    public void setIsMakeup(Integer isMakeup) {
-        this.isMakeup = isMakeup;
+    public void setIs_makeup(Integer is_makeup) {
+        this.is_makeup = is_makeup;
     }
 
-    public Double getOriginalScore() {
-        return originalScore;
+    public Double getOriginal_score() {
+        return original_score;
     }
 
-    public void setOriginalScore(Double originalScore) {
-        this.originalScore = originalScore;
+    public void setOriginal_score(Double original_score) {
+        this.original_score = original_score;
     }
 }

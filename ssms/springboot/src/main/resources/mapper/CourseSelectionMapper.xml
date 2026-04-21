@@ -8,16 +8,16 @@
         select * from course_selection
         <where>
             <if test="id != null"> and id = #{id}</if>
-            <if test="userId != null"> and userId = #{userId}</if>
-            <if test="userType != null and userType != ''"> and userType = #{userType}</if>
+            <if test="user_id != null"> and user_id = #{user_id}</if>
+            <if test="user_type != null and user_type != ''"> and user_type = #{user_type}</if>
             <if test="status != null and status != ''"> and status = #{status}</if>
         </where>
-        order by createTime desc
+        order by create_time desc
     </select>
 
     <insert id="insert" parameterType="com.lgs.entity.CourseSelection" useGeneratedKeys="true">
-        insert into course_selection(id, userId, userName, userType, courseId, courseName, teacherId, teacherName, status, createTime)
-        values (#{id}, #{userId}, #{userName}, #{userType}, #{courseId}, #{courseName}, #{teacherId}, #{teacherName}, #{status}, NOW())
+        insert into course_selection(id, user_id, user_name, user_type, course_id, course_name, teacher_id, teacher_name, status, create_time)
+        values (#{id}, #{user_id}, #{user_name}, #{user_type}, #{course_id}, #{course_name}, #{teacher_id}, #{teacher_name}, #{status}, NOW())
     </insert>
 
     <update id="updateById" parameterType="com.lgs.entity.CourseSelection">

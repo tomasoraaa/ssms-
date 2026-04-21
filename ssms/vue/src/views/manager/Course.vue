@@ -3,7 +3,7 @@
   <div>
 
     <div class="card" style="margin-bottom: 5px;">
-      <el-input v-model="data.courseName" style="width: 300px; margin-right: 10px" placeholder="请输入课程名称或课程代码查询"></el-input>
+      <el-input v-model="data.course_name" style="width: 300px; margin-right: 10px" placeholder="请输入课程名称或课程代码查询"></el-input>
       <el-button type="primary" @click="load">查询</el-button>
       <el-button type="info" style="margin: 0 10px" @click="reset">重置</el-button>
     </div>
@@ -14,8 +14,8 @@
       </div>
 
       <el-table :data="data.tableData" stripe>
-        <el-table-column label="课程代码" prop="courseCode"></el-table-column>
-        <el-table-column label="课程名称" prop="courseName"></el-table-column>
+        <el-table-column label="课程代码" prop="course_code"></el-table-column>
+        <el-table-column label="课程名称" prop="course_name"></el-table-column>
         <el-table-column label="学分" prop="credit"></el-table-column>
         <el-table-column label="任课教师" min-width="150">
             <template #default="scope">
@@ -78,11 +78,11 @@
       </div>
       <el-dialog title="课程信息" width="40%" v-model="data.formVisible" :close-on-click-modal="false" destroy-on-close>
         <el-form :model="data.form" label-width="100px" style="padding-right: 50px">
-          <el-form-item label="课程代码" prop="courseCode">
-            <el-input v-model="data.form.courseCode" autocomplete="off" />
+          <el-form-item label="课程代码" prop="course_code">
+            <el-input v-model="data.form.course_code" autocomplete="off" />
           </el-form-item>
-          <el-form-item label="课程名称" prop="courseName">
-            <el-input v-model="data.form.courseName" autocomplete="off" />
+          <el-form-item label="课程名称" prop="course_name">
+            <el-input v-model="data.form.course_name" autocomplete="off" />
           </el-form-item>
           <el-form-item label="学分" prop="credit">
             <el-input v-model="data.form.credit" type="number" autocomplete="off" />
@@ -102,7 +102,7 @@
       <!-- 成绩统计对话框 -->
       <el-dialog
         v-model="data.scoreDialogVisible"
-        :title="data.scoreStatistics.courseName + ' 成绩统计'"
+        :title="data.scoreStatistics.course_name + ' 成绩统计'"
         width="80%"
       >
         <div style="margin-bottom: 20px">
@@ -173,7 +173,7 @@
       <!-- 教师管理对话框 -->
       <el-dialog
         v-model="data.teacherDialogVisible"
-        :title="data.currentCourse?.courseName + ' - 教师管理'"
+        :title="data.currentCourse?.course_name + ' - 教师管理'"
         width="50%"
       >
         <div style="margin-bottom: 20px">
@@ -201,8 +201,8 @@
         </div>
 
         <el-table :data="data.currentCourse?.teachers || []" stripe>
-          <el-table-column label="教师工号" prop="teacherId"></el-table-column>
-          <el-table-column label="教师姓名" prop="teacherName"></el-table-column>
+          <el-table-column label="教师工号" prop="teacher_id"></el-table-column>
+          <el-table-column label="教师姓名" prop="teacher_name"></el-table-column>
           <el-table-column label="操作">
             <template #default="scope">
               <el-button
@@ -230,8 +230,8 @@
         width="50%"
       >
         <el-table :data="data.currentTeachers" stripe>
-          <el-table-column label="教师工号" prop="teacherId"></el-table-column>
-          <el-table-column label="教师姓名" prop="teacherName"></el-table-column>
+          <el-table-column label="教师工号" prop="teacher_id"></el-table-column>
+          <el-table-column label="教师姓名" prop="teacher_name"></el-table-column>
           <el-table-column label="角色">
             <template #default="scope">
               <el-tag type="default">
@@ -261,7 +261,7 @@ import {ArrowDown, Edit, Delete, DataAnalysis, User} from '@element-plus/icons-v
 const value = ref('')
 
 const data = reactive({
-  courseName:null,
+  course_name:null,
   form: {},
   formVisible: false,
   pageNum: 1,
@@ -270,7 +270,7 @@ const data = reactive({
   tableData:[],
   teachers: [], // 教师列表
   scoreStatistics: {
-    courseName: '',
+    course_name: '',
     averageScore: 0,
     highestScore: 0,
     lowestScore: 0,
@@ -290,7 +290,7 @@ const load = () => {
     params: {
       pageNum: data.pageNum,
       pageSize: data.pageSize,
-      courseName: data.courseName
+      course_name: data.course_name
     }
   }).then(res => {
     data.tableData = res.data?.list
@@ -391,7 +391,7 @@ const save = () => {
 
 // 重置
 const reset = () => {
-  data.courseName = null
+  data.course_name = null
   load()
 }
 
@@ -409,7 +409,7 @@ const handleCurrentChange = (current) => {
 
 // 查看成绩统计
 const viewScoreStatistics = (course) => {
-  data.scoreStatistics.courseName = course.courseName;
+  data.scoreStatistics.course_name = course.course_name;
   // 获取该课程的所有学生成绩
   request.get('/studentCourse/selectByCourseId/' + course.id).then(res => {
     if (res.code === '200') {
@@ -487,9 +487,9 @@ const addTeacher = () => {
     const selectedTeacher = data.teachers.find(teacher => teacher.username === data.selectedTeacherId);
     if (selectedTeacher) {
       const courseTeacher = {
-        courseId: data.currentCourse.id,
-        teacherId: data.selectedTeacherId,
-        teacherName: selectedTeacher.name
+        course_id: data.currentCourse.id,
+        teacher_id: data.selectedTeacherId,
+        teacher_name: selectedTeacher.name
       };
       request.post('/courseTeacher/add', courseTeacher).then(res => {
         if (res.code === '200') {
@@ -507,7 +507,7 @@ const addTeacher = () => {
 // 移除教师
 const removeTeacher = (teacher) => {
   ElMessageBox.confirm('确定要移除该教师吗?', '移除确认', { type: 'warning' }).then(res => {
-    request.delete(`/courseTeacher/delete/${data.currentCourse.id}/${teacher.teacherId}`).then(res => {
+    request.delete(`/courseTeacher/delete/${data.currentCourse.id}/${teacher.teacher_id}`).then(res => {
       if (res.code === '200') {
         ElMessage.success('教师移除成功');
         loadTeachersForCourse(data.currentCourse.id, data.currentCourse);

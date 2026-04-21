@@ -62,8 +62,8 @@ public class CourseWithdrawalServiceImpl implements CourseWithdrawalService {
             CourseWithdrawal selected = withdrawals.get(0);
             // 更新学生课程状态为已退课
             StudentCourse studentCourse = new StudentCourse();
-            studentCourse.setStudentId(selected.getStudentId());
-            studentCourse.setCourseId(selected.getCourseId());
+            studentCourse.setStudent_id(selected.getStudent_id());
+            studentCourse.setCourse_id(selected.getCourse_id());
             List<StudentCourse> existing = studentCourseMapper.selectAll(studentCourse);
             if (!existing.isEmpty()) {
                 StudentCourse sc = existing.get(0);

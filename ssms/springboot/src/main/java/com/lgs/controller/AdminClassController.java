@@ -23,14 +23,14 @@ public class AdminClassController {
     @PostMapping("/add")
     public Result add(@RequestBody AdminClass adminClass) {
         adminClassService.add(adminClass);
-        activityLogService.recordLog("系统", "admin", "新增行政班 " + adminClass.getClassName(), "ADMIN");
+        activityLogService.recordLog("系统", "admin", "新增行政班 " + adminClass.getClass_name(), "ADMIN");
         return Result.success();
     }
 
     @PutMapping("/update")
     public Result update(@RequestBody AdminClass adminClass) {
         adminClassService.updateById(adminClass);
-        activityLogService.recordLog("系统", "admin", "修改行政班 " + adminClass.getClassName(), "ADMIN");
+        activityLogService.recordLog("系统", "admin", "修改行政班 " + adminClass.getClass_name(), "ADMIN");
         return Result.success();
     }
 
@@ -39,7 +39,7 @@ public class AdminClassController {
         AdminClass adminClass = adminClassService.selectById(id);
         adminClassService.deleteById(id);
         if (adminClass != null) {
-            activityLogService.recordLog("系统", "admin", "删除行政班 " + adminClass.getClassName(), "ADMIN");
+            activityLogService.recordLog("系统", "admin", "删除行政班 " + adminClass.getClass_name(), "ADMIN");
         }
         return Result.success();
     }

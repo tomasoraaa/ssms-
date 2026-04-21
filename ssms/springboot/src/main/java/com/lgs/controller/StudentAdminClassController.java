@@ -67,7 +67,7 @@ public class StudentAdminClassController {
     @GetMapping("/selectByStudentId/{studentId}")
     public Result selectByStudentId(@PathVariable String studentId) {
         StudentAdminClass sac = new StudentAdminClass();
-        sac.setStudentId(studentId);
+        sac.setStudent_id(studentId);
         List<StudentAdminClass> list = studentAdminClassService.selectAll(sac);
         return Result.success(list);
     }

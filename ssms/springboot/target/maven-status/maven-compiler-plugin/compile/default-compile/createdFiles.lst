@@ -53,6 +53,7 @@ com\lgs\service\impl\CourseServiceImpl.class
 com\lgs\service\TeacherService.class
 com\lgs\entity\Admin.class
 com\lgs\service\StudentAdminClassService.class
+com\lgs\service\impl\AdminServiceImpl.class
 com\lgs\mapper\AcademicYearMapper.class
 com\lgs\entity\CourseTeacher.class
 com\lgs\service\CourseService.class

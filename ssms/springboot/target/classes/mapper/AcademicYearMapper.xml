@@ -3,17 +3,17 @@
 <mapper namespace="com.lgs.mapper.AcademicYearMapper">
     <insert id="insert" parameterType="com.lgs.entity.AcademicYear" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO academic_year (year, semester, start_date, end_date, selection_start, selection_end, status)
-        VALUES (#{year}, #{semester}, #{startDate}, #{endDate}, #{selectionStart}, #{selectionEnd}, #{status})
+        VALUES (#{year}, #{semester}, #{start_date}, #{end_date}, #{selection_start}, #{selection_end}, #{status})
     </insert>
 
     <update id="updateById" parameterType="com.lgs.entity.AcademicYear">
         UPDATE academic_year
         SET year = #{year},
             semester = #{semester},
-            start_date = #{startDate},
-            end_date = #{endDate},
-            selection_start = #{selectionStart},
-            selection_end = #{selectionEnd},
+            start_date = #{start_date},
+            end_date = #{end_date},
+            selection_start = #{selection_start},
+            selection_end = #{selection_end},
             status = #{status}
         WHERE id = #{id}
     </update>

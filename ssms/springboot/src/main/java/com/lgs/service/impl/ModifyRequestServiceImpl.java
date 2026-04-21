@@ -64,22 +64,22 @@ public class ModifyRequestServiceImpl implements ModifyRequestService {
             modifyRequestMapper.updateById(modifyRequest);
 
             // 根据用户类型更新相应的用户信息
-            if ("STUDENT".equals(modifyRequest.getUserType())) {
+            if ("STUDENT".equals(modifyRequest.getUser_type())) {
                 Student student = new Student();
-                student.setUsername(modifyRequest.getUserId());
+                student.setUsername(modifyRequest.getUser_id());
                 List<Student> students = studentMapper.selectAll(student);
                 if (!students.isEmpty()) {
                     student = students.get(0);
-                    updateStudentField(student, modifyRequest.getFieldName(), modifyRequest.getNewValue());
+                    updateStudentField(student, modifyRequest.getField_name(), modifyRequest.getNew_value());
                     studentMapper.updateById(student);
                 }
-            } else if ("TEACHER".equals(modifyRequest.getUserType())) {
+            } else if ("TEACHER".equals(modifyRequest.getUser_type())) {
                 Teacher teacher = new Teacher();
-                teacher.setUsername(modifyRequest.getUserId());
+                teacher.setUsername(modifyRequest.getUser_id());
                 List<Teacher> teachers = teacherMapper.selectAll(teacher);
                 if (!teachers.isEmpty()) {
                     teacher = teachers.get(0);
-                    updateTeacherField(teacher, modifyRequest.getFieldName(), modifyRequest.getNewValue());
+                    updateTeacherField(teacher, modifyRequest.getField_name(), modifyRequest.getNew_value());
                     teacherMapper.updateById(teacher);
                 }
             }

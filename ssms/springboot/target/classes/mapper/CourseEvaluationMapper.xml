@@ -5,38 +5,38 @@
 <mapper namespace="com.lgs.mapper.CourseEvaluationMapper">
     <insert id="insert" parameterType="com.lgs.entity.CourseEvaluation">
         insert into course_evaluation (student_id, student_name, course_id, course_name, teacher_id, rating, content, teacher_evaluation, evaluation_time)
-        values (#{studentId}, #{studentName}, #{courseId}, #{courseName}, #{teacherId}, #{rating}, #{content}, #{teacherEvaluation}, #{evaluationTime})
+        values (#{student_id}, #{student_name}, #{course_id}, #{course_name}, #{teacher_id}, #{rating}, #{content}, #{teacher_evaluation}, #{evaluation_time})
     </insert>
-    
+
     <update id="update" parameterType="com.lgs.entity.CourseEvaluation">
         update course_evaluation
-        set rating = #{rating}, content = #{content}, teacher_evaluation = #{teacherEvaluation}, evaluation_time = #{evaluationTime}
-        where student_id = #{studentId} and course_id = #{courseId}
+        set rating = #{rating}, content = #{content}, teacher_evaluation = #{teacher_evaluation}, evaluation_time = #{evaluation_time}
+        where student_id = #{student_id} and course_id = #{course_id}
     </update>
-    
+
     <delete id="deleteById" parameterType="int">
         delete from course_evaluation where id = #{id}
     </delete>
-    
+
     <select id="selectAll" resultType="com.lgs.entity.CourseEvaluation">
         select * from course_evaluation
         order by evaluation_time desc
     </select>
-    
+
     <select id="selectByStudentAndCourse" resultType="com.lgs.entity.CourseEvaluation">
         select * from course_evaluation
-        where student_id = #{studentId} and course_id = #{courseId}
+        where student_id = #{student_id} and course_id = #{course_id}
     </select>
-    
+
     <select id="selectByCourseId" resultType="com.lgs.entity.CourseEvaluation">
         select * from course_evaluation
-        where course_id = #{courseId}
+        where course_id = #{course_id}
         order by evaluation_time desc
     </select>
-    
+
     <select id="selectByTeacherId" resultType="com.lgs.entity.CourseEvaluation">
         select * from course_evaluation
-        where teacher_id = #{teacherId}
+        where teacher_id = #{teacher_id}
         order by evaluation_time desc
     </select>
 </mapper>

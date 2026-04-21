@@ -11,6 +11,6 @@ public interface TeachingClassService {
     TeachingClass selectById(Integer id);
     PageInfo<TeachingClass> selectPage(TeachingClass teachingClass, Integer pageNum, Integer pageSize);
     List<TeachingClass> selectAll(TeachingClass teachingClass);
-    List<TeachingClass> selectByAcademicYearId(Integer academicYearId);
-    List<TeachingClass> selectAvailable(Integer academicYearId);
+    List<TeachingClass> selectByAcademicYearId(Integer academic_year_id);
+    List<TeachingClass> selectAvailable(Integer academic_year_id);
 }

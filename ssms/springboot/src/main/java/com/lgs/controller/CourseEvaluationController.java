@@ -15,7 +15,6 @@ public class CourseEvaluationController {
     @Resource
     private CourseEvaluationService courseEvaluationService;
 
-    // 提交或更新评价
     @PostMapping("/saveOrUpdate")
     public Result saveOrUpdate(@RequestBody CourseEvaluation courseEvaluation) {
         boolean success = courseEvaluationService.saveOrUpdate(courseEvaluation);
@@ -26,35 +25,30 @@ public class CourseEvaluationController {
         }
     }
 
-    // 根据学生ID和课程ID查询评价
     @GetMapping("/selectByStudentAndCourse")
-    public Result selectByStudentAndCourse(@RequestParam String studentId, @RequestParam Integer courseId) {
-        CourseEvaluation evaluation = courseEvaluationService.getByStudentAndCourse(studentId, courseId);
+    public Result selectByStudentAndCourse(@RequestParam String student_id, @RequestParam Integer course_id) {
+        CourseEvaluation evaluation = courseEvaluationService.getByStudentAndCourse(student_id, course_id);
         return Result.success(evaluation);
     }
 
-    // 根据课程ID查询评价列表
     @GetMapping("/selectByCourseId")
-    public Result selectByCourseId(@RequestParam Integer courseId) {
-        List<CourseEvaluation> evaluations = courseEvaluationService.getByCourseId(courseId);
+    public Result selectByCourseId(@RequestParam Integer course_id) {
+        List<CourseEvaluation> evaluations = courseEvaluationService.getByCourseId(course_id);
         return Result.success(evaluations);
     }
 
-    // 根据教师ID查询评价列表
     @GetMapping("/selectByTeacherId")
-    public Result selectByTeacherId(@RequestParam String teacherId) {
-        List<CourseEvaluation> evaluations = courseEvaluationService.getByTeacherId(teacherId);
+    public Result selectByTeacherId(@RequestParam String teacher_id) {
+        List<CourseEvaluation> evaluations = courseEvaluationService.getByTeacherId(teacher_id);
         return Result.success(evaluations);
     }
-    
-    // 查询所有评价（管理员用）
+
     @GetMapping("/selectAll")
     public Result selectAll() {
         List<CourseEvaluation> evaluations = courseEvaluationService.getAll();
         return Result.success(evaluations);
     }
-    
-    // 删除评价（管理员用）
+
     @DeleteMapping("/delete/{id}")
     public Result deleteById(@PathVariable Integer id) {
         boolean success = courseEvaluationService.deleteById(id);

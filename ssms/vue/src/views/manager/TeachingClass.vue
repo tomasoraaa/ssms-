@@ -15,23 +15,23 @@
       </div>
 
       <el-table :data="data.tableData" stripe>
-        <el-table-column label="教学班编号" prop="classCode"></el-table-column>
-        <el-table-column label="课程名称" prop="courseName"></el-table-column>
-        <el-table-column label="课程代码" prop="courseCode"></el-table-column>
+        <el-table-column label="教学班编号" prop="class_code"></el-table-column>
+        <el-table-column label="课程名称" prop="course_name"></el-table-column>
+        <el-table-column label="课程代码" prop="course_code"></el-table-column>
         <el-table-column label="学年学期">
           <template #default="scope">
             {{ formatAcademicYear(scope.row) }}
           </template>
         </el-table-column>
-        <el-table-column label="主讲教师" prop="teacherName">
+        <el-table-column label="主讲教师" prop="teacher_name">
           <template #default="scope">
-            <span v-if="scope.row.teacherName">{{ scope.row.teacherName }}</span>
+            <span v-if="scope.row.teacher_name">{{ scope.row.teacher_name }}</span>
             <span v-else style="color: #999">未分配</span>
           </template>
         </el-table-column>
         <el-table-column label="容量">
           <template #default="scope">
-            {{ scope.row.selectedCount || 0 }} / {{ scope.row.capacity || 50 }}
+            {{ scope.row.selected_count || 0 }} / {{ scope.row.capacity || 50 }}
           </template>
         </el-table-column>
         <el-table-column label="上课地点" prop="location"></el-table-column>
@@ -64,22 +64,22 @@
 
       <el-dialog title="教学班信息" width="600px" v-model="data.formVisible" :close-on-click-modal="false" destroy-on-close>
         <el-form :model="data.form" label-width="120px" style="padding-right: 50px">
-          <el-form-item label="教学班编号" prop="classCode">
-            <el-input v-model="data.form.classCode" placeholder="如：CS101-2024-1-01" />
+          <el-form-item label="教学班编号" prop="class_code">
+            <el-input v-model="data.form.class_code" placeholder="如：CS101-2024-1-01" />
           </el-form-item>
-          <el-form-item label="学年学期" prop="academicYearId">
-            <el-select v-model="data.form.academicYearId" placeholder="请选择学年学期" style="width: 100%">
+          <el-form-item label="学年学期" prop="academic_year_id">
+            <el-select v-model="data.form.academic_year_id" placeholder="请选择学年学期" style="width: 100%">
               <el-option v-for="ay in academicYears" :key="ay.id" :label="formatAcademicYear(ay)" :value="ay.id" />
             </el-select>
           </el-form-item>
-          <el-form-item label="课程" prop="courseId">
-            <el-select v-model="data.form.courseId" placeholder="请选择课程" style="width: 100%" filterable @change="handleCourseChange">
-              <el-option v-for="c in courses" :key="c.id" :label="c.courseName + ' (' + c.courseCode + ')'" :value="c.id" />
+          <el-form-item label="课程" prop="course_id">
+            <el-select v-model="data.form.course_id" placeholder="请选择课程" style="width: 100%" filterable @change="handleCourseChange">
+              <el-option v-for="c in courses" :key="c.id" :label="`${c.course_name} (${c.course_code})`" :value="c.id" />
             </el-select>
           </el-form-item>
-          <el-form-item label="主讲教师" prop="teacherId">
-            <el-select v-model="data.form.teacherId" placeholder="请选择主讲教师" style="width: 100%" filterable>
-              <el-option v-for="t in availableTeachers" :key="t.username" :label="t.name + ' (' + t.username + ')'" :value="t.username" />
+          <el-form-item label="主讲教师" prop="teacher_id">
+            <el-select v-model="data.form.teacher_id" placeholder="请选择主讲教师" style="width: 100%" filterable>
+              <el-option v-for="t in availableTeachers" :key="t.username" :label="`${t.name} (${t.username})`" :value="t.username" />
             </el-select>
           </el-form-item>
           <el-form-item label="容量" prop="capacity">
@@ -174,7 +174,7 @@ const loadTeachers = () => {
 }
 
 const handleCourseChange = (courseId) => {
-  data.form.teacherId = null
+  data.form.teacher_id = null
   if (courseId) {
     request.get('/courseTeacher/selectByCourseId/' + courseId).then(res => {
       if (res.code === '200') {
@@ -198,11 +198,12 @@ const load = () => {
     params: {
       pageNum: data.pageNum,
       pageSize: data.pageSize,
-      academicYearId: data.academicYearId,
-      classCode: data.searchKey
+      academic_year_id: data.academicYearId,
+      class_code: data.searchKey
     }
   }).then(res => {
     if (res.code === '200') {
+      console.log('加载数据:', res.data.list)
       data.tableData = res.data.list
       data.total = res.data.total
     }
@@ -225,8 +226,10 @@ const handleAdd = () => {
 }
 
 const handleEdit = (row) => {
+  console.log('编辑数据:', row)
   data.form = {...row}
-  handleCourseChange(row.courseId)
+  console.log('表单数据:', data.form)
+  handleCourseChange(row.course_id)
   data.formVisible = true
 }
 
@@ -248,14 +251,16 @@ const handleDelete = (id) => {
 }
 
 const save = () => {
-  const course = courses.value.find(c => c.id === data.form.courseId)
-  const teacher = teachers.value.find(t => t.username === data.form.teacherId)
+  const course = courses.value.find(c => c.id === data.form.course_id)
+  const teacher = teachers.value.find(t => t.username === data.form.teacher_id)
   const formData = {
     ...data.form,
-    courseName: course?.courseName,
-    courseCode: course?.courseCode,
-    teacherName: teacher?.name
+    course_name: course?.course_name,
+    course_code: course?.course_code,
+    teacher_name: teacher?.name
   }
+
+  console.log('保存数据:', formData)
 
   const saveRequest = formData.id
     ? request.put('/teachingClass/update', formData)
@@ -267,13 +272,13 @@ const save = () => {
       data.formVisible = false
       load()
 
-      if (!formData.id && data.form.teacherId) {
+      if (!formData.id && data.form.teacher_id) {
         const ct = {
-          courseId: data.form.courseId,
-          teacherId: data.form.teacherId,
-          teacherName: teacher?.name,
-          teachingClassId: res.data?.id || formData.id,
-          isMainTeacher: 1
+          course_id: data.form.course_id,
+          teacher_id: data.form.teacher_id,
+          teacher_name: teacher?.name,
+          teaching_class_id: res.data?.id || formData.id,
+          is_main_teacher: 1
         }
         request.post('/courseTeacher/add', ct)
       }

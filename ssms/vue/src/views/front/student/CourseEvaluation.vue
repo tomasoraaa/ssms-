@@ -9,10 +9,10 @@
         <div class="card" style="margin-bottom: 15px">
           <h4>我的课程</h4>
           <el-table :data="data.courses" stripe>
-            <el-table-column label="课程代码" prop="courseCode"></el-table-column>
-            <el-table-column label="课程名称" prop="courseName"></el-table-column>
+            <el-table-column label="课程代码" prop="course_code"></el-table-column>
+            <el-table-column label="课程名称" prop="course_name"></el-table-column>
             <el-table-column label="学分" prop="credit"></el-table-column>
-            <el-table-column label="任课教师" prop="teacherName"></el-table-column>
+            <el-table-column label="任课教师" prop="teacher_name"></el-table-column>
             <el-table-column label="状态">
               <template #default="scope">
                 <el-tag v-if="scope.row.evaluated" type="success">已评价</el-tag>
@@ -32,8 +32,8 @@
         <div class="card" style="margin-bottom: 15px">
           <h4>我的评价</h4>
           <el-table :data="data.myEvaluations" stripe>
-            <el-table-column label="课程代码" prop="courseCode"></el-table-column>
-            <el-table-column label="课程名称" prop="courseName"></el-table-column>
+            <el-table-column label="课程代码" prop="course_code"></el-table-column>
+            <el-table-column label="课程名称" prop="course_name"></el-table-column>
             <el-table-column label="评分">
               <template #default="scope">
                 <div class="rating">
@@ -44,7 +44,7 @@
             <el-table-column label="评价内容" prop="content"></el-table-column>
             <el-table-column label="评价时间">
               <template #default="scope">
-                {{ formatDate(scope.row.evaluationTime) }}
+                {{ formatDate(scope.row.evaluation_time) }}
               </template>
             </el-table-column>
             <el-table-column label="操作">
@@ -57,10 +57,9 @@
       </el-tab-pane>
     </el-tabs>
 
-    <!-- 评价对话框 -->
     <el-dialog
       v-model="dialogVisible"
-      :title="`评价课程：${currentCourse?.courseName || ''}`"
+      :title="`评价课程：${currentCourse?.course_name || ''}`"
       width="60%"
     >
       <el-form :model="evaluationForm" label-width="100px">
@@ -117,21 +116,19 @@ const evaluationForm = reactive({
   teacherEvaluation: ''
 });
 
-// 加载学生课程
 const loadCourses = () => {
   const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
   if (user.username) {
     request.get('/course/selectByStudentId', {
-      params: { studentId: user.username }
+      params: { student_id: user.username }
     }).then(res => {
       if (res.code === '200') {
         data.courses = res.data;
-        // 检查每门课程是否已评价
         data.courses.forEach(course => {
           request.get('/courseEvaluation/selectByStudentAndCourse', {
             params: {
-              studentId: user.username,
-              courseId: course.id
+              student_id: user.username,
+              course_id: course.id
             }
           }).then(evalRes => {
             if (evalRes.code === '200' && evalRes.data) {
@@ -147,23 +144,21 @@ const loadCourses = () => {
   }
 };
 
-// 加载我的评价
 const loadMyEvaluations = () => {
   const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
   if (user.username) {
-    // 从课程列表中获取课程信息，然后查询每个课程的评价
     data.myEvaluations = [];
     data.courses.forEach(course => {
       request.get('/courseEvaluation/selectByStudentAndCourse', {
         params: {
-          studentId: user.username,
-          courseId: course.id
+          student_id: user.username,
+          course_id: course.id
         }
       }).then(res => {
         if (res.code === '200' && res.data) {
-          // 为评价添加课程代码信息
           const evaluation = res.data;
-          evaluation.courseCode = course.courseCode;
+          evaluation.course_code = course.course_code;
+          evaluation.course_name = course.course_name;
           data.myEvaluations.push(evaluation);
         }
       });
@@ -171,19 +166,17 @@ const loadMyEvaluations = () => {
   }
 };
 
-// 查看评价
 const viewEvaluation = (course) => {
   if (course.evaluationData) {
     currentCourse.value = course;
     evaluationForm.rating = course.evaluationData.rating;
     evaluationForm.content = course.evaluationData.content;
-    evaluationForm.teacherEvaluation = course.evaluationData.teacherEvaluation || '';
+    evaluationForm.teacherEvaluation = course.evaluationData.teacher_evaluation || '';
     isEditMode.value = true;
     dialogVisible.value = true;
   }
 };
 
-// 打开评价对话框
 const openEvaluationDialog = (course) => {
   currentCourse.value = course;
   evaluationForm.rating = 5;
@@ -193,28 +186,24 @@ const openEvaluationDialog = (course) => {
   dialogVisible.value = true;
 };
 
-// 编辑评价
 const editEvaluation = (evaluation) => {
-  // 查找对应的课程信息
-  const course = data.courses.find(c => c.id === evaluation.courseId);
+  const course = data.courses.find(c => c.id === evaluation.course_id);
   if (course) {
     currentCourse.value = course;
     evaluationForm.rating = evaluation.rating;
     evaluationForm.content = evaluation.content;
-    evaluationForm.teacherEvaluation = evaluation.teacherEvaluation;
+    evaluationForm.teacherEvaluation = evaluation.teacher_evaluation;
     isEditMode.value = true;
     dialogVisible.value = true;
   }
 };
 
-// 监听标签页切换
 watch(activeTab, (newTab) => {
   if (newTab === 'evaluations') {
     loadMyEvaluations();
   }
 });
 
-// 格式化日期，只显示年月日
 const formatDate = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
@@ -224,42 +213,35 @@ const formatDate = (dateString) => {
   return `${year}-${month}-${day}`;
 };
 
-// 提交评价
 const submitEvaluation = () => {
   if (!currentCourse.value) {
     return;
   }
-  
+
   const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
   if (!user.username) {
     return;
   }
-  
-  // 准备评价数据
+
   const evaluationData = {
-    studentId: user.username,
-    studentName: user.name,
-    courseId: currentCourse.value.id,
-    courseName: currentCourse.value.courseName,
-    teacherId: currentCourse.value.teacherId, // 保存教师ID
+    student_id: user.username,
+    student_name: user.name,
+    course_id: currentCourse.value.id,
+    course_name: currentCourse.value.course_name,
+    teacher_id: currentCourse.value.teacher_id || '',
     rating: evaluationForm.rating,
     content: evaluationForm.content,
-    teacherEvaluation: evaluationForm.teacherEvaluation
+    teacher_evaluation: evaluationForm.teacherEvaluation
   };
-  
-  // 调用后端API提交评价
+
   request.post('/courseEvaluation/saveOrUpdate', evaluationData).then(res => {
     if (res.code === '200') {
-      // 提交成功
       dialogVisible.value = false;
-      // 显示成功消息
       alert('评价提交成功！');
-      // 如果当前在评价历史标签页，重新加载评价
       if (activeTab.value === 'evaluations') {
         loadMyEvaluations();
       }
     } else {
-      // 提交失败
       alert('评价提交失败：' + res.msg);
     }
   }).catch(err => {

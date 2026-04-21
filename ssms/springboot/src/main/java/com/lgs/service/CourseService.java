@@ -10,9 +10,9 @@ public interface CourseService {
     void deleteById(Integer id);
     Course selectById(Integer id);
 
-    java.util.List<Course> selectByStudentId(String studentId);
+    java.util.List<Course> selectByStudentId(String student_id);
     
-    java.util.List<Course> selectByTeacherId(String teacherId);
+    java.util.List<Course> selectByTeacherId(String teacher_id);
     
     /**
      * 统计课程数量

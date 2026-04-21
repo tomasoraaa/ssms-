@@ -7,7 +7,7 @@
     <div class="card" style="margin-bottom: 15px">
       <el-form :inline="true" @submit.prevent="handleQuery">
         <el-form-item label="学生ID">
-          <el-input v-model="queryParams.studentId" placeholder="请输入学生ID"></el-input>
+          <el-input v-model="queryParams.student_id" placeholder="请输入学生ID"></el-input>
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="queryParams.status" placeholder="请选择状态">
@@ -26,11 +26,11 @@
 
     <div class="card" style="margin-bottom: 5px">
       <el-table :data="data.withdrawals" stripe>
-        <el-table-column label="学生ID" prop="studentId"></el-table-column>
-        <el-table-column label="课程ID" prop="courseId"></el-table-column>
-        <el-table-column label="教师姓名" prop="teacherName"></el-table-column>
+        <el-table-column label="学生ID" prop="student_id"></el-table-column>
+        <el-table-column label="课程ID" prop="course_id"></el-table-column>
+        <el-table-column label="教师姓名" prop="teacher_name"></el-table-column>
         <el-table-column label="退课原因" prop="reason"></el-table-column>
-        <el-table-column label="申请时间" prop="withdrawalTime" :formatter="formatDate"></el-table-column>
+        <el-table-column label="申请时间" prop="withdrawal_time" :formatter="formatDate"></el-table-column>
         <el-table-column label="状态" prop="status" :formatter="formatStatus"></el-table-column>
         <el-table-column label="操作" align="center" width="200">
           <template #default="scope">
@@ -54,7 +54,7 @@ const data = reactive({
 });
 
 const queryParams = reactive({
-  studentId: '',
+  student_id: '',
   status: ''
 });
 
@@ -62,7 +62,7 @@ const queryParams = reactive({
 const loadWithdrawals = () => {
   request.get('/courseWithdrawal/selectAll', {
     params: {
-      studentId: queryParams.studentId,
+      student_id: queryParams.student_id,
       status: queryParams.status
     }
   }).then(res => {
@@ -81,7 +81,7 @@ const handleQuery = () => {
 
 // 重置查询
 const resetQuery = () => {
-  queryParams.studentId = '';
+  queryParams.student_id = '';
   queryParams.status = '';
   loadWithdrawals();
 };

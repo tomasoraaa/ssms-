@@ -4,15 +4,15 @@ import java.util.Date;
 
 public class CourseEvaluation {
     private Integer id;
-    private String studentId;
-    private String studentName;
-    private Integer courseId;
-    private String courseName;
-    private String teacherId;
+    private String student_id;
+    private String student_name;
+    private Integer course_id;
+    private String course_name;
+    private String teacher_id;
     private Integer rating;
     private String content;
-    private String teacherEvaluation;
-    private Date evaluationTime;
+    private String teacher_evaluation;
+    private Date evaluation_time;
 
     public Integer getId() {
         return id;
@@ -22,44 +22,44 @@ public class CourseEvaluation {
         this.id = id;
     }
 
-    public String getStudentId() {
-        return studentId;
+    public String getStudent_id() {
+        return student_id;
     }
 
-    public void setStudentId(String studentId) {
-        this.studentId = studentId;
+    public void setStudent_id(String student_id) {
+        this.student_id = student_id;
     }
 
-    public String getStudentName() {
-        return studentName;
+    public String getStudent_name() {
+        return student_name;
     }
 
-    public void setStudentName(String studentName) {
-        this.studentName = studentName;
+    public void setStudent_name(String student_name) {
+        this.student_name = student_name;
     }
 
-    public Integer getCourseId() {
-        return courseId;
+    public Integer getCourse_id() {
+        return course_id;
     }
 
-    public void setCourseId(Integer courseId) {
-        this.courseId = courseId;
+    public void setCourse_id(Integer course_id) {
+        this.course_id = course_id;
     }
 
-    public String getCourseName() {
-        return courseName;
+    public String getCourse_name() {
+        return course_name;
     }
 
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
+    public void setCourse_name(String course_name) {
+        this.course_name = course_name;
     }
 
-    public String getTeacherId() {
-        return teacherId;
+    public String getTeacher_id() {
+        return teacher_id;
     }
 
-    public void setTeacherId(String teacherId) {
-        this.teacherId = teacherId;
+    public void setTeacher_id(String teacher_id) {
+        this.teacher_id = teacher_id;
     }
 
     public Integer getRating() {
@@ -78,19 +78,19 @@ public class CourseEvaluation {
         this.content = content;
     }
 
-    public String getTeacherEvaluation() {
-        return teacherEvaluation;
+    public String getTeacher_evaluation() {
+        return teacher_evaluation;
     }
 
-    public void setTeacherEvaluation(String teacherEvaluation) {
-        this.teacherEvaluation = teacherEvaluation;
+    public void setTeacher_evaluation(String teacher_evaluation) {
+        this.teacher_evaluation = teacher_evaluation;
     }
 
-    public Date getEvaluationTime() {
-        return evaluationTime;
+    public Date getEvaluation_time() {
+        return evaluation_time;
     }
 
-    public void setEvaluationTime(Date evaluationTime) {
-        this.evaluationTime = evaluationTime;
+    public void setEvaluation_time(Date evaluation_time) {
+        this.evaluation_time = evaluation_time;
     }
 }

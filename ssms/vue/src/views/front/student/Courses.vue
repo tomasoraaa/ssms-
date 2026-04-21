@@ -37,10 +37,10 @@
 
     <div class="card" style="margin-bottom: 5px">
       <el-table :data="filteredCourses" stripe>
-        <el-table-column label="课程代码" prop="courseCode"></el-table-column>
-        <el-table-column label="课程名称" prop="courseName"></el-table-column>
+        <el-table-column label="课程代码" prop="course_code"></el-table-column>
+        <el-table-column label="课程名称" prop="course_name"></el-table-column>
         <el-table-column label="学分" prop="credit"></el-table-column>
-        <el-table-column label="任课教师" prop="teacherName"></el-table-column>
+        <el-table-column label="任课教师" prop="teacher_name"></el-table-column>
         <el-table-column label="成绩" prop="score"></el-table-column>
         <el-table-column label="绩点" prop="gpa"></el-table-column>
         <el-table-column label="课程描述" prop="description"></el-table-column>
@@ -55,15 +55,15 @@
     <!-- 退课申请对话框 -->
     <el-dialog
       v-model="data.withdrawalDialogVisible"
-      :title="'退课申请 - ' + (data.selectedCourse ? data.selectedCourse.courseName : '')"
+      :title="'退课申请 - ' + (data.selectedCourse ? data.selectedCourse.course_name : '')"
       width="40%"
     >
       <el-form>
         <el-form-item label="课程名称">
-          <el-input :value="data.selectedCourse ? data.selectedCourse.courseName : ''" disabled></el-input>
+          <el-input :value="data.selectedCourse ? data.selectedCourse.course_name : ''" disabled></el-input>
         </el-form-item>
         <el-form-item label="任课教师">
-          <el-input :value="data.selectedCourse ? data.selectedCourse.teacherName : ''" disabled></el-input>
+          <el-input :value="data.selectedCourse ? data.selectedCourse.teacher_name : ''" disabled></el-input>
         </el-form-item>
         <el-form-item label="退课原因">
           <el-input
@@ -136,8 +136,8 @@ const filteredCourses = computed(() => {
   if (queryParams.keyword) {
     const keyword = queryParams.keyword.toLowerCase();
     courses = courses.filter(course => {
-      const matchesCode = course.courseCode.toLowerCase().includes(keyword);
-      const matchesName = course.courseName.toLowerCase().includes(keyword);
+      const matchesCode = course.course_code.toLowerCase().includes(keyword);
+      const matchesName = course.course_name.toLowerCase().includes(keyword);
       return matchesCode || matchesName;
     });
   }
@@ -166,17 +166,17 @@ const averageGPA = computed(() => {
   if (completedCourses.value.length === 0) {
     return "0.00";
   }
-  
+
   const totalGPAPoints = completedCourses.value.reduce((sum, course) => {
     const gpa = calculateGPA(course.score);
     return sum + (gpa * parseFloat(course.credit || 0));
   }, 0);
-  
+
   const totalCredits = totalCredit.value;
   if (totalCredits === 0) {
     return "0.00";
   }
-  
+
   const avgGPA = totalGPAPoints / totalCredits;
   return avgGPA.toFixed(2);
 });
@@ -187,7 +187,7 @@ const loadCourses = () => {
   if (user.username) {
     // 先获取学生的课程
     request.get('/course/selectByStudentId', {
-      params: { studentId: user.username }
+      params: { student_id: user.username }
     }).then(res => {
       if (res.code === '200') {
         const courses = res.data;
@@ -198,7 +198,7 @@ const loadCourses = () => {
             // 构建成绩映射
             data.scoreMap = {};
             scores.forEach(score => {
-              data.scoreMap[score.courseId] = score.score || 0;
+              data.scoreMap[score.course_id] = score.score || 0;
             });
             // 为课程添加成绩信息
             data.courses = courses.map(course => {
@@ -233,13 +233,13 @@ const showWithdrawalDialog = (course) => {
     ElMessage.warning('退课功能未开启，请等待管理员开启选课功能后再进行退课操作。');
     return;
   }
-  
+
   // 检查课程是否已经有成绩
   if (course.score && course.score > 0) {
     ElMessage.warning('该课程已经有成绩，无法退课。');
     return;
   }
-  
+
   data.selectedCourse = course;
   data.withdrawalReason = '';
   data.withdrawalDialogVisible = true;
@@ -250,10 +250,10 @@ const submitWithdrawal = () => {
   const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
   if (user.username && data.selectedCourse) {
     const withdrawal = {
-      studentId: user.username,
-      courseId: data.selectedCourse.id.toString(),
-      teacherId: data.selectedCourse.teacherId || '',
-      teacherName: data.selectedCourse.teacherName || '',
+      student_id: user.username,
+      course_id: data.selectedCourse.id.toString(),
+      teacher_id: data.selectedCourse.teacher_id || '',
+      teacher_name: data.selectedCourse.teacher_name || '',
       reason: data.withdrawalReason,
       status: 0
     };

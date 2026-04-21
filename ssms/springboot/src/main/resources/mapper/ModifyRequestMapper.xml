@@ -7,15 +7,15 @@
     <select id="selectAll" resultType="com.lgs.entity.ModifyRequest">
         select * from modify_request
         <where>
-            <if test="userType != null and userType != ''"> and userType = #{userType}</if>
+            <if test="user_type != null and user_type != ''"> and user_type = #{user_type}</if>
             <if test="status != null"> and status = #{status}</if>
         </where>
-        order by createTime desc
+        order by create_time desc
     </select>
 
     <insert id="insert" parameterType="com.lgs.entity.ModifyRequest" useGeneratedKeys="true">
-        insert into modify_request(id, userId, userName, userType, fieldName, oldValue, newValue, status, createTime)
-        values (#{id}, #{userId}, #{userName}, #{userType}, #{fieldName}, #{oldValue}, #{newValue}, #{status}, NOW())
+        insert into modify_request(id, user_id, user_name, user_type, field_name, old_value, new_value, status, create_time)
+        values (#{id}, #{user_id}, #{user_name}, #{user_type}, #{field_name}, #{old_value}, #{new_value}, #{status}, NOW())
     </insert>
 
     <update id="updateById" parameterType="com.lgs.entity.ModifyRequest">

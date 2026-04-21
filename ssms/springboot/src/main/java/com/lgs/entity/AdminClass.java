@@ -4,10 +4,10 @@ public class AdminClass {
     private Integer id;
     private String grade;
     private String major;
-    private String className;
-    private String classCode;
-    private String counselorId;
-    private String counselorName;
+    private String class_name;
+    private String class_code;
+    private String counselor_id;
+    private String counselor_name;
 
     public Integer getId() {
         return id;
@@ -33,35 +33,35 @@ public class AdminClass {
         this.major = major;
     }
 
-    public String getClassName() {
-        return className;
+    public String getClass_name() {
+        return class_name;
     }
 
-    public void setClassName(String className) {
-        this.className = className;
+    public void setClass_name(String class_name) {
+        this.class_name = class_name;
     }
 
-    public String getClassCode() {
-        return classCode;
+    public String getClass_code() {
+        return class_code;
     }
 
-    public void setClassCode(String classCode) {
-        this.classCode = classCode;
+    public void setClass_code(String class_code) {
+        this.class_code = class_code;
     }
 
-    public String getCounselorId() {
-        return counselorId;
+    public String getCounselor_id() {
+        return counselor_id;
     }
 
-    public void setCounselorId(String counselorId) {
-        this.counselorId = counselorId;
+    public void setCounselor_id(String counselor_id) {
+        this.counselor_id = counselor_id;
     }
 
-    public String getCounselorName() {
-        return counselorName;
+    public String getCounselor_name() {
+        return counselor_name;
     }
 
-    public void setCounselorName(String counselorName) {
-        this.counselorName = counselorName;
+    public void setCounselor_name(String counselor_name) {
+        this.counselor_name = counselor_name;
     }
 }

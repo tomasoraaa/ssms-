@@ -4,15 +4,15 @@ import java.util.Date;
 
 public class CourseSelection {
     private Integer id;
-    private String userId;
-    private String userName;
-    private String userType;
-    private String courseId;
-    private String courseName;
-    private String teacherId;
-    private String teacherName;
+    private String user_id;
+    private String user_name;
+    private String user_type;
+    private String course_id;
+    private String course_name;
+    private String teacher_id;
+    private String teacher_name;
     private Integer status; // 0: 待审核, 1: 已通过, 2: 已拒绝
-    private Date createTime;
+    private Date create_time;
 
     public Integer getId() {
         return id;
@@ -22,60 +22,60 @@ public class CourseSelection {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getUser_id() {
+        return user_id;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUser_name() {
+        return user_name;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
     }
 
-    public String getUserType() {
-        return userType;
+    public String getUser_type() {
+        return user_type;
     }
 
-    public void setUserType(String userType) {
-        this.userType = userType;
+    public void setUser_type(String user_type) {
+        this.user_type = user_type;
     }
 
-    public String getCourseId() {
-        return courseId;
+    public String getCourse_id() {
+        return course_id;
     }
 
-    public void setCourseId(String courseId) {
-        this.courseId = courseId;
+    public void setCourse_id(String course_id) {
+        this.course_id = course_id;
     }
 
-    public String getCourseName() {
-        return courseName;
+    public String getCourse_name() {
+        return course_name;
     }
 
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
+    public void setCourse_name(String course_name) {
+        this.course_name = course_name;
     }
 
-    public String getTeacherId() {
-        return teacherId;
+    public String getTeacher_id() {
+        return teacher_id;
     }
 
-    public void setTeacherId(String teacherId) {
-        this.teacherId = teacherId;
+    public void setTeacher_id(String teacher_id) {
+        this.teacher_id = teacher_id;
     }
 
-    public String getTeacherName() {
-        return teacherName;
+    public String getTeacher_name() {
+        return teacher_name;
     }
 
-    public void setTeacherName(String teacherName) {
-        this.teacherName = teacherName;
+    public void setTeacher_name(String teacher_name) {
+        this.teacher_name = teacher_name;
     }
 
     public Integer getStatus() {
@@ -86,11 +86,11 @@ public class CourseSelection {
         this.status = status;
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public Date getCreate_time() {
+        return create_time;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public void setCreate_time(Date create_time) {
+        this.create_time = create_time;
     }
 }

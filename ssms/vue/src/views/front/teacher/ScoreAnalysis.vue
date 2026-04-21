@@ -11,7 +11,7 @@
             <el-option
               v-for="course in data.courses"
               :key="course.id"
-              :label="`${course.courseName} (${course.courseCode})`"
+              :label="`${course.course_name} (${course.course_code})`"
               :value="course.id"
             ></el-option>
           </el-select>
@@ -19,7 +19,7 @@
         <el-form-item v-if="selectedCourse">
           <div class="selected-course">
             <span class="course-label">当前课程：</span>
-            <span class="course-value">{{ selectedCourse.courseName }} ({{ selectedCourse.courseCode }})</span>
+            <span class="course-value">{{ selectedCourse.course_name }} ({{ selectedCourse.course_code }})</span>
           </div>
         </el-form-item>
       </el-form>
@@ -82,7 +82,6 @@ const data = reactive({
 
 const selectedCourseId = ref('');
 
-// 计算当前选中的课程
 const selectedCourse = computed(() => {
   return data.courses.find(course => course.id === selectedCourseId.value) || null;
 });
@@ -95,12 +94,11 @@ const scoreStats = ref({
 
 let scoreDistributionChart = null;
 
-// 加载教师课程
 const loadCourses = () => {
   const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
   if (user.username) {
     request.get('/course/selectByTeacherId', {
-      params: { teacherId: user.username }
+      params: { teacher_id: user.username }
     }).then(res => {
       if (res.code === '200') {
         data.courses = res.data;
@@ -113,38 +111,32 @@ const loadCourses = () => {
   }
 };
 
-// 加载成绩数据
 const loadScoreData = () => {
   if (!selectedCourseId.value) {
     return;
   }
-  
-  // 获取该课程的学生成绩
+
   request.get('/studentCourse/selectAll', {
-    params: { courseId: selectedCourseId.value.toString() }
+    params: { course_id: selectedCourseId.value.toString() }
   }).then(res => {
     if (res.code === '200') {
       const studentCourses = res.data;
       data.scores = studentCourses.map(sc => sc.score || 0);
-      
+
       if (studentCourses.length > 0) {
-        // 获取所有学生信息
         request.get('/student/selectAll').then(studentRes => {
           if (studentRes.code === '200') {
             const allStudents = studentRes.data;
-            const studentIds = studentCourses.map(sc => sc.studentId);
-            // 筛选出选该课程的学生，并添加成绩信息
+            const studentIds = studentCourses.map(sc => sc.student_id);
             data.studentsWithScore = allStudents.filter(student => studentIds.includes(student.username)).map(student => {
-              const sc = studentCourses.find(s => s.studentId === student.username);
+              const sc = studentCourses.find(s => s.student_id === student.username);
               return {
                 ...student,
                 score: sc ? sc.score || 0 : 0
               };
             });
-            
-            // 计算成绩统计
+
             calculateScoreStats();
-            // 绘制成绩分布图表
             drawScoreDistributionChart();
           }
         });
@@ -163,7 +155,6 @@ const loadScoreData = () => {
   });
 };
 
-// 计算成绩统计
 const calculateScoreStats = () => {
   if (data.scores.length === 0) {
     scoreStats.value = {
@@ -174,14 +165,14 @@ const calculateScoreStats = () => {
     };
     return;
   }
-  
+
   const sum = data.scores.reduce((acc, score) => acc + score, 0);
   const average = sum / data.scores.length;
   const max = Math.max(...data.scores);
   const min = Math.min(...data.scores);
   const passCount = data.scores.filter(score => score >= 60).length;
   const passRate = (passCount / data.scores.length) * 100;
-  
+
   scoreStats.value = {
     average: average.toFixed(2),
     max: max,
@@ -190,18 +181,16 @@ const calculateScoreStats = () => {
   };
 };
 
-// 绘制成绩分布图表
 const drawScoreDistributionChart = () => {
   const chartDom = document.getElementById('scoreDistributionChart');
   if (!chartDom) return;
-  
+
   if (scoreDistributionChart) {
     scoreDistributionChart.dispose();
   }
-  
+
   scoreDistributionChart = echarts.init(chartDom);
-  
-  // 成绩分布区间
+
   const ranges = [
     { name: '0-59', min: 0, max: 59 },
     { name: '60-69', min: 60, max: 69 },
@@ -209,12 +198,11 @@ const drawScoreDistributionChart = () => {
     { name: '80-89', min: 80, max: 89 },
     { name: '90-100', min: 90, max: 100 }
   ];
-  
-  // 统计每个区间的学生数
+
   const dataCount = ranges.map(range => {
     return data.scores.filter(score => score >= range.min && score <= range.max).length;
   });
-  
+
   const option = {
     tooltip: {
       trigger: 'axis',
@@ -247,11 +235,10 @@ const drawScoreDistributionChart = () => {
       }
     ]
   };
-  
+
   scoreDistributionChart.setOption(option);
 };
 
-// 获取成绩等级
 const getScoreLevel = (score) => {
   if (score >= 90) return '优秀';
   if (score >= 80) return '良好';
@@ -260,7 +247,6 @@ const getScoreLevel = (score) => {
   return '不及格';
 };
 
-// 监听窗口大小变化，重新绘制图表
 window.addEventListener('resize', () => {
   if (scoreDistributionChart) {
     scoreDistributionChart.resize();

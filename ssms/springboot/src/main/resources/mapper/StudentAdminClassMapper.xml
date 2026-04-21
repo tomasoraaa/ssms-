@@ -3,14 +3,14 @@
 <mapper namespace="com.lgs.mapper.StudentAdminClassMapper">
     <insert id="insert" parameterType="com.lgs.entity.StudentAdminClass" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO student_admin_class (student_id, admin_class_id, enroll_year, status)
-        VALUES (#{studentId}, #{adminClassId}, #{enrollYear}, #{status})
+        VALUES (#{student_id}, #{admin_class_id}, #{enroll_year}, #{status})
     </insert>
 
     <update id="updateById" parameterType="com.lgs.entity.StudentAdminClass">
         UPDATE student_admin_class
-        SET student_id = #{studentId},
-            admin_class_id = #{adminClassId},
-            enroll_year = #{enrollYear},
+        SET student_id = #{student_id},
+            admin_class_id = #{admin_class_id},
+            enroll_year = #{enroll_year},
             status = #{status}
         WHERE id = #{id}
     </update>
@@ -33,14 +33,14 @@
         LEFT JOIN student s ON sac.student_id COLLATE utf8mb4_unicode_ci = s.username COLLATE utf8mb4_unicode_ci
         LEFT JOIN admin_class ac ON sac.admin_class_id = ac.id
         <where>
-            <if test="studentId != null and studentId != ''">
-                AND sac.student_id LIKE CONCAT('%', #{studentId}, '%')
+            <if test="student_id != null and student_id != ''">
+                AND sac.student_id LIKE CONCAT('%', #{student_id}, '%')
             </if>
-            <if test="adminClassId != null">
-                AND sac.admin_class_id = #{adminClassId}
+            <if test="admin_class_id != null">
+                AND sac.admin_class_id = #{admin_class_id}
             </if>
-            <if test="enrollYear != null and enrollYear != ''">
-                AND sac.enroll_year = #{enrollYear}
+            <if test="enroll_year != null and enroll_year != ''">
+                AND sac.enroll_year = #{enroll_year}
             </if>
             <if test="status != null">
                 AND sac.status = #{status}
@@ -50,6 +50,6 @@
     </select>
 
     <delete id="deleteByStudentIdAndClassId">
-        DELETE FROM student_admin_class WHERE student_id = #{studentId} AND admin_class_id = #{adminClassId}
+        DELETE FROM student_admin_class WHERE student_id = #{student_id} AND admin_class_id = #{admin_class_id}
     </delete>
 </mapper>

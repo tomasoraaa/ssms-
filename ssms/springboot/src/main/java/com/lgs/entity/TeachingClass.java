@@ -2,19 +2,19 @@ package com.lgs.entity;
 
 public class TeachingClass {
     private Integer id;
-    private String classCode;
-    private Integer courseId;
-    private String courseName;
-    private String courseCode;
-    private Integer academicYearId;
-    private String academicYearName;
+    private String class_code;
+    private Integer course_id;
+    private String course_name;
+    private String course_code;
+    private Integer academic_year_id;
+    private String academic_year_name;
     private Integer capacity;
-    private Integer selectedCount;
+    private Integer selected_count;
     private String location;
     private String schedule;
     private Integer status;
-    private String teacherName;
-    private String teacherId;
+    private String teacher_name;
+    private String teacher_id;
 
     public Integer getId() {
         return id;
@@ -24,52 +24,52 @@ public class TeachingClass {
         this.id = id;
     }
 
-    public String getClassCode() {
-        return classCode;
+    public String getClass_code() {
+        return class_code;
     }
 
-    public void setClassCode(String classCode) {
-        this.classCode = classCode;
+    public void setClass_code(String class_code) {
+        this.class_code = class_code;
     }
 
-    public Integer getCourseId() {
-        return courseId;
+    public Integer getCourse_id() {
+        return course_id;
     }
 
-    public void setCourseId(Integer courseId) {
-        this.courseId = courseId;
+    public void setCourse_id(Integer course_id) {
+        this.course_id = course_id;
     }
 
-    public String getCourseName() {
-        return courseName;
+    public String getCourse_name() {
+        return course_name;
     }
 
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
+    public void setCourse_name(String course_name) {
+        this.course_name = course_name;
     }
 
-    public String getCourseCode() {
-        return courseCode;
+    public String getCourse_code() {
+        return course_code;
     }
 
-    public void setCourseCode(String courseCode) {
-        this.courseCode = courseCode;
+    public void setCourse_code(String course_code) {
+        this.course_code = course_code;
     }
 
-    public Integer getAcademicYearId() {
-        return academicYearId;
+    public Integer getAcademic_year_id() {
+        return academic_year_id;
     }
 
-    public void setAcademicYearId(Integer academicYearId) {
-        this.academicYearId = academicYearId;
+    public void setAcademic_year_id(Integer academic_year_id) {
+        this.academic_year_id = academic_year_id;
     }
 
-    public String getAcademicYearName() {
-        return academicYearName;
+    public String getAcademic_year_name() {
+        return academic_year_name;
     }
 
-    public void setAcademicYearName(String academicYearName) {
-        this.academicYearName = academicYearName;
+    public void setAcademic_year_name(String academic_year_name) {
+        this.academic_year_name = academic_year_name;
     }
 
     public Integer getCapacity() {
@@ -80,12 +80,12 @@ public class TeachingClass {
         this.capacity = capacity;
     }
 
-    public Integer getSelectedCount() {
-        return selectedCount;
+    public Integer getSelected_count() {
+        return selected_count;
     }
 
-    public void setSelectedCount(Integer selectedCount) {
-        this.selectedCount = selectedCount;
+    public void setSelected_count(Integer selected_count) {
+        this.selected_count = selected_count;
     }
 
     public String getLocation() {
@@ -112,19 +112,19 @@ public class TeachingClass {
         this.status = status;
     }
 
-    public String getTeacherName() {
-        return teacherName;
+    public String getTeacher_name() {
+        return teacher_name;
     }
 
-    public void setTeacherName(String teacherName) {
-        this.teacherName = teacherName;
+    public void setTeacher_name(String teacher_name) {
+        this.teacher_name = teacher_name;
     }
 
-    public String getTeacherId() {
-        return teacherId;
+    public String getTeacher_id() {
+        return teacher_id;
     }
 
-    public void setTeacherId(String teacherId) {
-        this.teacherId = teacherId;
+    public void setTeacher_id(String teacher_id) {
+        this.teacher_id = teacher_id;
     }
 }

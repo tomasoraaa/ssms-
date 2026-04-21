@@ -18,7 +18,7 @@ mybatis:
   mapper-locations: classpath:mapper/*.xml
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    map-underscore-to-camel-case: true
+    map-underscore-to-camel-case: false
 
 # 文件上传的前缀url
 fileBaseUrl: http://localhost:9090

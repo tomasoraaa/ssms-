@@ -20,7 +20,7 @@ public class CourseWithdrawalController {
     @PostMapping("/add")
     public Result add(@RequestBody CourseWithdrawal courseWithdrawal) {
         courseWithdrawalService.add(courseWithdrawal);
-        activityLogService.recordLog("退课", courseWithdrawal.getStudentId(), "学生 " + courseWithdrawal.getStudentId() + " 提交退课申请", "STUDENT");
+        activityLogService.recordLog("退课", courseWithdrawal.getStudent_id(), "学生 " + courseWithdrawal.getStudent_id() + " 提交退课申请", "STUDENT");
         return Result.success();
     }
 

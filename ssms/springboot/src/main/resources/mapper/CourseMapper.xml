@@ -7,21 +7,21 @@
     <select id="selectAll" resultType="com.lgs.entity.Course">
         select * from course
         <where>
-            <if test="courseName != null"> and (courseName like concat('%', #{courseName}, '%') or courseCode like concat('%', #{courseName}, '%'))</if>
+            <if test="course_name != null"> and (course_name like concat('%', #{course_name}, '%') or course_code like concat('%', #{course_name}, '%'))</if>
         </where>
-        order by courseCode asc
+        order by course_code asc
     </select>
 
     <insert id="insert" parameterType="com.lgs.entity.Course" useGeneratedKeys="true">
-        insert into course(id, courseName, courseCode, credit, description)
-        values (#{id}, #{courseName}, #{courseCode}, #{credit}, #{description})
+        insert into course(id, course_name, course_code, credit, description)
+        values (#{id}, #{course_name}, #{course_code}, #{credit}, #{description})
     </insert>
 
     <update id="updateById" parameterType="com.lgs.entity.Course">
         update course
         <set>
-            <if test="courseName != null">courseName = #{courseName},</if>
-            <if test="courseCode != null">courseCode = #{courseCode},</if>
+            <if test="course_name != null">course_name = #{course_name},</if>
+            <if test="course_code != null">course_code = #{course_code},</if>
             <if test="credit != null">credit = #{credit},</if>
             <if test="description != null">description = #{description},</if>
         </set>
@@ -38,7 +38,7 @@
 
     <select id="selectWithTeachers" resultType="com.lgs.entity.Course">
         select c.*, 
-               GROUP_CONCAT(ct.teacher_name SEPARATOR '、') as teacherName
+               GROUP_CONCAT(ct.teacher_name SEPARATOR '、') as teacher_name
         from course c
         left join course_teacher ct on c.id = ct.course_id
         where c.id = #{id}

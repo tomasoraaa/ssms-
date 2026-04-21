@@ -38,8 +38,9 @@
     <div class="card" style="margin-bottom: 15px">
       <h4>课程成绩列表</h4>
       <el-table :data="data.coursesWithScore" stripe>
-        <el-table-column label="课程代码" prop="courseCode"></el-table-column>
-        <el-table-column label="课程名称" prop="courseName"></el-table-column>
+        <el-table-column label="学年" prop="academic_year_name"></el-table-column>
+        <el-table-column label="课程代码" prop="course_code"></el-table-column>
+        <el-table-column label="课程名称" prop="course_name"></el-table-column>
         <el-table-column label="学分" prop="credit"></el-table-column>
         <el-table-column label="成绩" prop="score"></el-table-column>
         <el-table-column label="绩点" prop="gpa"></el-table-column>
@@ -59,7 +60,6 @@ import request from "@/utils/request";
 import {reactive, ref, onMounted} from "vue";
 import * as echarts from 'echarts';
 
-// 计算绩点的函数
 const calculateGPA = (score) => {
   if (score >= 96) {
     return 4.0;
@@ -101,26 +101,21 @@ const scoreStats = ref({
 
 let scoreDistributionChart = null;
 
-// 加载学生成绩
 const loadStudentScores = () => {
   const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
   if (user.username) {
-    // 先获取学生的课程
     request.get('/course/selectByStudentId', {
-      params: { studentId: user.username }
+      params: { student_id: user.username }
     }).then(res => {
       if (res.code === '200') {
         const courses = res.data;
-        // 再获取学生的成绩
         request.get('/studentCourse/selectByStudentId/' + user.username).then(scoreRes => {
           if (scoreRes.code === '200') {
             const scores = scoreRes.data;
-            // 构建成绩映射
             const scoreMap = {};
             scores.forEach(score => {
-              scoreMap[score.courseId] = score.score || 0;
+              scoreMap[score.course_id] = score.score || 0;
             });
-            // 为课程添加成绩信息和绩点
             data.coursesWithScore = courses.map(course => {
               const score = scoreMap[course.id.toString()] || 0;
               const gpa = calculateGPA(score);
@@ -130,11 +125,8 @@ const loadStudentScores = () => {
                 gpa: gpa.toFixed(1)
               };
             });
-            // 提取成绩数据
             data.scores = data.coursesWithScore.map(course => course.score);
-            // 计算成绩统计
             calculateScoreStats();
-            // 绘制成绩分布图表
             drawScoreDistributionChart();
           }
         });
@@ -143,7 +135,6 @@ const loadStudentScores = () => {
   }
 };
 
-// 计算成绩统计
 const calculateScoreStats = () => {
   if (data.scores.length === 0) {
     scoreStats.value = {
@@ -155,27 +146,24 @@ const calculateScoreStats = () => {
     };
     return;
   }
-  
-  const courseCount = data.scores.length;
+
   const sum = data.scores.reduce((acc, score) => acc + score, 0);
-  const average = sum / courseCount;
+  const average = sum / data.scores.length;
   const max = Math.max(...data.scores);
   const min = Math.min(...data.scores);
-  
-  // 计算平均学分绩点
-  const totalGPAPoints = data.coursesWithScore.reduce((sum, course) => {
+
+  let totalGPA = 0;
+  let totalCredit = 0;
+  data.coursesWithScore.forEach(course => {
     const gpa = calculateGPA(course.score);
-    return sum + (gpa * parseFloat(course.credit || 0));
-  }, 0);
-  
-  const totalCredits = data.coursesWithScore.reduce((sum, course) => {
-    return sum + parseFloat(course.credit || 0);
-  }, 0);
-  
-  const averageGPA = totalCredits > 0 ? totalGPAPoints / totalCredits : 0;
-  
+    const credit = parseFloat(course.credit || 0);
+    totalGPA += gpa * credit;
+    totalCredit += credit;
+  });
+  const averageGPA = totalCredit > 0 ? (totalGPA / totalCredit) : 0;
+
   scoreStats.value = {
-    courseCount: courseCount,
+    courseCount: data.coursesWithScore.length,
     average: average.toFixed(2),
     max: max,
     min: min,
@@ -183,18 +171,16 @@ const calculateScoreStats = () => {
   };
 };
 
-// 绘制成绩分布图表
 const drawScoreDistributionChart = () => {
   const chartDom = document.getElementById('scoreDistributionChart');
   if (!chartDom) return;
-  
+
   if (scoreDistributionChart) {
     scoreDistributionChart.dispose();
   }
-  
+
   scoreDistributionChart = echarts.init(chartDom);
-  
-  // 成绩分布区间
+
   const ranges = [
     { name: '0-59', min: 0, max: 59 },
     { name: '60-69', min: 60, max: 69 },
@@ -202,12 +188,11 @@ const drawScoreDistributionChart = () => {
     { name: '80-89', min: 80, max: 89 },
     { name: '90-100', min: 90, max: 100 }
   ];
-  
-  // 统计每个区间的课程数
+
   const dataCount = ranges.map(range => {
     return data.scores.filter(score => score >= range.min && score <= range.max).length;
   });
-  
+
   const option = {
     tooltip: {
       trigger: 'axis',
@@ -240,11 +225,10 @@ const drawScoreDistributionChart = () => {
       }
     ]
   };
-  
+
   scoreDistributionChart.setOption(option);
 };
 
-// 获取成绩等级
 const getScoreLevel = (score) => {
   if (score >= 90) return '优秀';
   if (score >= 80) return '良好';
@@ -253,7 +237,6 @@ const getScoreLevel = (score) => {
   return '不及格';
 };
 
-// 监听窗口大小变化，重新绘制图表
 window.addEventListener('resize', () => {
   if (scoreDistributionChart) {
     scoreDistributionChart.resize();

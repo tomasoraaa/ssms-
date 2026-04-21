@@ -17,18 +17,18 @@
     </div>
 
     <div class="card" style="margin-bottom: 5px" v-else>
-      <el-input v-model="data.courseName" style="width: 300px; margin-right: 10px" placeholder="请输入课程名称或课程代码查询"></el-input>
+      <el-input v-model="data.course_name" style="width: 300px; margin-right: 10px" placeholder="请输入课程名称或课程代码查询"></el-input>
       <el-button type="primary" @click="loadCourses">查询</el-button>
       <el-button type="info" style="margin: 0 10px" @click="reset">重置</el-button>
 
       <el-table :data="data.courses" stripe style="margin-top: 10px">
-        <el-table-column label="课程代码" prop="courseCode"></el-table-column>
-        <el-table-column label="课程名称" prop="courseName"></el-table-column>
+        <el-table-column label="课程代码" prop="course_code"></el-table-column>
+        <el-table-column label="课程名称" prop="course_name"></el-table-column>
         <el-table-column label="学分" prop="credit"></el-table-column>
         <el-table-column label="任课教师">
           <template #default="scope">
             <span v-if="scope.row.teachers && scope.row.teachers.length > 0">
-              {{ scope.row.teachers.map(t => t.teacherName + (t.isMainTeacher === 1 ? ' (主)' : '')).join(', ') }}
+              {{ scope.row.teachers.map(t => t.teacher_name + (t.is_main_teacher === 1 ? ' (主)' : '')).join(', ') }}
             </span>
             <span v-else style="color: #999">暂无教师</span>
           </template>
@@ -67,8 +67,8 @@
     <div class="card" style="margin-bottom: 5px">
       <h3>我的选课申请</h3>
       <el-table :data="data.selections" stripe style="margin-top: 10px">
-        <el-table-column label="课程名称" prop="courseName"></el-table-column>
-        <el-table-column label="申请时间" prop="createTime" :formatter="formatDate"></el-table-column>
+        <el-table-column label="课程名称" prop="course_name"></el-table-column>
+        <el-table-column label="申请时间" prop="create_time" :formatter="formatDate"></el-table-column>
         <el-table-column label="状态" prop="status" :formatter="formatStatus"></el-table-column>
       </el-table>
     </div>
@@ -76,17 +76,17 @@
     <!-- 教师选择对话框 -->
     <el-dialog
       v-model="data.teacherDialogVisible"
-      :title="data.selectedCourse?.courseName + ' - 选择教师'"
+      :title="data.selectedCourse?.course_name + ' - 选择教师'"
       width="40%"
     >
       <div v-if="data.selectedCourse?.teachers && data.selectedCourse.teachers.length > 0">
         <el-radio-group v-model="data.selectedTeacherId">
           <el-radio
             v-for="teacher in data.selectedCourse.teachers"
-            :key="teacher.teacherId"
-            :label="teacher.teacherId"
+            :key="teacher.teacher_id"
+            :label="teacher.teacher_id"
           >
-            {{ teacher.teacherName }}{{ teacher.isMainTeacher === 1 ? ' (主)' : '' }}
+            {{ teacher.teacher_name }}{{ teacher.is_main_teacher === 1 ? ' (主)' : '' }}
           </el-radio>
         </el-radio-group>
       </div>
@@ -116,7 +116,7 @@ import {reactive, onMounted} from "vue";
 import {ElMessage} from "element-plus";
 
 const data = reactive({
-  courseName: null,
+  course_name: null,
   pageNum: 1,
   pageSize: 10,
   total: 0,
@@ -134,7 +134,7 @@ const loadCourses = () => {
     params: {
       pageNum: data.pageNum,
       pageSize: data.pageSize,
-      courseName: data.courseName
+      course_name: data.course_name
     }
   }).then(res => {
     data.courses = res.data?.list
@@ -162,7 +162,7 @@ const loadSelections = () => {
   if (user.username) {
     console.log('请求选课申请，用户ID:', user.username);
     request.get('/courseSelection/selectAll', {
-      params: { userId: user.username }
+      params: { user_id: user.username }
     }).then(res => {
       console.log('选课申请响应:', res);
       if (res.code === '200') {
@@ -183,7 +183,7 @@ const selectCourse = (course) => {
   if (user.username) {
     if (course.teachers && course.teachers.length > 0) {
       data.selectedCourse = course;
-      data.selectedTeacherId = course.teachers.find(t => t.isMainTeacher === 1)?.teacherId || course.teachers[0]?.teacherId;
+      data.selectedTeacherId = course.teachers.find(t => t.is_main_teacher === 1)?.teacher_id || course.teachers[0]?.teacher_id;
       data.teacherDialogVisible = true;
     } else {
       ElMessage.warning('该课程暂无任课教师，无法选课');
@@ -197,15 +197,15 @@ const selectCourse = (course) => {
 const confirmSelectCourse = () => {
   const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
   if (user.username && data.selectedCourse && data.selectedTeacherId) {
-    const selectedTeacher = data.selectedCourse.teachers.find(t => t.teacherId === data.selectedTeacherId);
+    const selectedTeacher = data.selectedCourse.teachers.find(t => t.teacher_id === data.selectedTeacherId);
     const selection = {
-      userId: user.username,
-      userName: user.name,
-      userType: user.role,
-      courseId: data.selectedCourse.id.toString(),
-      courseName: data.selectedCourse.courseName,
-      teacherId: data.selectedTeacherId,
-      teacherName: selectedTeacher?.teacherName,
+      user_id: user.username,
+      user_name: user.name,
+      user_type: user.role,
+      course_id: data.selectedCourse.id.toString(),
+      course_name: data.selectedCourse.course_name,
+      teacher_id: data.selectedTeacherId,
+      teacher_name: selectedTeacher?.teacher_name,
       status: 0
     };
     console.log('提交选课申请:', selection);
@@ -228,18 +228,18 @@ const confirmSelectCourse = () => {
 
 // 判断课程是否已选
 const isSelected = (courseId) => {
-  return data.selections.some(item => item.courseId === courseId.toString() && item.status !== 2);
+  return data.selections.some(item => item.course_id === courseId.toString() && item.status !== 2);
 }
 
 // 获取课程选择状态
 const getSelectionStatus = (courseId) => {
-  const selection = data.selections.find(item => item.courseId === courseId.toString());
+  const selection = data.selections.find(item => item.course_id === courseId.toString());
   return selection ? selection.status : null;
 }
 
 // 重置
 const reset = () => {
-  data.courseName = null
+  data.course_name = null
   loadCourses()
 }
 

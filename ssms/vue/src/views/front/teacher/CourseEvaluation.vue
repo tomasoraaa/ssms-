@@ -11,7 +11,7 @@
             <el-option
               v-for="course in data.courses"
               :key="course.id"
-              :label="`${course.courseName} (${course.courseCode})`"
+              :label="`${course.course_name} (${course.course_code})`"
               :value="course.id"
             ></el-option>
           </el-select>
@@ -40,8 +40,8 @@
     <div class="card" style="margin-bottom: 15px" v-if="selectedCourseId">
       <h4>评价详情</h4>
       <el-table :data="data.evaluations" stripe>
-        <el-table-column label="学生学号" prop="studentId"></el-table-column>
-        <el-table-column label="学生姓名" prop="studentName"></el-table-column>
+        <el-table-column label="学生学号" prop="student_id"></el-table-column>
+        <el-table-column label="学生姓名" prop="student_name"></el-table-column>
         <el-table-column label="评分">
           <template #default="scope">
             <div class="rating">
@@ -51,10 +51,10 @@
         </el-table-column>
         <el-table-column label="评价内容" prop="content"></el-table-column>
         <el-table-column label="评价时间">
-              <template #default="scope">
-                {{ formatDate(scope.row.evaluationTime) }}
-              </template>
-            </el-table-column>
+          <template #default="scope">
+            {{ formatDate(scope.row.evaluation_time) }}
+          </template>
+        </el-table-column>
       </el-table>
     </div>
   </div>
@@ -65,7 +65,6 @@
 import request from "@/utils/request";
 import {reactive, ref, onMounted} from "vue";
 
-// 格式化日期，只显示年月日
 const formatDate = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
@@ -87,12 +86,11 @@ const evaluationStats = ref({
   goodRate: 0
 });
 
-// 加载教师课程
 const loadCourses = () => {
   const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
   if (user.username) {
     request.get('/course/selectByTeacherId', {
-      params: { teacherId: user.username }
+      params: { teacher_id: user.username }
     }).then(res => {
       if (res.code === '200') {
         data.courses = res.data;
@@ -105,15 +103,13 @@ const loadCourses = () => {
   }
 };
 
-// 加载课程评价
 const loadEvaluations = () => {
   if (!selectedCourseId.value) {
     return;
   }
-  
-  // 调用后端API获取评价数据
+
   request.get('/courseEvaluation/selectByCourseId', {
-    params: { courseId: selectedCourseId.value }
+    params: { course_id: selectedCourseId.value }
   }).then(res => {
     if (res.code === '200') {
       data.evaluations = res.data || [];
@@ -130,7 +126,6 @@ const loadEvaluations = () => {
   });
 };
 
-// 计算评价统计
 const calculateEvaluationStats = () => {
   if (data.evaluations.length === 0) {
     evaluationStats.value = {
@@ -140,17 +135,17 @@ const calculateEvaluationStats = () => {
     };
     return;
   }
-  
+
   const total = data.evaluations.length;
   const sumRating = data.evaluations.reduce((acc, evaluation) => acc + evaluation.rating, 0);
   const averageRating = sumRating / total;
-  const goodCount = data.evaluations.filter(evaluation => evaluation.rating >= 4).length;
+  const goodCount = data.evaluations.filter(e => e.rating >= 4).length;
   const goodRate = (goodCount / total) * 100;
-  
+
   evaluationStats.value = {
     total: total,
     averageRating: averageRating.toFixed(1),
-    goodRate: goodRate.toFixed(2)
+    goodRate: goodRate.toFixed(1)
   };
 };
 

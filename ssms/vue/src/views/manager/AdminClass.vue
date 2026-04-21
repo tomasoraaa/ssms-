@@ -42,13 +42,13 @@
       </el-dialog>
 
       <el-table :data="data.tableData" stripe>
-        <el-table-column label="班级代码" prop="classCode"></el-table-column>
-        <el-table-column label="班级名称" prop="className"></el-table-column>
+        <el-table-column label="班级代码" prop="class_code"></el-table-column>
+        <el-table-column label="班级名称" prop="class_name"></el-table-column>
         <el-table-column label="年级" prop="grade"></el-table-column>
         <el-table-column label="专业" prop="major"></el-table-column>
-        <el-table-column label="班主任" prop="counselorName">
+        <el-table-column label="班主任" prop="counselor_name">
           <template #default="scope">
-            <span v-if="scope.row.counselorName">{{ scope.row.counselorName }}</span>
+            <span v-if="scope.row.counselor_name">{{ scope.row.counselor_name }}</span>
             <span v-else style="color: #999">未分配</span>
           </template>
         </el-table-column>
@@ -92,8 +92,8 @@
 
       <el-dialog title="行政班信息" width="500px" v-model="data.formVisible" :close-on-click-modal="false" destroy-on-close>
         <el-form :model="data.form" label-width="100px" style="padding-right: 50px">
-          <el-form-item label="班级代码" prop="classCode">
-            <el-input v-model="data.form.classCode" placeholder="如：CS2024-1" />
+          <el-form-item label="班级代码" prop="class_code">
+            <el-input v-model="data.form.class_code" placeholder="如：CS2024-1" />
           </el-form-item>
           <el-form-item label="年级" prop="grade">
             <el-input v-model="data.form.grade" placeholder="如：2024" />
@@ -103,11 +103,11 @@
               <el-option v-for="major in majors" :key="major" :label="major" :value="major" />
             </el-select>
           </el-form-item>
-          <el-form-item label="班级名称" prop="className">
-            <el-input v-model="data.form.className" placeholder="如：2024级计算机1班" />
+          <el-form-item label="班级名称" prop="class_name">
+            <el-input v-model="data.form.class_name" placeholder="如：2024级计算机1班" />
           </el-form-item>
-          <el-form-item label="班主任" prop="counselorId">
-            <el-select v-model="data.form.counselorId" placeholder="请选择班主任" style="width: 100%" filterable>
+          <el-form-item label="班主任" prop="counselor_id">
+            <el-select v-model="data.form.counselor_id" placeholder="请选择班主任" style="width: 100%" filterable>
               <el-option v-for="t in teachers" :key="t.username" :label="t.name + ' (' + t.username + ')'" :value="t.username" />
             </el-select>
           </el-form-item>
@@ -122,13 +122,13 @@
 
       <el-dialog title="班级学生管理" width="80%" v-model="data.studentsVisible" :close-on-click-modal="false">
         <div style="margin-bottom: 15px;">
-          <span style="margin-right: 20px;">班级：{{ data.currentClass?.className }}</span>
+          <span style="margin-right: 20px;">班级：{{ data.currentClass?.class_name }}</span>
           <el-button type="primary" size="small" @click="showAddStudentDialog">添加学生</el-button>
         </div>
         <el-table :data="data.classStudents" stripe>
-          <el-table-column label="学号" prop="studentId"></el-table-column>
-          <el-table-column label="姓名" prop="studentName"></el-table-column>
-          <el-table-column label="入学年份" prop="enrollYear"></el-table-column>
+          <el-table-column label="学号" prop="student_id"></el-table-column>
+          <el-table-column label="姓名" prop="student_name"></el-table-column>
+          <el-table-column label="入学年份" prop="enroll_year"></el-table-column>
           <el-table-column label="状态">
             <template #default="scope">
               <el-tag v-if="scope.row.status === 1" type="success">在读</el-tag>
@@ -203,7 +203,7 @@ const load = () => {
     params: {
       pageNum: data.pageNum,
       pageSize: data.pageSize,
-      className: data.searchKey
+      class_name: data.searchKey
     }
   }).then(res => {
     if (res.code === '200') {
@@ -343,7 +343,7 @@ const viewStudents = (row) => {
 
 const loadClassStudents = (classId) => {
   request.get('/studentAdminClass/selectAll', {
-    params: {adminClassId: classId}
+    params: {admin_class_id: classId}
   }).then(res => {
     if (res.code === '200') {
       data.classStudents = res.data
@@ -373,9 +373,9 @@ const searchStudents = () => {
 
 const addStudent = (student) => {
   const sac = {
-    studentId: student.username,
-    adminClassId: data.currentClass.id,
-    enrollYear: student.username.substring(0, 4),
+    student_id: student.username,
+    admin_class_id: data.currentClass.id,
+    enroll_year: student.username.substring(0, 4),
     status: 1
   }
   request.post('/studentAdminClass/add', sac).then(res => {

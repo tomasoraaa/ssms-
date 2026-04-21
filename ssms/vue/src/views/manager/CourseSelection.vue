@@ -9,13 +9,13 @@
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="用户类型">
-              <el-select v-model="data.assignForm.userType" placeholder="请选择用户类型" @change="loadUsers">
+              <el-select v-model="data.assignForm.user_type" placeholder="请选择用户类型" @change="loadUsers">
                 <el-option label="学生" value="STUDENT"></el-option>
                 <el-option label="教师" value="TEACHER"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="用户">
-              <el-select v-model="data.assignForm.userId" filterable remote :remote-method="searchUser" placeholder="请输入用户姓名或学号/工号搜索">
+              <el-select v-model="data.assignForm.user_id" filterable remote :remote-method="searchUser" placeholder="请输入用户姓名或学号/工号搜索">
                 <el-option
                   v-for="user in data.users"
                   :key="user.username"
@@ -27,11 +27,11 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="课程">
-              <el-select v-model="data.assignForm.courseId" filterable placeholder="请选择课程">
+              <el-select v-model="data.assignForm.course_id" filterable placeholder="请选择课程">
                 <el-option
                   v-for="course in data.courses"
                   :key="course.id"
-                  :label="course.courseName"
+                  :label="course.course_name"
                   :value="course.id.toString()"
                 />
               </el-select>
@@ -63,11 +63,11 @@
       </div>
 
       <el-table :data="data.selections" stripe>
-        <el-table-column label="用户类型" prop="userType" :formatter="formatUserType"></el-table-column>
-        <el-table-column label="用户学号/工号" prop="userId"></el-table-column>
-        <el-table-column label="用户姓名" prop="userName"></el-table-column>
-        <el-table-column label="课程名称" prop="courseName"></el-table-column>
-        <el-table-column label="申请时间" prop="createTime" :formatter="formatDate"></el-table-column>
+        <el-table-column label="用户类型" prop="user_type" :formatter="formatUserType"></el-table-column>
+        <el-table-column label="用户学号/工号" prop="user_id"></el-table-column>
+        <el-table-column label="用户姓名" prop="user_name"></el-table-column>
+        <el-table-column label="课程名称" prop="course_name"></el-table-column>
+        <el-table-column label="申请时间" prop="create_time" :formatter="formatDate"></el-table-column>
         <el-table-column label="状态" prop="status" :formatter="formatStatus"></el-table-column>
         <el-table-column label="操作" align="center" width="200">
           <template #default="scope">
@@ -88,14 +88,14 @@ import {ElMessage} from "element-plus";
 
 const data = reactive({
   assignForm: {
-    userType: '',
-    userId: '',
-    courseId: ''
+    user_type: '',
+    user_id: '',
+    course_id: ''
   },
   users: [],
   courses: [],
   filter: {
-    userType: '',
+    user_type: '',
     status: ''
   },
   selections: []
@@ -106,9 +106,9 @@ const loadUsers = () => {
   // 先清空用户列表
   data.users = [];
   // 清空用户选择
-  data.assignForm.userId = '';
+  data.assignForm.user_id = '';
   
-  if (data.assignForm.userType === 'STUDENT') {
+  if (data.assignForm.user_type === 'STUDENT') {
     request.get('/student/selectAll').then(res => {
       if (res.code === '200') {
         data.users = res.data;
@@ -134,7 +134,7 @@ const searchUser = (query) => {
     return;
   }
   
-  if (data.assignForm.userType === 'STUDENT') {
+  if (data.assignForm.user_type === 'STUDENT') {
     request.get('/student/selectPage', {
       params: {
         pageNum: 1,
@@ -148,7 +148,7 @@ const searchUser = (query) => {
     }).catch(err => {
       console.error('搜索学生失败:', err);
     })
-  } else if (data.assignForm.userType === 'TEACHER') {
+  } else if (data.assignForm.user_type === 'TEACHER') {
     request.get('/teacher/selectPage', {
       params: {
         pageNum: 1,
@@ -182,7 +182,7 @@ const loadSelections = () => {
   console.log('请求选课申请，过滤条件:', data.filter);
   request.get('/courseSelection/selectAll', {
     params: {
-      userType: data.filter.userType,
+      user_type: data.filter.user_type,
       status: data.filter.status
     }
   }).then(res => {
@@ -198,24 +198,24 @@ const loadSelections = () => {
 
 // 分配课程
 const assignCourse = () => {
-  if (!data.assignForm.userId || !data.assignForm.courseId) {
+  if (!data.assignForm.user_id || !data.assignForm.course_id) {
     ElMessage.warning('请选择用户和课程');
     return;
   }
 
   // 直接添加学生课程关联
-  if (data.assignForm.userType === 'STUDENT') {
+  if (data.assignForm.user_type === 'STUDENT') {
     const studentCourse = {
-      studentId: data.assignForm.userId,
-      courseId: data.assignForm.courseId
+      student_id: data.assignForm.user_id,
+      course_id: data.assignForm.course_id
     };
     request.post('/studentCourse/add', studentCourse).then(res => {
       if (res.code === '200') {
         ElMessage.success('课程分配成功');
         data.assignForm = {
-          userType: '',
-          userId: '',
-          courseId: ''
+          user_type: '',
+          user_id: '',
+          course_id: ''
         };
         data.users = [];
       } else {
@@ -223,21 +223,21 @@ const assignCourse = () => {
       }
     })
   } else {
-    // 教师课程分配（直接修改课程的teacherId）
-    const course = data.courses.find(c => c.id.toString() === data.assignForm.courseId);
+    // 教师课程分配（直接修改课程的teacher_id）
+    const course = data.courses.find(c => c.id.toString() === data.assignForm.course_id);
     if (course) {
       const updatedCourse = {
         id: course.id,
-        teacherId: data.assignForm.userId,
-        teacherName: data.users.find(u => u.username === data.assignForm.userId)?.name
+        teacher_id: data.assignForm.user_id,
+        teacher_name: data.users.find(u => u.username === data.assignForm.user_id)?.name
       };
       request.put('/course/update', updatedCourse).then(res => {
         if (res.code === '200') {
           ElMessage.success('课程分配成功');
           data.assignForm = {
-            userType: '',
-            userId: '',
-            courseId: ''
+            user_type: '',
+            user_id: '',
+            course_id: ''
           };
           data.users = [];
         } else {

@@ -56,12 +56,12 @@ public class CourseSelectionServiceImpl implements CourseSelectionService {
         if (!selections.isEmpty()) {
             CourseSelection selected = selections.get(0);
             // 为学生添加课程关联
-                if ("STUDENT".equals(selected.getUserType())) {
+                if ("STUDENT".equals(selected.getUser_type())) {
                     StudentCourse studentCourse = new StudentCourse();
-                    studentCourse.setStudentId(selected.getUserId());
-                    studentCourse.setCourseId(selected.getCourseId());
-                    studentCourse.setTeacherId(selected.getTeacherId());
-                    studentCourse.setTeacherName(selected.getTeacherName());
+                    studentCourse.setStudent_id(selected.getUser_id());
+                    studentCourse.setCourse_id(selected.getCourse_id());
+                    studentCourse.setTeacher_id(selected.getTeacher_id());
+                    studentCourse.setTeacher_name(selected.getTeacher_name());
                     studentCourse.setStatus(1); // 1表示正常
                     // 检查是否已存在关联
                     List<StudentCourse> existing = studentCourseMapper.selectAll(studentCourse);

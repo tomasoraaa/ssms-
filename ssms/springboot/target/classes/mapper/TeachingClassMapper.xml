@@ -3,16 +3,16 @@
 <mapper namespace="com.lgs.mapper.TeachingClassMapper">
     <insert id="insert" parameterType="com.lgs.entity.TeachingClass" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO teaching_class (class_code, course_id, academic_year_id, capacity, selected_count, location, schedule, status)
-        VALUES (#{classCode}, #{courseId}, #{academicYearId}, #{capacity}, #{selectedCount}, #{location}, #{schedule}, #{status})
+        VALUES (#{class_code}, #{course_id}, #{academic_year_id}, #{capacity}, #{selected_count}, #{location}, #{schedule}, #{status})
     </insert>
 
     <update id="updateById" parameterType="com.lgs.entity.TeachingClass">
         UPDATE teaching_class
-        SET class_code = #{classCode},
-            course_id = #{courseId},
-            academic_year_id = #{academicYearId},
+        SET class_code = #{class_code},
+            course_id = #{course_id},
+            academic_year_id = #{academic_year_id},
             capacity = #{capacity},
-            selected_count = #{selectedCount},
+            selected_count = #{selected_count},
             location = #{location},
             schedule = #{schedule},
             status = #{status}
@@ -24,7 +24,7 @@
     </delete>
 
     <select id="selectById" parameterType="java.lang.Integer" resultType="com.lgs.entity.TeachingClass">
-        SELECT tc.*, c.courseName, c.courseCode, ay.year as academic_year_name, ay.semester,
+        SELECT tc.*, c.course_name, c.course_code, ay.year as academic_year_name, ay.semester,
                ct.teacher_name, ct.teacher_id
         FROM teaching_class tc
         LEFT JOIN course c ON tc.course_id = c.id
@@ -34,7 +34,7 @@
     </select>
 
     <select id="selectAll" parameterType="com.lgs.entity.TeachingClass" resultType="com.lgs.entity.TeachingClass">
-        SELECT tc.*, c.courseName, c.courseCode, ay.year, ay.semester,
+        SELECT tc.*, c.course_name, c.course_code, ay.year, ay.semester,
                (CASE WHEN ay.semester = 1 THEN CONCAT(ay.year, ' 第一学期') ELSE CONCAT(ay.year, ' 第二学期') END) as academic_year_name,
                ct.teacher_name, ct.teacher_id
         FROM teaching_class tc
@@ -42,41 +42,39 @@
         LEFT JOIN academic_year ay ON tc.academic_year_id = ay.id
         LEFT JOIN course_teacher ct ON tc.id = ct.teaching_class_id AND ct.is_main_teacher = 1
         <where>
-            <if test="courseId != null">
-                AND tc.course_id = #{courseId}
+            <if test="course_id != null">
+                AND tc.course_id = #{course_id}
             </if>
-            <if test="academicYearId != null">
-                AND tc.academic_year_id = #{academicYearId}
+            <if test="academic_year_id != null">
+                AND tc.academic_year_id = #{academic_year_id}
             </if>
             <if test="status != null">
                 AND tc.status = #{status}
             </if>
-            <if test="classCode != null and classCode != ''">
-                AND tc.class_code LIKE CONCAT('%', #{classCode}, '%')
+            <if test="class_code != null and class_code != ''">
+                AND tc.class_code LIKE CONCAT('%', #{class_code}, '%')
             </if>
         </where>
         ORDER BY ay.year DESC, ay.semester, tc.class_code
     </select>
 
     <select id="selectByAcademicYearId" parameterType="java.lang.Integer" resultType="com.lgs.entity.TeachingClass">
-        SELECT tc.*, c.courseName, c.courseCode,
+        SELECT tc.*, c.course_name, c.course_code,
                ct.teacher_name, ct.teacher_id
         FROM teaching_class tc
         LEFT JOIN course c ON tc.course_id = c.id
         LEFT JOIN course_teacher ct ON tc.id = ct.teaching_class_id AND ct.is_main_teacher = 1
-        WHERE tc.academic_year_id = #{academicYearId}
-        ORDER BY tc.class_code
+        WHERE tc.academic_year_id = #{academic_year_id}
     </select>
 
     <select id="selectAvailable" parameterType="java.lang.Integer" resultType="com.lgs.entity.TeachingClass">
-        SELECT tc.*, c.courseName, c.courseCode, c.credit,
+        SELECT tc.*, c.course_name, c.course_code, c.credit,
                ct.teacher_name, ct.teacher_id
         FROM teaching_class tc
         LEFT JOIN course c ON tc.course_id = c.id
         LEFT JOIN course_teacher ct ON tc.id = ct.teaching_class_id AND ct.is_main_teacher = 1
-        WHERE tc.academic_year_id = #{academicYearId}
+        WHERE tc.academic_year_id = #{academic_year_id}
           AND tc.status = 1
           AND tc.selected_count &lt; tc.capacity
-        ORDER BY c.courseCode, tc.class_code
     </select>
 </mapper>

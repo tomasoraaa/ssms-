@@ -20,7 +20,7 @@ public class CourseSelectionController {
     @PostMapping("/add")
     public Result add(@RequestBody CourseSelection courseSelection) {
         courseSelectionService.add(courseSelection);
-        activityLogService.recordLog("选课", courseSelection.getUserId(), "学生 " + courseSelection.getUserId() + " 申请选课", "STUDENT");
+        activityLogService.recordLog("选课", courseSelection.getUser_id(), "学生 " + courseSelection.getUser_id() + " 申请选课", "STUDENT");
         return Result.success();
     }
 

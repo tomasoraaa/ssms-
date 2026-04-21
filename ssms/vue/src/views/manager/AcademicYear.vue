@@ -18,10 +18,10 @@
             <span>第{{ scope.row.semester }}学期</span>
           </template>
         </el-table-column>
-        <el-table-column label="开始日期" prop="startDate"></el-table-column>
-        <el-table-column label="结束日期" prop="endDate"></el-table-column>
-        <el-table-column label="选课开始时间" prop="selectionStart"></el-table-column>
-        <el-table-column label="选课结束时间" prop="selectionEnd"></el-table-column>
+        <el-table-column label="开始日期" prop="start_date"></el-table-column>
+        <el-table-column label="结束日期" prop="end_date"></el-table-column>
+        <el-table-column label="选课开始时间" prop="selection_start"></el-table-column>
+        <el-table-column label="选课结束时间" prop="selection_end"></el-table-column>
         <el-table-column label="状态" prop="status">
           <template #default="scope">
             <el-tag v-if="scope.row.status === 0" type="info">未开启</el-tag>
@@ -59,17 +59,17 @@
               <el-option :value="2" label="第二学期"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="开始日期" prop="startDate">
-            <el-date-picker v-model="data.form.startDate" type="date" placeholder="选择日期" style="width: 100%" value-format="YYYY-MM-DD" />
+          <el-form-item label="开始日期" prop="start_date">
+            <el-date-picker v-model="data.form.start_date" type="date" placeholder="选择日期" style="width: 100%" value-format="YYYY-MM-DD" />
           </el-form-item>
-          <el-form-item label="结束日期" prop="endDate">
-            <el-date-picker v-model="data.form.endDate" type="date" placeholder="选择日期" style="width: 100%" value-format="YYYY-MM-DD" />
+          <el-form-item label="结束日期" prop="end_date">
+            <el-date-picker v-model="data.form.end_date" type="date" placeholder="选择日期" style="width: 100%" value-format="YYYY-MM-DD" />
           </el-form-item>
-          <el-form-item label="选课开始时间" prop="selectionStart">
-            <el-date-picker v-model="data.form.selectionStart" type="datetime" placeholder="选择时间" style="width: 100%" value-format="YYYY-MM-DD HH:mm:ss" />
+          <el-form-item label="选课开始时间" prop="selection_start">
+            <el-date-picker v-model="data.form.selection_start" type="datetime" placeholder="选择时间" style="width: 100%" value-format="YYYY-MM-DD HH:mm:ss" />
           </el-form-item>
-          <el-form-item label="选课结束时间" prop="selectionEnd">
-            <el-date-picker v-model="data.form.selectionEnd" type="datetime" placeholder="选择时间" style="width: 100%" value-format="YYYY-MM-DD HH:mm:ss" />
+          <el-form-item label="选课结束时间" prop="selection_end">
+            <el-date-picker v-model="data.form.selection_end" type="datetime" placeholder="选择时间" style="width: 100%" value-format="YYYY-MM-DD HH:mm:ss" />
           </el-form-item>
           <el-form-item label="状态" prop="status">
             <el-select v-model="data.form.status" placeholder="请选择状态" style="width: 100%">

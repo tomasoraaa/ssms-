@@ -2,8 +2,8 @@ package com.lgs.entity;
 
 public class SystemConfig {
     private Integer id;
-    private String configKey;
-    private String configValue;
+    private String config_key;
+    private String config_value;
     private String description;
 
     public Integer getId() {
@@ -14,20 +14,20 @@ public class SystemConfig {
         this.id = id;
     }
 
-    public String getConfigKey() {
-        return configKey;
+    public String getConfig_key() {
+        return config_key;
     }
 
-    public void setConfigKey(String configKey) {
-        this.configKey = configKey;
+    public void setConfig_key(String config_key) {
+        this.config_key = config_key;
     }
 
-    public String getConfigValue() {
-        return configValue;
+    public String getConfig_value() {
+        return config_value;
     }
 
-    public void setConfigValue(String configValue) {
-        this.configValue = configValue;
+    public void setConfig_value(String config_value) {
+        this.config_value = config_value;
     }
 
     public String getDescription() {

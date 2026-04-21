@@ -17,43 +17,41 @@ public class CourseEvaluationServiceImpl implements CourseEvaluationService {
 
     @Override
     public boolean saveOrUpdate(CourseEvaluation courseEvaluation) {
-        courseEvaluation.setEvaluationTime(new Date());
+        courseEvaluation.setEvaluation_time(new Date());
         CourseEvaluation existing = courseEvaluationMapper.selectByStudentAndCourse(
-                courseEvaluation.getStudentId(), courseEvaluation.getCourseId());
+                courseEvaluation.getStudent_id(), courseEvaluation.getCourse_id());
         if (existing != null) {
-            // 更新现有评价
             return courseEvaluationMapper.update(courseEvaluation) > 0;
         } else {
-            // 添加新评价
             return courseEvaluationMapper.insert(courseEvaluation) > 0;
         }
     }
-    
+
     @Override
     public List<CourseEvaluation> getAll() {
         return courseEvaluationMapper.selectAll();
     }
-    
+
     @Override
     public boolean deleteById(Integer id) {
         return courseEvaluationMapper.deleteById(id) > 0;
     }
 
     @Override
-    public CourseEvaluation getByStudentAndCourse(String studentId, Integer courseId) {
-        return courseEvaluationMapper.selectByStudentAndCourse(studentId, courseId);
+    public CourseEvaluation getByStudentAndCourse(String student_id, Integer course_id) {
+        return courseEvaluationMapper.selectByStudentAndCourse(student_id, course_id);
     }
 
     @Override
-    public List<CourseEvaluation> getByCourseId(Integer courseId) {
-        return courseEvaluationMapper.selectByCourseId(courseId);
+    public List<CourseEvaluation> getByCourseId(Integer course_id) {
+        return courseEvaluationMapper.selectByCourseId(course_id);
     }
 
     @Override
-    public List<CourseEvaluation> getByTeacherId(String teacherId) {
-        return courseEvaluationMapper.selectByTeacherId(teacherId);
+    public List<CourseEvaluation> getByTeacherId(String teacher_id) {
+        return courseEvaluationMapper.selectByTeacherId(teacher_id);
     }
-    
+
     @Override
     public int count() {
         return courseEvaluationMapper.count();

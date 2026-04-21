@@ -13,32 +13,32 @@ public class SystemConfigServiceImpl implements SystemConfigService {
     private SystemConfigMapper systemConfigMapper;
 
     @Override
-    public SystemConfig getByKey(String configKey) {
-        return systemConfigMapper.selectByKey(configKey);
+    public SystemConfig getByKey(String config_key) {
+        return systemConfigMapper.selectByKey(config_key);
     }
 
     @Override
     public boolean isCourseSelectionEnabled() {
         SystemConfig config = systemConfigMapper.selectByKey("course_selection_enabled");
-        return config != null && "true".equals(config.getConfigValue());
+        return config != null && "true".equals(config.getConfig_value());
     }
 
     @Override
     public boolean isTeacherScoreEntryEnabled() {
         SystemConfig config = systemConfigMapper.selectByKey("teacher_score_entry_enabled");
-        return config != null && "true".equals(config.getConfigValue());
+        return config != null && "true".equals(config.getConfig_value());
     }
 
     @Override
-    public boolean updateConfig(String configKey, String configValue) {
-        SystemConfig config = systemConfigMapper.selectByKey(configKey);
+    public boolean updateConfig(String config_key, String config_value) {
+        SystemConfig config = systemConfigMapper.selectByKey(config_key);
         if (config == null) {
             config = new SystemConfig();
-            config.setConfigKey(configKey);
-            config.setConfigValue(configValue);
+            config.setConfig_key(config_key);
+            config.setConfig_value(config_value);
             return systemConfigMapper.insert(config) > 0;
         }
-        config.setConfigValue(configValue);
+        config.setConfig_value(config_value);
         return systemConfigMapper.updateByKey(config) > 0;
     }
 }

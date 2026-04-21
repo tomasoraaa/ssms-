@@ -2,14 +2,14 @@ package com.lgs.entity;
 
 public class Course {
     private Integer id;
-    private String courseName;
-    private String courseCode;
+    private String course_name;
+    private String course_code;
     private Integer credit;
     private String description;
-    private String teacherName;
-    private String teacherId;
+    private String teacher_name;
+    private String teacher_id;
     private Double score;
-    private String academicYearName; // 修读学期
+    private String academic_year_name; // 修读学期
 
     public Integer getId() {
         return id;
@@ -19,20 +19,20 @@ public class Course {
         this.id = id;
     }
 
-    public String getCourseName() {
-        return courseName;
+    public String getCourse_name() {
+        return course_name;
     }
 
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
+    public void setCourse_name(String course_name) {
+        this.course_name = course_name;
     }
 
-    public String getCourseCode() {
-        return courseCode;
+    public String getCourse_code() {
+        return course_code;
     }
 
-    public void setCourseCode(String courseCode) {
-        this.courseCode = courseCode;
+    public void setCourse_code(String course_code) {
+        this.course_code = course_code;
     }
 
     public Integer getCredit() {
@@ -51,20 +51,20 @@ public class Course {
         this.description = description;
     }
 
-    public String getTeacherName() {
-        return teacherName;
+    public String getTeacher_name() {
+        return teacher_name;
     }
 
-    public void setTeacherName(String teacherName) {
-        this.teacherName = teacherName;
+    public void setTeacher_name(String teacher_name) {
+        this.teacher_name = teacher_name;
     }
 
-    public String getTeacherId() {
-        return teacherId;
+    public String getTeacher_id() {
+        return teacher_id;
     }
 
-    public void setTeacherId(String teacherId) {
-        this.teacherId = teacherId;
+    public void setTeacher_id(String teacher_id) {
+        this.teacher_id = teacher_id;
     }
 
     public Double getScore() {
@@ -75,11 +75,11 @@ public class Course {
         this.score = score;
     }
 
-    public String getAcademicYearName() {
-        return academicYearName;
+    public String getAcademic_year_name() {
+        return academic_year_name;
     }
 
-    public void setAcademicYearName(String academicYearName) {
-        this.academicYearName = academicYearName;
+    public void setAcademic_year_name(String academic_year_name) {
+        this.academic_year_name = academic_year_name;
     }
 }
