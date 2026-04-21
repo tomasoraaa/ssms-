@@ -21,10 +21,10 @@
             <template #default="scope">
               <div v-if="scope.row.teachers && scope.row.teachers.length > 0">
                 <span v-if="scope.row.teachers.length === 1">
-                  {{ scope.row.teachers[0].teacherName }}
+                  {{ scope.row.teachers[0].teacher_name }}
                 </span>
                 <template v-else>
-                  <span>{{ scope.row.teachers[0].teacherName }} 等 {{ scope.row.teachers.length }} 位教师</span>
+                  <span>{{ scope.row.teachers[0].teacher_name }} 等 {{ scope.row.teachers.length }} 位教师</span>
                   <el-button
                     type="text"
                     size="small"
@@ -306,10 +306,26 @@ const load = () => {
 const loadTeachersForCourse = (courseId, course) => {
   request.get(`/courseTeacher/selectByCourseId/${courseId}`).then(res => {
     if (res.code === '200') {
-      // 过滤掉已经关联到教学班的教师，只保留课程级别的教师
-      course.teachers = res.data.filter(teacher => !teacher.teachingClassId)
+      course.teachers = filterAndDeduplicateTeachers(res.data)
     }
   })
+}
+
+// 过滤和去重教师列表
+const filterAndDeduplicateTeachers = (teachers) => {
+  // 过滤掉已经关联到教学班的教师，只保留课程级别的教师
+  // 去重处理，避免教师信息重复显示
+  const teacherMap = new Map()
+  teachers.forEach(teacher => {
+    // 只保留未关联到教学班的教师
+    if (!teacher.teaching_class_id) {
+      // 使用教师ID作为key，避免重复
+      if (!teacherMap.has(teacher.teacher_id)) {
+        teacherMap.set(teacher.teacher_id, teacher)
+      }
+    }
+  })
+  return Array.from(teacherMap.values())
 }
 
 load()
@@ -522,9 +538,16 @@ const removeTeacher = (teacher) => {
 
 // 显示教师详情弹窗
 const showTeachersDialog = (teachers) => {
-  // 过滤掉已经关联到教学班的教师，只保留课程级别的教师，然后按主教师优先排序
-  data.currentTeachers = [...teachers].filter(teacher => !teacher.teachingClassId).sort((a, b) => b.isMainTeacher - a.isMainTeacher);
-  data.teachersDialogVisible = true;
+  // 过滤和去重教师列表
+  const filteredTeachers = filterAndDeduplicateTeachers(teachers)
+  // 转换为数组并排序
+  data.currentTeachers = filteredTeachers.sort((a, b) => {
+    // 按is_main_teacher字段排序，主教师优先
+    const isMainA = a.is_main_teacher || 0
+    const isMainB = b.is_main_teacher || 0
+    return isMainB - isMainA
+  })
+  data.teachersDialogVisible = true
 }
 
 </script>

@@ -5,16 +5,22 @@ import com.github.pagehelper.PageInfo;
 import com.lgs.entity.Course;
 import com.lgs.entity.CourseTeacher;
 import com.lgs.entity.StudentCourse;
+import com.lgs.entity.TeachingClass;
 import com.lgs.mapper.CourseMapper;
 import com.lgs.mapper.CourseTeacherMapper;
 import com.lgs.mapper.StudentCourseMapper;
 import com.lgs.service.AcademicYearService;
 import com.lgs.service.CourseService;
+import com.lgs.service.TeachingClassService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -30,6 +36,9 @@ public class CourseServiceImpl implements CourseService {
 
     @Resource
     private AcademicYearService academicYearService;
+
+    @Resource
+    private TeachingClassService teachingClassService;
 
     @Override
     public void add(Course course) {
@@ -102,15 +111,50 @@ public class CourseServiceImpl implements CourseService {
         // 先查询教师关联的课程
         List<CourseTeacher> courseTeachers = courseTeacherMapper.selectByTeacherId(teacher_id);
 
-        // 再根据课程ID查询课程信息
-        List<Course> courses = new ArrayList<>();
+        // 再根据课程ID查询课程信息，使用Map去重
+        Map<Integer, Course> courseMap = new HashMap<>();
+        Map<Integer, List<CourseTeacher>> courseTeacherMap = new HashMap<>();
+        
+        // 先收集每个课程的教师关联
         for (CourseTeacher ct : courseTeachers) {
-            Course course = courseMapper.selectById(ct.getCourse_id());
+            courseTeacherMap.computeIfAbsent(ct.getCourse_id(), k -> new ArrayList<>()).add(ct);
+        }
+        
+        // 为每个课程加载信息和关联的教学班
+        for (Map.Entry<Integer, List<CourseTeacher>> entry : courseTeacherMap.entrySet()) {
+            Integer courseId = entry.getKey();
+            List<CourseTeacher> courseTeacherList = entry.getValue();
+            
+            Course course = courseMapper.selectById(courseId);
             if (course != null) {
-                courses.add(course);
+                courseMap.put(courseId, course);
+                
+                // 收集该教师在该课程中的教学班ID
+                Set<Integer> teachingClassIds = new HashSet<>();
+                boolean isGeneralTeacher = false;
+                for (CourseTeacher ct : courseTeacherList) {
+                    if (ct.getTeaching_class_id() != null) {
+                        teachingClassIds.add(ct.getTeaching_class_id());
+                    } else {
+                        // 通用课程教师，没有关联特定教学班
+                        isGeneralTeacher = true;
+                    }
+                }
+                
+                // 加载关联的教学班列表，并过滤出该教师教授的教学班
+                List<TeachingClass> allTeachingClasses = teachingClassService.selectByCourseId(courseId);
+                List<TeachingClass> teacherTeachingClasses = new ArrayList<>();
+                for (TeachingClass tc : allTeachingClasses) {
+                    if (isGeneralTeacher || teachingClassIds.contains(tc.getId())) {
+                        teacherTeachingClasses.add(tc);
+                    }
+                }
+                course.setTeachingClasses(teacherTeachingClasses);
             }
         }
-        return courses;
+        
+        // 将Map转换为List
+        return new ArrayList<>(courseMap.values());
     }
 
     @Override

@@ -298,7 +298,6 @@ const save = () => {
     if (res.code === '200') {
       ElMessage.success(formData.id ? '修改成功' : '新增成功')
       data.formVisible = false
-      load()
 
       if (data.form.teacher_id) {
         if (!formData.id) {
@@ -310,7 +309,10 @@ const save = () => {
             teaching_class_id: res.data?.id || formData.id,
             is_main_teacher: 1
           }
-          request.post('/courseTeacher/add', ct)
+          request.post('/courseTeacher/add', ct).then(() => {
+            // 添加完成后重新加载数据
+            load()
+          })
         } else {
           // 编辑时更新course_teacher记录
           // 先删除原有的记录
@@ -323,9 +325,15 @@ const save = () => {
               teaching_class_id: formData.id,
               is_main_teacher: 1
             }
-            request.post('/courseTeacher/add', ct)
+            request.post('/courseTeacher/add', ct).then(() => {
+              // 更新完成后重新加载数据
+              load()
+            })
           })
         }
+      } else {
+        // 如果没有教师信息，直接重新加载数据
+        load()
       }
     } else {
       ElMessage.error(res.msg)

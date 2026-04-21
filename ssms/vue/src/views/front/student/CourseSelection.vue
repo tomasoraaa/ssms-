@@ -17,95 +17,96 @@
     </div>
 
     <div class="card" style="margin-bottom: 5px" v-else>
-      <el-input v-model="data.course_name" style="width: 300px; margin-right: 10px" placeholder="请输入课程名称或课程代码查询"></el-input>
-      <el-button type="primary" @click="loadCourses">查询</el-button>
-      <el-button type="info" style="margin: 0 10px" @click="reset">重置</el-button>
+      <!-- 标签页切换 -->
+      <el-tabs v-model="data.activeTab" type="card" style="margin-bottom: 20px;">
+        <el-tab-pane label="课程列表" name="courses">
+          <el-input v-model="data.course_name" style="width: 300px; margin-right: 10px" placeholder="请输入课程名称或课程代码查询"></el-input>
+          <el-button type="primary" @click="loadCourses">查询</el-button>
+          <el-button type="info" style="margin: 0 10px" @click="reset">重置</el-button>
 
-      <el-table :data="data.courses" stripe style="margin-top: 10px">
-        <el-table-column label="课程代码" prop="course_code"></el-table-column>
-        <el-table-column label="课程名称" prop="course_name"></el-table-column>
-        <el-table-column label="学分" prop="credit"></el-table-column>
-        <el-table-column label="课程描述" prop="description"></el-table-column>
-        <el-table-column label="操作" align="center">
-          <template #default="scope">
-            <template v-if="getSelectionStatus(scope.row.id) === 0">
-              <el-button type="warning" disabled>待审核</el-button>
-            </template>
-            <template v-else-if="getSelectionStatus(scope.row.id) === 1">
-              <el-button type="success" disabled>已选课</el-button>
-            </template>
-            <template v-else-if="getSelectionStatus(scope.row.id) === 2">
-              <el-button type="primary" @click="selectCourse(scope.row)">选课</el-button>
-            </template>
-            <template v-else>
-              <el-button type="primary" @click="selectCourse(scope.row)">选课</el-button>
-            </template>
-          </template>
-        </el-table-column>
-      </el-table>
-      <div class="pagination" style="margin-top: 10px; text-align: right">
-        <el-pagination
-          v-model:current-page="data.pageNum"
-          v-model:page-size="data.pageSize"
-          :page-sizes="[5, 10, 20, 50]"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="data.total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </div>
-
-    <div class="card" style="margin-bottom: 5px">
-      <h3>我的选课申请</h3>
-      <el-table :data="data.selections" stripe style="margin-top: 10px">
-        <el-table-column label="课程名称" prop="course_name"></el-table-column>
-        <el-table-column label="教学班" prop="teaching_class_code"></el-table-column>
-        <el-table-column label="申请时间" prop="create_time" :formatter="formatDate"></el-table-column>
-        <el-table-column label="状态" prop="status" :formatter="formatStatus"></el-table-column>
-      </el-table>
-    </div>
-
-    <!-- 教学班选择对话框 -->
-    <el-dialog
-      v-model="data.teacherDialogVisible"
-      :title="data.selectedCourse?.course_name + ' - 选择教学班'"
-      width="50%"
-    >
-      <div v-if="data.selectedCourse?.teachingClasses && data.selectedCourse.teachingClasses.length > 0">
-        <el-radio-group v-model="data.selectedTeachingClassId">
-          <el-radio
-            v-for="cls in data.selectedCourse.teachingClasses"
-            :key="cls.id"
-            :label="cls.id"
-          >
-            <div style="padding: 10px; border-bottom: 1px solid #f0f0f0">
-              <div><strong>教学班代码：</strong>{{ cls.class_code }}</div>
-              <div><strong>教师：</strong>{{ cls.teacher_name }}</div>
-              <div><strong>上课时间：</strong>{{ cls.schedule }}</div>
-              <div><strong>上课地点：</strong>{{ cls.location }}</div>
-              <div><strong>容量：</strong>{{ cls.selected_count }}/{{ cls.capacity }}</div>
+          <div v-for="course in data.courses" :key="course.id" style="margin-top: 15px; border: 1px solid #e4e7ed; border-radius: 4px; overflow: hidden;">
+            <div style="padding: 15px; background-color: #f9f9f9; display: flex; justify-content: space-between; align-items: center; cursor: pointer;" @click="toggleCourseDetail(course.id)">
+              <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="font-weight: bold; min-width: 100px;">{{ course.course_code }}</div>
+                <div style="min-width: 200px;">{{ course.course_name }}</div>
+                <div style="min-width: 50px;">{{ course.credit }} 学分</div>
+                <div style="flex: 1; color: #666;">{{ course.description }}</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <el-button
+                  :type="getSelectionStatus(course.id) === 0 ? 'warning' : (getSelectionStatus(course.id) === 1 ? 'success' : 'primary')"
+                  :disabled="getSelectionStatus(course.id) === 0 || getSelectionStatus(course.id) === 1"
+                  @click.stop="handleCourseAction(course)"
+                >
+                  {{ getSelectionStatus(course.id) === 0 ? '待审核' : (getSelectionStatus(course.id) === 1 ? '已选课' : '选课') }}
+                </el-button>
+                <el-icon :size="20" :class="{ 'rotate-180': data.expandedCourseId === course.id }">
+                  <el-icon-arrow-down />
+                </el-icon>
+              </div>
             </div>
-          </el-radio>
-        </el-radio-group>
-      </div>
-      <div v-else>
-        <p style="text-align: center; color: #999">该课程暂无可用教学班</p>
-      </div>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="data.teacherDialogVisible = false">取消</el-button>
-          <el-button
-            type="primary"
-            @click="confirmSelectCourse"
-            :disabled="!data.selectedTeachingClassId"
-          >
-            确认选课
-          </el-button>
-        </span>
-      </template>
-    </el-dialog>
+            
+            <!-- 教学班详情 -->
+            <div v-if="data.expandedCourseId === course.id" style="padding: 20px; background-color: white; border-top: 1px solid #e4e7ed;">
+              <h4 style="margin-bottom: 15px; color: #303133;">可选教学班</h4>
+              
+              <div v-if="course.teachingClasses && course.teachingClasses.length > 0">
+                <div v-for="cls in course.teachingClasses" :key="cls.id" style="margin-bottom: 15px; padding: 15px; border: 1px solid #e4e7ed; border-radius: 4px; transition: all 0.3s;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+                    <div style="flex: 1; min-width: 200px;"><strong>教学班代码：</strong>{{ cls.class_code }}</div>
+                    <div style="flex: 1; min-width: 200px;"><strong>教师：</strong>{{ cls.teacher_name }}</div>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+                    <div style="flex: 1; min-width: 200px;"><strong>上课时间：</strong>{{ cls.schedule }}</div>
+                    <div style="flex: 1; min-width: 200px;"><strong>上课地点：</strong>{{ cls.location }}</div>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <strong>容量：</strong>
+                      <span :style="{ color: cls.selected_count >= cls.capacity * 0.8 ? 'orange' : '#67c23a' }">
+                        {{ cls.selected_count }}/{{ cls.capacity }}
+                      </span>
+                    </div>
+                    <el-button
+                      type="primary"
+                      size="small"
+                      @click="selectSpecificClass(course, cls)"
+                      :disabled="getSelectionStatus(course.id) === 0 || getSelectionStatus(course.id) === 1"
+                    >
+                      选择此教学班
+                    </el-button>
+                  </div>
+                </div>
+              </div>
+              <div v-else style="text-align: center; padding: 20px; color: #999;">
+                该课程暂无可用教学班
+              </div>
+            </div>
+          </div>
+          
+          <div class="pagination" style="margin-top: 20px; text-align: right">
+            <el-pagination
+              v-model:current-page="data.pageNum"
+              v-model:page-size="data.pageSize"
+              :page-sizes="[5, 10, 20, 50]"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="data.total"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+            />
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="我的选课申请" name="selections">
+          <el-table :data="data.selections" stripe style="margin-top: 10px">
+            <el-table-column label="课程名称" prop="course_name"></el-table-column>
+            <el-table-column label="教学班" prop="teaching_class_code"></el-table-column>
+            <el-table-column label="申请时间" prop="create_time" :formatter="formatDate"></el-table-column>
+            <el-table-column label="状态" prop="status" :formatter="formatStatus"></el-table-column>
+          </el-table>
+        </el-tab-pane>
+      </el-tabs>
     </div>
+  </div>
 </template>
 
 <script setup>
@@ -113,6 +114,7 @@
 import request from "@/utils/request";
 import {reactive, onMounted} from "vue";
 import {ElMessage} from "element-plus";
+import {ArrowDown as ElIconArrowDown} from "@element-plus/icons-vue";
 
 const data = reactive({
   course_name: null,
@@ -121,9 +123,8 @@ const data = reactive({
   total: 0,
   courses: [],
   selections: [],
-  teacherDialogVisible: false,
-  selectedCourse: null,
-  selectedTeachingClassId: null,
+  expandedCourseId: null,
+  activeTab: 'courses',
   courseSelectionEnabled: false
 })
 
@@ -177,14 +178,22 @@ const loadSelections = () => {
   }
 }
 
-// 选课 - 打开教学班选择对话框
-const selectCourse = (course) => {
+// 切换课程详情展开/收起
+const toggleCourseDetail = (courseId) => {
+  if (data.expandedCourseId === courseId) {
+    data.expandedCourseId = null;
+  } else {
+    data.expandedCourseId = courseId;
+  }
+}
+
+// 处理课程操作
+const handleCourseAction = (course) => {
   const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
   if (user.username) {
     if (course.teachingClasses && course.teachingClasses.length > 0) {
-      data.selectedCourse = course;
-      data.selectedTeachingClassId = course.teachingClasses[0]?.id;
-      data.teacherDialogVisible = true;
+      // 展开课程详情
+      data.expandedCourseId = course.id;
     } else {
       ElMessage.warning('该课程暂无可用教学班');
     }
@@ -193,17 +202,16 @@ const selectCourse = (course) => {
   }
 }
 
-// 确认选课
-const confirmSelectCourse = () => {
+// 选择特定教学班
+const selectSpecificClass = (course, selectedClass) => {
   const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
-  if (user.username && data.selectedCourse && data.selectedTeachingClassId) {
-    const selectedClass = data.selectedCourse.teachingClasses.find(tc => tc.id === data.selectedTeachingClassId);
+  if (user.username) {
     const selection = {
       user_id: user.username,
       user_name: user.name,
       user_type: user.role,
-      course_id: data.selectedCourse.id.toString(),
-      course_name: data.selectedCourse.course_name,
+      course_id: course.id.toString(),
+      course_name: course.course_name,
       teacher_id: selectedClass?.teacher_id,
       teacher_name: selectedClass?.teacher_name,
       teaching_class_id: selectedClass?.id,
@@ -216,9 +224,6 @@ const confirmSelectCourse = () => {
       if (res.code === '200') {
         ElMessage.success('选课申请已提交，请等待管理员审核');
         loadSelections();
-        data.teacherDialogVisible = false;
-        data.selectedCourse = null;
-        data.selectedTeachingClassId = null;
       } else {
         ElMessage.error(res.msg);
       }

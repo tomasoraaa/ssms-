@@ -9,6 +9,7 @@
         <where>
             <if test="student_id != null"> and student_id = #{student_id}</if>
             <if test="course_id != null"> and course_id = #{course_id}</if>
+            <if test="teaching_class_id != null"> and teaching_class_id = #{teaching_class_id}</if>
         </where>
     </select>
 

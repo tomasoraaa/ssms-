@@ -1,5 +1,7 @@
 package com.lgs.entity;
 
+import java.util.List;
+
 public class Course {
     private Integer id;
     private String course_name;
@@ -10,6 +12,7 @@ public class Course {
     private String teacher_id;
     private Double score;
     private String academic_year_name; // 修读学期
+    private List<TeachingClass> teachingClasses; // 关联的教学班列表
 
     public Integer getId() {
         return id;
@@ -81,5 +84,13 @@ public class Course {
 
     public void setAcademic_year_name(String academic_year_name) {
         this.academic_year_name = academic_year_name;
+    }
+
+    public List<TeachingClass> getTeachingClasses() {
+        return teachingClasses;
+    }
+
+    public void setTeachingClasses(List<TeachingClass> teachingClasses) {
+        this.teachingClasses = teachingClasses;
     }
 }

@@ -19,8 +19,8 @@
 
       <div class="card" style="margin-bottom: 5px">
         <el-table :data="data.courses" stripe>
-          <el-table-column label="课程代码" prop="courseCode"></el-table-column>
-          <el-table-column label="课程名称" prop="courseName"></el-table-column>
+          <el-table-column label="课程代码" prop="course_code"></el-table-column>
+          <el-table-column label="课程名称" prop="course_name"></el-table-column>
           <el-table-column label="学分" prop="credit"></el-table-column>
           <el-table-column label="课程描述" prop="description"></el-table-column>
           <el-table-column label="操作">
@@ -88,7 +88,7 @@
             <el-option
               v-for="course in data.courses"
               :key="course.id"
-              :label="`${course.courseName} (${course.courseCode})`"
+              :label="`${course.course_name} (${course.course_code})`"
               :value="course.id"
             ></el-option>
           </el-select>
@@ -176,7 +176,7 @@ const loadCourses = () => {
   const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
   if (user.username) {
     request.get('/course/selectByTeacherId', {
-      params: { teacherId: user.username }
+      params: { teacher_id: user.username }
     }).then(res => {
       if (res.code === '200') {
         data.courses = res.data;
@@ -190,14 +190,14 @@ const viewStudents = (course) => {
   currentCourse.value = course;
   // 先获取学生课程关联
   request.get('/studentCourse/selectAll', {
-    params: { courseId: course.id.toString() }
+    params: { course_id: course.id.toString() }
   }).then(res => {
     if (res.code === '200') {
       const studentCourses = res.data;
       // 构建学生ID到成绩的映射
       data.studentCourseMap = {};
       studentCourses.forEach(sc => {
-        data.studentCourseMap[sc.studentId] = sc.score || 0;
+        data.studentCourseMap[sc.student_id] = sc.score || 0;
       });
       
       if (studentCourses.length > 0) {
@@ -205,7 +205,7 @@ const viewStudents = (course) => {
         request.get('/student/selectAll').then(studentRes => {
           if (studentRes.code === '200') {
             const allStudents = studentRes.data;
-            const studentIds = studentCourses.map(sc => sc.studentId);
+            const studentIds = studentCourses.map(sc => sc.student_id);
             // 筛选出选该课程的学生，并添加成绩信息和绩点
             data.studentsWithScore = allStudents.filter(student => studentIds.includes(student.username)).map(student => {
               const score = data.studentCourseMap[student.username] || 0;
@@ -240,8 +240,8 @@ const startEdit = (student) => {
 const saveScore = (student) => {
   if (currentCourse.value) {
     const studentCourse = {
-      studentId: student.username,
-      courseId: currentCourse.value.id.toString(),
+      student_id: student.username,
+      course_id: currentCourse.value.id.toString(),
       score: student.score
     };
     request.put('/studentCourse/updateScore', studentCourse).then(res => {
@@ -310,13 +310,13 @@ const processImportedData = (data) => {
   // 批量导入成绩
   const importPromises = data.map(item => {
     const studentCourse = {
-      studentId: item.studentId || item.学号,
-      courseId: selectedCourseId.value,
+      student_id: item.studentId || item.学号,
+      course_id: selectedCourseId.value,
       score: item.score || item.成绩
     };
     
     // 验证必填字段
-    if (!studentCourse.studentId || !studentCourse.courseId || studentCourse.score === undefined) {
+    if (!studentCourse.student_id || !studentCourse.course_id || studentCourse.score === undefined) {
       console.error('数据格式错误:', item);
       return Promise.resolve(null);
     }
@@ -352,7 +352,7 @@ const downloadCourseTemplate = () => {
   
   // 获取该课程的学生列表
   request.get('/studentCourse/selectAll', {
-    params: { courseId: selectedCourseId.value.toString() }
+    params: { course_id: selectedCourseId.value.toString() }
   }).then(res => {
     if (res.code === '200') {
       const studentCourses = res.data;
@@ -362,7 +362,7 @@ const downloadCourseTemplate = () => {
         request.get('/student/selectAll').then(studentRes => {
           if (studentRes.code === '200') {
             const allStudents = studentRes.data;
-            const studentIds = studentCourses.map(sc => sc.studentId);
+            const studentIds = studentCourses.map(sc => sc.student_id);
             // 筛选出选该课程的学生
             const courseStudents = allStudents.filter(student => studentIds.includes(student.username));
             
@@ -386,7 +386,7 @@ const downloadCourseTemplate = () => {
             XLSX.utils.book_append_sheet(workbook, worksheet, '成绩模板');
             
             // 下载文件
-            XLSX.writeFile(workbook, `${course.courseName}_成绩导入模板.xlsx`);
+            XLSX.writeFile(workbook, `${course.course_name}_成绩导入模板.xlsx`);
           }
         });
       }
