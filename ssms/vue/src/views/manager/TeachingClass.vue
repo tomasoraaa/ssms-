@@ -174,17 +174,45 @@ const loadTeachers = () => {
 }
 
 const handleCourseChange = (courseId) => {
-  data.form.teacher_id = null
+  // 保存当前的教师选择
+  const currentTeacherId = data.form.teacher_id
   if (courseId) {
     request.get('/courseTeacher/selectByCourseId/' + courseId).then(res => {
       if (res.code === '200') {
-        const courseTeachers = res.data.filter(ct => !ct.teachingClassId)
-        availableTeachers.value = courseTeachers.map(ct => ({
-          username: ct.teacherId,
-          name: ct.teacherName
+        // 获取该课程的所有教师
+        const courseTeachers = res.data
+        // 构建教师映射，避免重复
+        const teacherMap = new Map()
+        
+        // 先添加未分配到教学班的教师
+        courseTeachers.forEach(ct => {
+          if (!ct.teaching_class_id) {
+            teacherMap.set(ct.teacher_id, ct.teacher_name)
+          }
+        })
+        
+        // 如果是编辑模式，添加当前教学班的教师
+        if (data.form.id) {
+          const currentTeacher = courseTeachers.find(ct => ct.teaching_class_id === data.form.id)
+          if (currentTeacher) {
+            teacherMap.set(currentTeacher.teacher_id, currentTeacher.teacher_name)
+          }
+        }
+        
+        // 转换为下拉选项格式
+        availableTeachers.value = Array.from(teacherMap.entries()).map(([id, name]) => ({
+          username: id,
+          name: name
         }))
+        
+        // 如果没有可用教师，显示所有教师
         if (availableTeachers.value.length === 0) {
           availableTeachers.value = teachers.value
+        }
+        
+        // 恢复之前的教师选择
+        if (currentTeacherId) {
+          data.form.teacher_id = currentTeacherId
         }
       }
     })
@@ -272,15 +300,32 @@ const save = () => {
       data.formVisible = false
       load()
 
-      if (!formData.id && data.form.teacher_id) {
-        const ct = {
-          course_id: data.form.course_id,
-          teacher_id: data.form.teacher_id,
-          teacher_name: teacher?.name,
-          teaching_class_id: res.data?.id || formData.id,
-          is_main_teacher: 1
+      if (data.form.teacher_id) {
+        if (!formData.id) {
+          // 新增时添加course_teacher记录
+          const ct = {
+            course_id: data.form.course_id,
+            teacher_id: data.form.teacher_id,
+            teacher_name: teacher?.name,
+            teaching_class_id: res.data?.id || formData.id,
+            is_main_teacher: 1
+          }
+          request.post('/courseTeacher/add', ct)
+        } else {
+          // 编辑时更新course_teacher记录
+          // 先删除原有的记录
+          request.delete('/courseTeacher/delete/' + formData.id).then(() => {
+            // 再添加新的记录
+            const ct = {
+              course_id: data.form.course_id,
+              teacher_id: data.form.teacher_id,
+              teacher_name: teacher?.name,
+              teaching_class_id: formData.id,
+              is_main_teacher: 1
+            }
+            request.post('/courseTeacher/add', ct)
+          })
         }
-        request.post('/courseTeacher/add', ct)
       }
     } else {
       ElMessage.error(res.msg)

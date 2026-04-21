@@ -80,4 +80,10 @@ public class TeachingClassController {
         List<TeachingClass> list = teachingClassService.selectAvailable(academic_year_id);
         return Result.success(list);
     }
+
+    @GetMapping("/selectByCourseId/{course_id}")
+    public Result selectByCourseId(@PathVariable Integer course_id) {
+        List<TeachingClass> list = teachingClassService.selectByCourseId(course_id);
+        return Result.success(list);
+    }
 }

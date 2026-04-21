@@ -11,7 +11,7 @@
  Target Server Version : 80042 (8.0.42)
  File Encoding         : 65001
 
- Date: 21/04/2026 20:16:31
+ Date: 21/04/2026 21:49:33
 */
 
 SET NAMES utf8mb4;
@@ -241,6 +241,7 @@ CREATE TABLE `course_selection`  (
   `create_time` datetime NULL DEFAULT NULL,
   `teacher_id` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL DEFAULT NULL,
   `teacher_name` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL DEFAULT NULL,
+  `teaching_class_code` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL DEFAULT NULL,
   `teaching_class_id` int NULL DEFAULT NULL,
   `academic_year_id` int NULL DEFAULT NULL,
   `admin_class_id` int NULL DEFAULT NULL,
@@ -251,11 +252,11 @@ CREATE TABLE `course_selection`  (
 -- ----------------------------
 -- Records of course_selection
 -- ----------------------------
-INSERT INTO `course_selection` VALUES (10, '20240101001', '张梓萱', 'STUDENT', '1', 'C语言程序设计', 1, '2026-04-19 20:07:56', 'T2024001', '张明', NULL, NULL, NULL);
-INSERT INTO `course_selection` VALUES (11, '20240101001', '张梓萱', 'STUDENT', '2', '数据结构', 1, '2026-04-19 20:07:59', 'T2024002', '李华', NULL, NULL, NULL);
-INSERT INTO `course_selection` VALUES (12, '20240101001', '张梓萱', 'STUDENT', '5', '离散数学', 2, '2026-04-19 20:10:21', 'T2024008', '孙丽', NULL, NULL, NULL);
-INSERT INTO `course_selection` VALUES (13, '20240101001', '张梓萱', 'STUDENT', '11', '计算机组成原理', 2, '2026-04-19 20:10:29', 'T2024017', '郭建国', NULL, NULL, NULL);
-INSERT INTO `course_selection` VALUES (14, '20240101001', '张梓萱', 'STUDENT', '14', '人工智能导论', 1, '2026-04-19 21:38:07', 'T2024001', '张明', NULL, NULL, NULL);
+INSERT INTO `course_selection` VALUES (10, '20240101001', '张梓萱', 'STUDENT', '1', 'C语言程序设计', 1, '2026-04-19 20:07:56', 'T2024001', '张明', NULL, NULL, 1, NULL);
+INSERT INTO `course_selection` VALUES (11, '20240101001', '张梓萱', 'STUDENT', '2', '数据结构', 1, '2026-04-19 20:07:59', 'T2024002', '李华', NULL, NULL, 1, NULL);
+INSERT INTO `course_selection` VALUES (12, '20240101001', '张梓萱', 'STUDENT', '5', '离散数学', 2, '2026-04-19 20:10:21', 'T2024008', '孙丽', NULL, NULL, 1, NULL);
+INSERT INTO `course_selection` VALUES (13, '20240101001', '张梓萱', 'STUDENT', '11', '计算机组成原理', 2, '2026-04-19 20:10:29', 'T2024017', '郭建国', 'CS104-2024-1-01', 5, 1, NULL);
+INSERT INTO `course_selection` VALUES (14, '20240101001', '张梓萱', 'STUDENT', '14', '人工智能导论', 1, '2026-04-19 21:38:07', 'T2024001', '张明', NULL, NULL, 1, NULL);
 
 -- ----------------------------
 -- Table structure for course_teacher

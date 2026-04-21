@@ -16,8 +16,8 @@
     </select>
 
     <insert id="insert" parameterType="com.lgs.entity.CourseSelection" useGeneratedKeys="true">
-        insert into course_selection(id, user_id, user_name, user_type, course_id, course_name, teacher_id, teacher_name, status, create_time)
-        values (#{id}, #{user_id}, #{user_name}, #{user_type}, #{course_id}, #{course_name}, #{teacher_id}, #{teacher_name}, #{status}, NOW())
+        insert into course_selection(id, user_id, user_name, user_type, course_id, course_name, teacher_id, teacher_name, teaching_class_id, teaching_class_code, status, create_time)
+        values (#{id}, #{user_id}, #{user_name}, #{user_type}, #{course_id}, #{course_name}, #{teacher_id}, #{teacher_name}, #{teaching_class_id}, #{teaching_class_code}, #{status}, NOW())
     </insert>
 
     <update id="updateById" parameterType="com.lgs.entity.CourseSelection">

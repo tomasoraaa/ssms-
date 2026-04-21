@@ -25,14 +25,6 @@
         <el-table-column label="课程代码" prop="course_code"></el-table-column>
         <el-table-column label="课程名称" prop="course_name"></el-table-column>
         <el-table-column label="学分" prop="credit"></el-table-column>
-        <el-table-column label="任课教师">
-          <template #default="scope">
-            <span v-if="scope.row.teachers && scope.row.teachers.length > 0">
-              {{ scope.row.teachers.map(t => t.teacher_name + (t.is_main_teacher === 1 ? ' (主)' : '')).join(', ') }}
-            </span>
-            <span v-else style="color: #999">暂无教师</span>
-          </template>
-        </el-table-column>
         <el-table-column label="课程描述" prop="description"></el-table-column>
         <el-table-column label="操作" align="center">
           <template #default="scope">
@@ -68,30 +60,37 @@
       <h3>我的选课申请</h3>
       <el-table :data="data.selections" stripe style="margin-top: 10px">
         <el-table-column label="课程名称" prop="course_name"></el-table-column>
+        <el-table-column label="教学班" prop="teaching_class_code"></el-table-column>
         <el-table-column label="申请时间" prop="create_time" :formatter="formatDate"></el-table-column>
         <el-table-column label="状态" prop="status" :formatter="formatStatus"></el-table-column>
       </el-table>
     </div>
 
-    <!-- 教师选择对话框 -->
+    <!-- 教学班选择对话框 -->
     <el-dialog
       v-model="data.teacherDialogVisible"
-      :title="data.selectedCourse?.course_name + ' - 选择教师'"
-      width="40%"
+      :title="data.selectedCourse?.course_name + ' - 选择教学班'"
+      width="50%"
     >
-      <div v-if="data.selectedCourse?.teachers && data.selectedCourse.teachers.length > 0">
-        <el-radio-group v-model="data.selectedTeacherId">
+      <div v-if="data.selectedCourse?.teachingClasses && data.selectedCourse.teachingClasses.length > 0">
+        <el-radio-group v-model="data.selectedTeachingClassId">
           <el-radio
-            v-for="teacher in data.selectedCourse.teachers"
-            :key="teacher.teacher_id"
-            :label="teacher.teacher_id"
+            v-for="cls in data.selectedCourse.teachingClasses"
+            :key="cls.id"
+            :label="cls.id"
           >
-            {{ teacher.teacher_name }}{{ teacher.is_main_teacher === 1 ? ' (主)' : '' }}
+            <div style="padding: 10px; border-bottom: 1px solid #f0f0f0">
+              <div><strong>教学班代码：</strong>{{ cls.class_code }}</div>
+              <div><strong>教师：</strong>{{ cls.teacher_name }}</div>
+              <div><strong>上课时间：</strong>{{ cls.schedule }}</div>
+              <div><strong>上课地点：</strong>{{ cls.location }}</div>
+              <div><strong>容量：</strong>{{ cls.selected_count }}/{{ cls.capacity }}</div>
+            </div>
           </el-radio>
         </el-radio-group>
       </div>
       <div v-else>
-        <p style="text-align: center; color: #999">该课程暂无任课教师</p>
+        <p style="text-align: center; color: #999">该课程暂无可用教学班</p>
       </div>
       <template #footer>
         <span class="dialog-footer">
@@ -99,7 +98,7 @@
           <el-button
             type="primary"
             @click="confirmSelectCourse"
-            :disabled="!data.selectedTeacherId"
+            :disabled="!data.selectedTeachingClassId"
           >
             确认选课
           </el-button>
@@ -124,7 +123,7 @@ const data = reactive({
   selections: [],
   teacherDialogVisible: false,
   selectedCourse: null,
-  selectedTeacherId: null,
+  selectedTeachingClassId: null,
   courseSelectionEnabled: false
 })
 
@@ -139,18 +138,19 @@ const loadCourses = () => {
   }).then(res => {
     data.courses = res.data?.list
     data.total = res.data?.total
-    // 为每个课程加载教师列表
+    // 为每个课程加载教学班列表
     data.courses.forEach(course => {
-      loadTeachersForCourse(course.id, course)
+      loadTeachingClassesForCourse(course.id, course)
     })
   })
 }
 
-// 为课程加载教师列表
-const loadTeachersForCourse = (courseId, course) => {
-  request.get(`/courseTeacher/selectByCourseId/${courseId}`).then(res => {
+// 为课程加载教学班列表
+const loadTeachingClassesForCourse = (courseId, course) => {
+  request.get(`/teachingClass/selectByCourseId/${courseId}`).then(res => {
     if (res.code === '200') {
-      course.teachers = res.data
+      // 只显示状态为1（可用）且未满的教学班
+      course.teachingClasses = res.data.filter(cls => cls.status === 1 && cls.selected_count < cls.capacity)
     }
   })
 }
@@ -177,16 +177,16 @@ const loadSelections = () => {
   }
 }
 
-// 选课 - 打开教师选择对话框
+// 选课 - 打开教学班选择对话框
 const selectCourse = (course) => {
   const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
   if (user.username) {
-    if (course.teachers && course.teachers.length > 0) {
+    if (course.teachingClasses && course.teachingClasses.length > 0) {
       data.selectedCourse = course;
-      data.selectedTeacherId = course.teachers.find(t => t.is_main_teacher === 1)?.teacher_id || course.teachers[0]?.teacher_id;
+      data.selectedTeachingClassId = course.teachingClasses[0]?.id;
       data.teacherDialogVisible = true;
     } else {
-      ElMessage.warning('该课程暂无任课教师，无法选课');
+      ElMessage.warning('该课程暂无可用教学班');
     }
   } else {
     console.log('用户未登录，无法提交选课申请');
@@ -196,16 +196,18 @@ const selectCourse = (course) => {
 // 确认选课
 const confirmSelectCourse = () => {
   const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
-  if (user.username && data.selectedCourse && data.selectedTeacherId) {
-    const selectedTeacher = data.selectedCourse.teachers.find(t => t.teacher_id === data.selectedTeacherId);
+  if (user.username && data.selectedCourse && data.selectedTeachingClassId) {
+    const selectedClass = data.selectedCourse.teachingClasses.find(tc => tc.id === data.selectedTeachingClassId);
     const selection = {
       user_id: user.username,
       user_name: user.name,
       user_type: user.role,
       course_id: data.selectedCourse.id.toString(),
       course_name: data.selectedCourse.course_name,
-      teacher_id: data.selectedTeacherId,
-      teacher_name: selectedTeacher?.teacher_name,
+      teacher_id: selectedClass?.teacher_id,
+      teacher_name: selectedClass?.teacher_name,
+      teaching_class_id: selectedClass?.id,
+      teaching_class_code: selectedClass?.class_code,
       status: 0
     };
     console.log('提交选课申请:', selection);
@@ -216,7 +218,7 @@ const confirmSelectCourse = () => {
         loadSelections();
         data.teacherDialogVisible = false;
         data.selectedCourse = null;
-        data.selectedTeacherId = null;
+        data.selectedTeachingClassId = null;
       } else {
         ElMessage.error(res.msg);
       }

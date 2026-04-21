@@ -11,6 +11,8 @@ public class CourseSelection {
     private String course_name;
     private String teacher_id;
     private String teacher_name;
+    private Integer teaching_class_id;
+    private String teaching_class_code;
     private Integer status; // 0: 待审核, 1: 已通过, 2: 已拒绝
     private Date create_time;
 
@@ -92,5 +94,21 @@ public class CourseSelection {
 
     public void setCreate_time(Date create_time) {
         this.create_time = create_time;
+    }
+
+    public Integer getTeaching_class_id() {
+        return teaching_class_id;
+    }
+
+    public void setTeaching_class_id(Integer teaching_class_id) {
+        this.teaching_class_id = teaching_class_id;
+    }
+
+    public String getTeaching_class_code() {
+        return teaching_class_code;
+    }
+
+    public void setTeaching_class_code(String teaching_class_code) {
+        this.teaching_class_code = teaching_class_code;
     }
 }

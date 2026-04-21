@@ -62,4 +62,11 @@ public class TeachingClassServiceImpl implements TeachingClassService {
     public List<TeachingClass> selectAvailable(Integer academic_year_id) {
         return teachingClassMapper.selectAvailable(academic_year_id);
     }
+
+    @Override
+    public List<TeachingClass> selectByCourseId(Integer course_id) {
+        TeachingClass teachingClass = new TeachingClass();
+        teachingClass.setCourse_id(course_id);
+        return teachingClassMapper.selectAll(teachingClass);
+    }
 }

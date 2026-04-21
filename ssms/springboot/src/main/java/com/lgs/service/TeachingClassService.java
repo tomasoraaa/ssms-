@@ -13,4 +13,5 @@ public interface TeachingClassService {
     List<TeachingClass> selectAll(TeachingClass teachingClass);
     List<TeachingClass> selectByAcademicYearId(Integer academic_year_id);
     List<TeachingClass> selectAvailable(Integer academic_year_id);
+    List<TeachingClass> selectByCourseId(Integer course_id);
 }
