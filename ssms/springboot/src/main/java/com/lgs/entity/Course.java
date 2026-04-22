@@ -11,6 +11,7 @@ public class Course {
     private String teacher_name;
     private String teacher_id;
     private Double score;
+    private Integer teaching_class_id; // 教学班ID
     private String academic_year_name; // 修读学期
     private List<TeachingClass> teachingClasses; // 关联的教学班列表
 
@@ -76,6 +77,14 @@ public class Course {
 
     public void setScore(Double score) {
         this.score = score;
+    }
+
+    public Integer getTeaching_class_id() {
+        return teaching_class_id;
+    }
+
+    public void setTeaching_class_id(Integer teaching_class_id) {
+        this.teaching_class_id = teaching_class_id;
     }
 
     public String getAcademic_year_name() {

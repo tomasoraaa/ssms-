@@ -22,6 +22,8 @@ public class CourseWithdrawalServiceImpl implements CourseWithdrawalService {
 
     @Override
     public void add(CourseWithdrawal courseWithdrawal) {
+        // 设置退课时间为当前时间
+        courseWithdrawal.setWithdrawal_time(new java.util.Date());
         courseWithdrawalMapper.insert(courseWithdrawal);
     }
 

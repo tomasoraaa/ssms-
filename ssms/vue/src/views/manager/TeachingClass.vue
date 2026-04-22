@@ -35,7 +35,14 @@
           </template>
         </el-table-column>
         <el-table-column label="上课地点" prop="location"></el-table-column>
-        <el-table-column label="上课时间" prop="schedule"></el-table-column>
+        <el-table-column label="上课时间">
+          <template #default="scope">
+            <span v-if="scope.row.day_of_week && scope.row.period_start && scope.row.period_end">
+              {{ formatSchedule(scope.row) }}
+            </span>
+            <span v-else style="color: #999">未设置</span>
+          </template>
+        </el-table-column>
         <el-table-column label="状态" prop="status">
           <template #default="scope">
             <el-tag v-if="scope.row.status === 0" type="info">未开启</el-tag>
@@ -88,8 +95,23 @@
           <el-form-item label="上课地点" prop="location">
             <el-input v-model="data.form.location" placeholder="如：A101" />
           </el-form-item>
-          <el-form-item label="上课时间" prop="schedule">
-            <el-input v-model="data.form.schedule" placeholder="如：周一 3-4节" />
+          <el-form-item label="上课时间">
+            <div style="display: flex; gap: 10px; align-items: center">
+              <el-select v-model="data.form.dayOfWeek" style="flex: 1.5; min-width: 100px">
+                <el-option :value="1" label="周一"></el-option>
+                <el-option :value="2" label="周二"></el-option>
+                <el-option :value="3" label="周三"></el-option>
+                <el-option :value="4" label="周四"></el-option>
+                <el-option :value="5" label="周五"></el-option>
+                <el-option :value="6" label="周六"></el-option>
+                <el-option :value="7" label="周日"></el-option>
+              </el-select>
+              <span>第</span>
+              <el-input-number v-model="data.form.periodStart" :min="1" :max="12" style="width: 100px" ></el-input-number>
+              <span>-</span>
+              <el-input-number v-model="data.form.periodEnd" :min="1" :max="12" style="width: 100px" ></el-input-number>
+              <span>节</span>
+            </div>
           </el-form-item>
           <el-form-item label="状态" prop="status">
             <el-select v-model="data.form.status" placeholder="请选择状态" style="width: 100%">
@@ -140,6 +162,15 @@ const formatAcademicYear = (row) => {
   return row.academicYearName || `${semesterText}`
 }
 
+const formatSchedule = (row) => {
+  if (!row.day_of_week || !row.period_start || !row.period_end) {
+    return '未设置'
+  }
+  const days = ['', '周一', '周二', '周三', '周四', '周五', '周六', '周日']
+  const day = days[row.day_of_week] || `第${row.day_of_week}天`
+  return `${day} 第${row.period_start}-${row.period_end}节`
+}
+
 const loadAcademicYears = () => {
   request.get('/academicYear/selectAll').then(res => {
     if (res.code === '200') {
@@ -184,20 +215,10 @@ const handleCourseChange = (courseId) => {
         // 构建教师映射，避免重复
         const teacherMap = new Map()
         
-        // 先添加未分配到教学班的教师
+        // 添加所有课程教师
         courseTeachers.forEach(ct => {
-          if (!ct.teaching_class_id) {
-            teacherMap.set(ct.teacher_id, ct.teacher_name)
-          }
+          teacherMap.set(ct.teacher_id, ct.teacher_name)
         })
-        
-        // 如果是编辑模式，添加当前教学班的教师
-        if (data.form.id) {
-          const currentTeacher = courseTeachers.find(ct => ct.teaching_class_id === data.form.id)
-          if (currentTeacher) {
-            teacherMap.set(currentTeacher.teacher_id, currentTeacher.teacher_name)
-          }
-        }
         
         // 转换为下拉选项格式
         availableTeachers.value = Array.from(teacherMap.entries()).map(([id, name]) => ({
@@ -247,7 +268,8 @@ const handleAdd = () => {
   data.form = {
     status: 1,
     capacity: 50,
-    selectedCount: 0
+    selectedCount: 0,
+    class_code: ''
   }
   availableTeachers.value = teachers.value
   data.formVisible = true
@@ -255,9 +277,51 @@ const handleAdd = () => {
 
 const handleEdit = (row) => {
   console.log('编辑数据:', row)
-  data.form = {...row}
-  console.log('表单数据:', data.form)
+  console.log('原始时间字段:', {
+    day_of_week: row.day_of_week,
+    period_start: row.period_start,
+    period_end: row.period_end
+  })
+  
+  // 直接创建新的表单对象，确保所有字段都被正确设置
+  data.form = {
+    id: row.id,
+    class_code: row.class_code,
+    course_id: row.course_id,
+    course_name: row.course_name,
+    course_code: row.course_code,
+    academic_year_id: row.academic_year_id,
+    academic_year_name: row.academic_year_name,
+    capacity: row.capacity,
+    selected_count: row.selected_count,
+    location: row.location,
+    // 时间字段使用驼峰命名
+    dayOfWeek: row.day_of_week,
+    periodStart: row.period_start,
+    periodEnd: row.period_end,
+    status: row.status,
+    teacher_name: row.teacher_name,
+    teacher_id: row.teacher_id
+  }
+  
+  console.log('最终表单数据:', data.form)
+  console.log('时间字段:', {
+    dayOfWeek: data.form.dayOfWeek,
+    periodStart: data.form.periodStart,
+    periodEnd: data.form.periodEnd
+  })
+  
   handleCourseChange(row.course_id)
+  // 延迟检查，确保handleCourseChange执行后的数据
+  setTimeout(() => {
+    console.log('handleCourseChange执行后的数据:', data.form)
+    console.log('handleCourseChange执行后时间字段:', {
+      dayOfWeek: data.form.dayOfWeek,
+      periodStart: data.form.periodStart,
+      periodEnd: data.form.periodEnd
+    })
+  }, 100)
+  
   data.formVisible = true
 }
 
@@ -279,14 +343,44 @@ const handleDelete = (id) => {
 }
 
 const save = () => {
+  // 验证必要字段
+  if (!data.form.class_code) {
+    ElMessage.error('请填写教学班编号')
+    return
+  }
+  if (!data.form.course_id) {
+    ElMessage.error('请选择课程')
+    return
+  }
+  if (!data.form.academic_year_id) {
+    ElMessage.error('请选择学年学期')
+    return
+  }
+  if (!data.form.location) {
+    ElMessage.error('请填写上课地点')
+    return
+  }
+  if (!data.form.dayOfWeek || !data.form.periodStart || !data.form.periodEnd) {
+    ElMessage.error('请设置上课时间')
+    return
+  }
   const course = courses.value.find(c => c.id === data.form.course_id)
   const teacher = teachers.value.find(t => t.username === data.form.teacher_id)
   const formData = {
     ...data.form,
     course_name: course?.course_name,
     course_code: course?.course_code,
-    teacher_name: teacher?.name
+    teacher_name: teacher?.name,
+    // 转换驼峰命名为下划线命名
+    day_of_week: data.form.dayOfWeek,
+    period_start: data.form.periodStart,
+    period_end: data.form.periodEnd
   }
+
+  // 删除驼峰命名的字段，避免重复
+  delete formData.dayOfWeek
+  delete formData.periodStart
+  delete formData.periodEnd
 
   console.log('保存数据:', formData)
 
@@ -298,43 +392,7 @@ const save = () => {
     if (res.code === '200') {
       ElMessage.success(formData.id ? '修改成功' : '新增成功')
       data.formVisible = false
-
-      if (data.form.teacher_id) {
-        if (!formData.id) {
-          // 新增时添加course_teacher记录
-          const ct = {
-            course_id: data.form.course_id,
-            teacher_id: data.form.teacher_id,
-            teacher_name: teacher?.name,
-            teaching_class_id: res.data?.id || formData.id,
-            is_main_teacher: 1
-          }
-          request.post('/courseTeacher/add', ct).then(() => {
-            // 添加完成后重新加载数据
-            load()
-          })
-        } else {
-          // 编辑时更新course_teacher记录
-          // 先删除原有的记录
-          request.delete('/courseTeacher/delete/' + formData.id).then(() => {
-            // 再添加新的记录
-            const ct = {
-              course_id: data.form.course_id,
-              teacher_id: data.form.teacher_id,
-              teacher_name: teacher?.name,
-              teaching_class_id: formData.id,
-              is_main_teacher: 1
-            }
-            request.post('/courseTeacher/add', ct).then(() => {
-              // 更新完成后重新加载数据
-              load()
-            })
-          })
-        }
-      } else {
-        // 如果没有教师信息，直接重新加载数据
-        load()
-      }
+      load()
     } else {
       ElMessage.error(res.msg)
     }

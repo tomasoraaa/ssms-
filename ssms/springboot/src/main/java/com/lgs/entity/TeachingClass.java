@@ -11,7 +11,9 @@ public class TeachingClass {
     private Integer capacity;
     private Integer selected_count;
     private String location;
-    private String schedule;
+    private Integer day_of_week;
+    private Integer period_start;
+    private Integer period_end;
     private Integer status;
     private String teacher_name;
     private String teacher_id;
@@ -96,12 +98,28 @@ public class TeachingClass {
         this.location = location;
     }
 
-    public String getSchedule() {
-        return schedule;
+    public Integer getDay_of_week() {
+        return day_of_week;
     }
 
-    public void setSchedule(String schedule) {
-        this.schedule = schedule;
+    public void setDay_of_week(Integer day_of_week) {
+        this.day_of_week = day_of_week;
+    }
+
+    public Integer getPeriod_start() {
+        return period_start;
+    }
+
+    public void setPeriod_start(Integer period_start) {
+        this.period_start = period_start;
+    }
+
+    public Integer getPeriod_end() {
+        return period_end;
+    }
+
+    public void setPeriod_end(Integer period_end) {
+        this.period_end = period_end;
     }
 
     public Integer getStatus() {
@@ -126,5 +144,26 @@ public class TeachingClass {
 
     public void setTeacher_id(String teacher_id) {
         this.teacher_id = teacher_id;
+    }
+
+    public String getScheduleText() {
+        if (day_of_week == null || period_start == null || period_end == null) {
+            return "";
+        }
+        String[] days = {"", "周一", "周二", "周三", "周四", "周五", "周六", "周日"};
+        String day = day_of_week >= 1 && day_of_week <= 7 ? days[day_of_week] : "第" + day_of_week + "天";
+        return day + " 第" + period_start + "-" + period_end + "节";
+    }
+
+    public boolean hasTimeConflict(TeachingClass other) {
+        if (this.day_of_week == null || other.day_of_week == null ||
+            this.period_start == null || other.period_start == null ||
+            this.period_end == null || other.period_end == null) {
+            return false;
+        }
+        if (!this.day_of_week.equals(other.day_of_week)) {
+            return false;
+        }
+        return this.period_start <= other.period_end && other.period_start <= this.period_end;
     }
 }

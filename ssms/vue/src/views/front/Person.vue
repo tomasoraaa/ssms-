@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { reactive, onMounted } from "vue";
+import { reactive, onMounted, onUnmounted } from "vue";
 import request from "@/utils/request.js";
 import {ElMessage} from "element-plus";
 
@@ -81,7 +81,22 @@ const loadUserInfo = () => {
 // 页面加载时获取最新用户信息
 onMounted(() => {
   loadUserInfo()
+  
+  // 监听页面可见性变化
+  document.addEventListener('visibilitychange', handleVisibilityChange)
 })
+
+// 页面卸载时移除事件监听
+onUnmounted(() => {
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
+})
+
+// 处理页面可见性变化
+const handleVisibilityChange = () => {
+  if (document.visibilityState === 'visible') {
+    loadUserInfo()
+  }
+}
 
 const handleFileUpload = (res) => {
   data.user.avatar = res.data
@@ -135,12 +150,12 @@ const update = () => {
       // 提交修改申请
       const promises = changes.map(change => {
         const modifyRequest = {
-          userId: data.user.username,
-          userName: data.user.name,
-          userType: userType,
-          fieldName: change.fieldName,
-          oldValue: change.oldValue,
-          newValue: change.newValue
+          user_id: data.user.username,
+          user_name: data.user.name,
+          user_type: userType,
+          field_name: change.fieldName,
+          old_value: change.oldValue,
+          new_value: change.newValue
         }
         return request.post('/modifyRequest/add', modifyRequest)
       })

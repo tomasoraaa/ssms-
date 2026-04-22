@@ -85,6 +85,8 @@ public class CourseServiceImpl implements CourseService {
                     // 设置学生选择的教师信息
                     course.setTeacher_name(sc.getTeacher_name());
                     course.setTeacher_id(sc.getTeacher_id());
+                    // 设置教学班ID
+                    course.setTeaching_class_id(sc.getTeaching_class_id());
                     // 设置成绩信息
                     course.setScore(sc.getScore());
                     // 设置修读学期信息
@@ -113,43 +115,28 @@ public class CourseServiceImpl implements CourseService {
 
         // 再根据课程ID查询课程信息，使用Map去重
         Map<Integer, Course> courseMap = new HashMap<>();
-        Map<Integer, List<CourseTeacher>> courseTeacherMap = new HashMap<>();
-        
-        // 先收集每个课程的教师关联
-        for (CourseTeacher ct : courseTeachers) {
-            courseTeacherMap.computeIfAbsent(ct.getCourse_id(), k -> new ArrayList<>()).add(ct);
-        }
         
         // 为每个课程加载信息和关联的教学班
-        for (Map.Entry<Integer, List<CourseTeacher>> entry : courseTeacherMap.entrySet()) {
-            Integer courseId = entry.getKey();
-            List<CourseTeacher> courseTeacherList = entry.getValue();
+        for (CourseTeacher ct : courseTeachers) {
+            Integer courseId = ct.getCourse_id();
             
-            Course course = courseMapper.selectById(courseId);
-            if (course != null) {
-                courseMap.put(courseId, course);
-                
-                // 收集该教师在该课程中的教学班ID
-                Set<Integer> teachingClassIds = new HashSet<>();
-                boolean isGeneralTeacher = false;
-                for (CourseTeacher ct : courseTeacherList) {
-                    if (ct.getTeaching_class_id() != null) {
-                        teachingClassIds.add(ct.getTeaching_class_id());
-                    } else {
-                        // 通用课程教师，没有关联特定教学班
-                        isGeneralTeacher = true;
+            Course course = courseMap.get(courseId);
+            if (course == null) {
+                course = courseMapper.selectById(courseId);
+                if (course != null) {
+                    courseMap.put(courseId, course);
+                    
+                    // 加载关联的教学班列表，并过滤出该教师教授的教学班
+                    List<TeachingClass> allTeachingClasses = teachingClassService.selectByCourseId(courseId);
+                    List<TeachingClass> teacherTeachingClasses = new ArrayList<>();
+                    for (TeachingClass tc : allTeachingClasses) {
+                        // 根据teaching_class表中的teacher_id字段来筛选
+                        if (teacher_id.equals(tc.getTeacher_id())) {
+                            teacherTeachingClasses.add(tc);
+                        }
                     }
+                    course.setTeachingClasses(teacherTeachingClasses);
                 }
-                
-                // 加载关联的教学班列表，并过滤出该教师教授的教学班
-                List<TeachingClass> allTeachingClasses = teachingClassService.selectByCourseId(courseId);
-                List<TeachingClass> teacherTeachingClasses = new ArrayList<>();
-                for (TeachingClass tc : allTeachingClasses) {
-                    if (isGeneralTeacher || teachingClassIds.contains(tc.getId())) {
-                        teacherTeachingClasses.add(tc);
-                    }
-                }
-                course.setTeachingClasses(teacherTeachingClasses);
             }
         }
         

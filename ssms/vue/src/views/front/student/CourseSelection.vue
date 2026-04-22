@@ -57,7 +57,7 @@
                     <div style="flex: 1; min-width: 200px;"><strong>教师：</strong>{{ cls.teacher_name }}</div>
                   </div>
                   <div style="display: flex; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
-                    <div style="flex: 1; min-width: 200px;"><strong>上课时间：</strong>{{ cls.schedule }}</div>
+                    <div style="flex: 1; min-width: 200px;"><strong>上课时间：</strong>{{ formatSchedule(cls) }}</div>
                     <div style="flex: 1; min-width: 200px;"><strong>上课地点：</strong>{{ cls.location }}</div>
                   </div>
                   <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -282,6 +282,16 @@ const formatStatus = (row, column, cellValue) => {
     default:
       return '';
   }
+}
+
+// 格式化上课时间
+const formatSchedule = (cls) => {
+  if (!cls.dayOfWeek || !cls.periodStart || !cls.periodEnd) {
+    return '未设置';
+  }
+  const days = ['', '周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+  const day = days[cls.dayOfWeek] || `第${cls.dayOfWeek}天`;
+  return `${day} 第${cls.periodStart}-${cls.periodEnd}节`;
 }
 
 onMounted(() => {

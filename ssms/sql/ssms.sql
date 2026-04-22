@@ -11,7 +11,7 @@
  Target Server Version : 80042 (8.0.42)
  File Encoding         : 65001
 
- Date: 21/04/2026 22:51:06
+ Date: 22/04/2026 16:12:07
 */
 
 SET NAMES utf8mb4;
@@ -53,7 +53,7 @@ CREATE TABLE `activity_log`  (
   `user_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_operate_time`(`operate_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 72 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 100 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of activity_log
@@ -129,6 +129,34 @@ INSERT INTO `activity_log` VALUES (68, '2026-04-21 22:21:10', '系统', 'admin',
 INSERT INTO `activity_log` VALUES (69, '2026-04-21 22:37:12', '选课', '20240101001', '学生 20240101001 申请选课', 'STUDENT');
 INSERT INTO `activity_log` VALUES (70, '2026-04-21 22:37:25', '选课', 'admin', '批准选课申请', 'ADMIN');
 INSERT INTO `activity_log` VALUES (71, '2026-04-21 22:42:22', '登录', 'T2024020', '教师 T2024020 登录系统', 'TEACHER');
+INSERT INTO `activity_log` VALUES (72, '2026-04-21 23:22:03', '系统', 'admin', '修改教学班 CS403-2024-2-01', 'ADMIN');
+INSERT INTO `activity_log` VALUES (73, '2026-04-22 13:36:51', '登录', 'admin', '管理员 admin 登录系统', 'ADMIN');
+INSERT INTO `activity_log` VALUES (74, '2026-04-22 13:39:05', '登录', 'admin', '管理员 admin 登录系统', 'ADMIN');
+INSERT INTO `activity_log` VALUES (75, '2026-04-22 13:39:34', '登录', '20240101001', '学生 20240101001 登录系统', 'STUDENT');
+INSERT INTO `activity_log` VALUES (76, '2026-04-22 13:42:30', '登录', 'T2024020', '教师 T2024020 登录系统', 'TEACHER');
+INSERT INTO `activity_log` VALUES (77, '2026-04-22 13:43:41', '系统', 'admin', '修改教学班 CS104-2024-1-01', 'ADMIN');
+INSERT INTO `activity_log` VALUES (78, '2026-04-22 13:46:25', '系统', 'admin', '修改教学班 CS403-2024-2-01', 'ADMIN');
+INSERT INTO `activity_log` VALUES (79, '2026-04-22 13:46:56', '系统', 'admin', '修改教学班 CS403-2024-2-01', 'ADMIN');
+INSERT INTO `activity_log` VALUES (80, '2026-04-22 13:47:07', '系统', 'admin', '修改教学班 CS403-2024-2-02', 'ADMIN');
+INSERT INTO `activity_log` VALUES (81, '2026-04-22 13:55:43', '系统', 'admin', '修改教学班 CS403-2024-2-02', 'ADMIN');
+INSERT INTO `activity_log` VALUES (82, '2026-04-22 13:56:10', '系统', 'admin', '修改教学班 CS104-2024-1-01', 'ADMIN');
+INSERT INTO `activity_log` VALUES (83, '2026-04-22 13:57:28', '系统', 'admin', '新增教学班 CS402-2024-2-01', 'ADMIN');
+INSERT INTO `activity_log` VALUES (84, '2026-04-22 13:57:34', '系统', 'admin', '修改教学班 CS402-2024-2-01', 'ADMIN');
+INSERT INTO `activity_log` VALUES (85, '2026-04-22 14:11:57', '系统', 'admin', '新增教学班 CS304-2024-2-1', 'ADMIN');
+INSERT INTO `activity_log` VALUES (86, '2026-04-22 14:20:07', '系统', 'admin', '删除教学班 CS304-2024-2-1', 'ADMIN');
+INSERT INTO `activity_log` VALUES (87, '2026-04-22 14:21:14', '系统', 'admin', '新增教学班 CS304-2024-2-01', 'ADMIN');
+INSERT INTO `activity_log` VALUES (88, '2026-04-22 14:48:39', '系统', 'admin', '修改教学班 CS304-2024-2-01', 'ADMIN');
+INSERT INTO `activity_log` VALUES (89, '2026-04-22 14:49:14', '系统', 'admin', '修改教学班 CS402-2024-2-01', 'ADMIN');
+INSERT INTO `activity_log` VALUES (90, '2026-04-22 14:49:40', '系统', 'admin', '修改教学班 CS403-2024-2-02', 'ADMIN');
+INSERT INTO `activity_log` VALUES (91, '2026-04-22 14:49:43', '系统', 'admin', '修改教学班 CS403-2024-2-01', 'ADMIN');
+INSERT INTO `activity_log` VALUES (92, '2026-04-22 14:50:38', '系统', 'admin', '修改教学班 CS104-2024-1-01', 'ADMIN');
+INSERT INTO `activity_log` VALUES (93, '2026-04-22 15:06:47', '退课', '20240101001', '学生 20240101001 提交退课申请', 'STUDENT');
+INSERT INTO `activity_log` VALUES (94, '2026-04-22 15:06:52', '退课', 'admin', '批准退课申请', 'ADMIN');
+INSERT INTO `activity_log` VALUES (95, '2026-04-22 15:28:04', '登录', '20240101001', '学生 20240101001 登录系统', 'STUDENT');
+INSERT INTO `activity_log` VALUES (96, '2026-04-22 15:28:20', '登录', '20240101002', '学生 20240101002 登录系统', 'STUDENT');
+INSERT INTO `activity_log` VALUES (97, '2026-04-22 15:31:20', '选课', '20240101002', '学生 20240101002 申请选课', 'STUDENT');
+INSERT INTO `activity_log` VALUES (98, '2026-04-22 15:31:30', '选课', '20240101001', '学生 20240101001 申请选课', 'STUDENT');
+INSERT INTO `activity_log` VALUES (99, '2026-04-22 16:07:21', '系统', 'admin', '修改教学班 CS104-2024-1-01', 'ADMIN');
 
 -- ----------------------------
 -- Table structure for admin
@@ -263,17 +291,13 @@ CREATE TABLE `course_selection`  (
   `admin_class_id` int NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_user_course`(`user_id` ASC, `course_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of course_selection
 -- ----------------------------
-INSERT INTO `course_selection` VALUES (10, '20240101001', '张梓萱', 'STUDENT', '1', 'C语言程序设计', 1, '2026-04-19 20:07:56', 'T2024001', '张明', NULL, NULL, 1, NULL);
-INSERT INTO `course_selection` VALUES (11, '20240101001', '张梓萱', 'STUDENT', '2', '数据结构', 1, '2026-04-19 20:07:59', 'T2024002', '李华', NULL, NULL, 1, NULL);
-INSERT INTO `course_selection` VALUES (12, '20240101001', '张梓萱', 'STUDENT', '5', '离散数学', 2, '2026-04-19 20:10:21', 'T2024008', '孙丽', NULL, NULL, 1, NULL);
-INSERT INTO `course_selection` VALUES (13, '20240101001', '张梓萱', 'STUDENT', '11', '计算机组成原理', 2, '2026-04-19 20:10:29', 'T2024017', '郭建国', 'CS104-2024-1-01', 5, 1, NULL);
-INSERT INTO `course_selection` VALUES (14, '20240101001', '张梓萱', 'STUDENT', '14', '人工智能导论', 1, '2026-04-19 21:38:07', 'T2024001', '张明', NULL, NULL, 1, NULL);
-INSERT INTO `course_selection` VALUES (15, '20240101001', '张梓萱', 'STUDENT', '17', '云计算与大数据', 1, '2026-04-21 22:37:12', 'T2024020', '宋丽', 'CS403-2024-2-02', 7, NULL, NULL);
+INSERT INTO `course_selection` VALUES (16, '20240101002', '李浩然', 'STUDENT', '17', '云计算与大数据', 1, '2026-04-22 15:31:19', 'T2024004', '刘芳', 'CS403-2024-2-02', 7, NULL, NULL);
+INSERT INTO `course_selection` VALUES (17, '20240101001', '张梓萱', 'STUDENT', '17', '云计算与大数据', 1, '2026-04-22 15:31:29', 'T2024004', '刘芳', 'CS403-2024-2-02', 7, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for course_teacher
@@ -284,47 +308,50 @@ CREATE TABLE `course_teacher`  (
   `course_id` int NOT NULL COMMENT '课程ID',
   `teacher_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '教师工号',
   `teacher_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '教师姓名',
-  `teaching_class_id` int NULL DEFAULT NULL COMMENT '教学班ID（为空表示课程通用教师）',
   `is_main_teacher` int NULL DEFAULT 0 COMMENT '是否主讲教师：0-普通教师，1-主讲教师',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_course_id`(`course_id` ASC) USING BTREE,
   INDEX `idx_teacher_id`(`teacher_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 46 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '课程教师关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 57 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '课程教师关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of course_teacher
 -- ----------------------------
-INSERT INTO `course_teacher` VALUES (1, 1, 'T2024001', '张明', NULL, 1);
-INSERT INTO `course_teacher` VALUES (2, 1, 'T2024004', '刘芳', NULL, 1);
-INSERT INTO `course_teacher` VALUES (3, 2, 'T2024002', '李华', NULL, 1);
-INSERT INTO `course_teacher` VALUES (4, 2, 'T2024005', '陈明亮', NULL, 1);
-INSERT INTO `course_teacher` VALUES (5, 3, 'T2024003', '王强', NULL, 1);
-INSERT INTO `course_teacher` VALUES (6, 3, 'T2024006', '赵小红', NULL, 1);
-INSERT INTO `course_teacher` VALUES (7, 4, 'T2024007', '钱建国', NULL, 1);
-INSERT INTO `course_teacher` VALUES (8, 5, 'T2024008', '孙丽', NULL, 1);
-INSERT INTO `course_teacher` VALUES (9, 6, 'T2024009', '周建国', NULL, 1);
-INSERT INTO `course_teacher` VALUES (10, 6, 'T2024010', '吴敏', NULL, 1);
-INSERT INTO `course_teacher` VALUES (11, 7, 'T2024011', '郑华', NULL, 1);
-INSERT INTO `course_teacher` VALUES (12, 8, 'T2024012', '黄丽', NULL, 1);
-INSERT INTO `course_teacher` VALUES (13, 8, 'T2024013', '马建国', NULL, 1);
-INSERT INTO `course_teacher` VALUES (14, 9, 'T2024014', '朱敏', NULL, 1);
-INSERT INTO `course_teacher` VALUES (15, 10, 'T2024015', '胡华', NULL, 1);
-INSERT INTO `course_teacher` VALUES (16, 11, 'T2024016', '林丽', NULL, 1);
-INSERT INTO `course_teacher` VALUES (17, 11, 'T2024017', '郭建国', NULL, 1);
-INSERT INTO `course_teacher` VALUES (18, 12, 'T2024018', '梁敏', NULL, 1);
-INSERT INTO `course_teacher` VALUES (19, 13, 'T2024019', '谢华', NULL, 1);
-INSERT INTO `course_teacher` VALUES (20, 14, 'T2024020', '宋丽', NULL, 1);
-INSERT INTO `course_teacher` VALUES (21, 14, 'T2024001', '张明', NULL, 1);
-INSERT INTO `course_teacher` VALUES (22, 15, 'T2024002', '李华', NULL, 1);
-INSERT INTO `course_teacher` VALUES (23, 16, 'T2024003', '王强', NULL, 1);
-INSERT INTO `course_teacher` VALUES (24, 17, 'T2024004', '刘芳', NULL, 1);
-INSERT INTO `course_teacher` VALUES (25, 18, 'T2024005', '陈明亮', NULL, 1);
-INSERT INTO `course_teacher` VALUES (26, 19, 'T2024006', '赵小红', NULL, 1);
-INSERT INTO `course_teacher` VALUES (27, 20, 'T2024007', '钱建国', NULL, 1);
-INSERT INTO `course_teacher` VALUES (28, 20, 'T2024008', '孙丽', NULL, 1);
-INSERT INTO `course_teacher` VALUES (33, 11, 'T2024016', '林丽', 5, 1);
-INSERT INTO `course_teacher` VALUES (37, 17, 'T2024004', '刘芳', 6, 1);
-INSERT INTO `course_teacher` VALUES (45, 17, 'T2024020', '宋丽', 7, 1);
+INSERT INTO `course_teacher` VALUES (1, 1, 'T2024001', '张明', 1);
+INSERT INTO `course_teacher` VALUES (2, 1, 'T2024004', '刘芳', 1);
+INSERT INTO `course_teacher` VALUES (3, 2, 'T2024002', '李华', 1);
+INSERT INTO `course_teacher` VALUES (4, 2, 'T2024005', '陈明亮', 1);
+INSERT INTO `course_teacher` VALUES (5, 3, 'T2024003', '王强', 1);
+INSERT INTO `course_teacher` VALUES (6, 3, 'T2024006', '赵小红', 1);
+INSERT INTO `course_teacher` VALUES (7, 4, 'T2024007', '钱建国', 1);
+INSERT INTO `course_teacher` VALUES (8, 5, 'T2024008', '孙丽', 1);
+INSERT INTO `course_teacher` VALUES (9, 6, 'T2024009', '周建国', 1);
+INSERT INTO `course_teacher` VALUES (10, 6, 'T2024010', '吴敏', 1);
+INSERT INTO `course_teacher` VALUES (11, 7, 'T2024011', '郑华', 1);
+INSERT INTO `course_teacher` VALUES (12, 8, 'T2024012', '黄丽', 1);
+INSERT INTO `course_teacher` VALUES (13, 8, 'T2024013', '马建国', 1);
+INSERT INTO `course_teacher` VALUES (14, 9, 'T2024014', '朱敏', 1);
+INSERT INTO `course_teacher` VALUES (15, 10, 'T2024015', '胡华', 1);
+INSERT INTO `course_teacher` VALUES (16, 11, 'T2024016', '林丽', 1);
+INSERT INTO `course_teacher` VALUES (17, 11, 'T2024017', '郭建国', 1);
+INSERT INTO `course_teacher` VALUES (18, 12, 'T2024018', '梁敏', 1);
+INSERT INTO `course_teacher` VALUES (19, 13, 'T2024019', '谢华', 1);
+INSERT INTO `course_teacher` VALUES (20, 14, 'T2024020', '宋丽', 1);
+INSERT INTO `course_teacher` VALUES (21, 14, 'T2024001', '张明', 1);
+INSERT INTO `course_teacher` VALUES (22, 15, 'T2024002', '李华', 1);
+INSERT INTO `course_teacher` VALUES (23, 16, 'T2024003', '王强', 1);
+INSERT INTO `course_teacher` VALUES (24, 17, 'T2024004', '刘芳', 1);
+INSERT INTO `course_teacher` VALUES (25, 18, 'T2024005', '陈明亮', 1);
+INSERT INTO `course_teacher` VALUES (26, 19, 'T2024006', '赵小红', 1);
+INSERT INTO `course_teacher` VALUES (27, 20, 'T2024007', '钱建国', 1);
+INSERT INTO `course_teacher` VALUES (28, 20, 'T2024008', '孙丽', 1);
+INSERT INTO `course_teacher` VALUES (49, 17, 'T2024004', '刘芳', 1);
+INSERT INTO `course_teacher` VALUES (51, 17, 'T2024020', '宋丽', 1);
+INSERT INTO `course_teacher` VALUES (52, 11, 'T2024016', '林丽', 1);
+INSERT INTO `course_teacher` VALUES (53, 15, 'T2024002', '李华', 1);
+INSERT INTO `course_teacher` VALUES (54, 15, 'T2024002', '李华', 1);
+INSERT INTO `course_teacher` VALUES (55, 18, 'T2024005', '陈明亮', 1);
+INSERT INTO `course_teacher` VALUES (56, 18, 'T2024005', '陈明亮', 1);
 
 -- ----------------------------
 -- Table structure for course_withdrawal
@@ -342,12 +369,11 @@ CREATE TABLE `course_withdrawal`  (
   `status` int NULL DEFAULT 0,
   `reason_type` int NULL DEFAULT NULL COMMENT '退课原因类型：1-自愿退课，2-不及格退课，3-其他',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of course_withdrawal
 -- ----------------------------
-INSERT INTO `course_withdrawal` VALUES (1, '20240101001', '14', '', '张明', NULL, '2026-04-19 21:46:51', '选错了', 1, NULL);
 
 -- ----------------------------
 -- Table structure for modify_request
@@ -364,13 +390,15 @@ CREATE TABLE `modify_request`  (
   `status` int NULL DEFAULT NULL,
   `create_time` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of modify_request
 -- ----------------------------
 INSERT INTO `modify_request` VALUES (1, '20240101001', '张梓萱', 'STUDENT', 'avatar', '', 'http://localhost:9090/files/download/1776589631128-f9db561dbcc6f77c0e70a1208921b5.jpg', 1, '2026-04-19 17:07:12');
 INSERT INTO `modify_request` VALUES (2, 'T2024001', '张明', 'TEACHER', 'avatar', '', 'http://localhost:9090/files/download/1776596101549-0d19b52d7e475569095d0400858eec.jpg', 1, '2026-04-19 18:55:02');
+INSERT INTO `modify_request` VALUES (6, 'T2024020', '宋丽', 'TEACHER', 'avatar', '', 'http://localhost:9090/files/download/1776844315693-0ff7e2e97b44d74ef25052bd7294fb.jpg', 1, '2026-04-22 15:51:56');
+INSERT INTO `modify_request` VALUES (7, '20240101002', '李浩然', 'STUDENT', 'avatar', '', 'http://localhost:9090/files/download/1776844339119-1c62775b7a6fdc7e6ef35af2aac3bf.jpg', 1, '2026-04-22 15:52:19');
 
 -- ----------------------------
 -- Table structure for student
@@ -397,7 +425,7 @@ CREATE TABLE `student`  (
 -- Records of student
 -- ----------------------------
 INSERT INTO `student` VALUES (1, '20240101001', '123456', '张梓萱', 'http://localhost:9090/files/download/1776589631128-f9db561dbcc6f77c0e70a1208921b5.jpg', '19', '女', '13812340001', '计算机科学与技术', 'STUDENT', 1, 'zhangzx@sms.edu.cn');
-INSERT INTO `student` VALUES (2, '20240101002', '123456', '李浩然', NULL, '19', '男', '13812340002', '计算机科学与技术', 'STUDENT', 1, 'lihr@sms.edu.cn');
+INSERT INTO `student` VALUES (2, '20240101002', '123456', '李浩然', 'http://localhost:9090/files/download/1776844339119-1c62775b7a6fdc7e6ef35af2aac3bf.jpg', '19', '男', '13812340002', '计算机科学与技术', 'STUDENT', 1, 'lihr@sms.edu.cn');
 INSERT INTO `student` VALUES (3, '20240101003', '123456', '王思琪', NULL, '19', '女', '13812340003', '计算机科学与技术', 'STUDENT', 1, 'wangsq@sms.edu.cn');
 INSERT INTO `student` VALUES (4, '20240102001', '123456', '刘子墨', NULL, '19', '男', '13812340004', '软件工程', 'STUDENT', 1, 'liuzm@sms.edu.cn');
 INSERT INTO `student` VALUES (5, '20240102002', '123456', '陈雨萱', NULL, '19', '女', '13812340005', '软件工程', 'STUDENT', 1, 'chenyx@sms.edu.cn');
@@ -476,14 +504,13 @@ CREATE TABLE `student_course`  (
   `original_score` double NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_student_course`(`student_id` ASC, `course_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of student_course
 -- ----------------------------
-INSERT INTO `student_course` VALUES (7, '20240101001', '2', NULL, NULL, 59, 'T2024002', '李华', 1, 0, NULL);
-INSERT INTO `student_course` VALUES (8, '20240101001', '1', NULL, NULL, 85, 'T2024001', '张明', 1, 0, NULL);
-INSERT INTO `student_course` VALUES (10, '20240101001', '17', 7, NULL, NULL, 'T2024020', '宋丽', 1, NULL, NULL);
+INSERT INTO `student_course` VALUES (11, '20240101002', '17', 7, 2, NULL, 'T2024004', '刘芳', 1, NULL, NULL);
+INSERT INTO `student_course` VALUES (12, '20240101001', '17', 7, 2, NULL, 'T2024004', '刘芳', 1, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for system_config
@@ -502,7 +529,7 @@ CREATE TABLE `system_config`  (
 -- Records of system_config
 -- ----------------------------
 INSERT INTO `system_config` VALUES (1, 'course_selection_enabled', 'true', '选课功能开关：true-开启，false-关闭');
-INSERT INTO `system_config` VALUES (2, 'teacher_score_entry_enabled', 'false', '教师录入成绩开关：true-开启，false-关闭');
+INSERT INTO `system_config` VALUES (2, 'teacher_score_entry_enabled', 'true', '教师录入成绩开关：true-开启，false-关闭');
 
 -- ----------------------------
 -- Table structure for teacher
@@ -545,7 +572,7 @@ INSERT INTO `teacher` VALUES (16, 'T2024016', '123456', '林丽', NULL, '女', '
 INSERT INTO `teacher` VALUES (17, 'T2024017', '123456', '郭建国', NULL, '男', '13912341017', 'TEACHER', 1, 'guojianguo@cs.edu.cn');
 INSERT INTO `teacher` VALUES (18, 'T2024018', '123456', '梁敏', NULL, '女', '13912341018', 'TEACHER', 1, 'liangmin@cs.edu.cn');
 INSERT INTO `teacher` VALUES (19, 'T2024019', '123456', '谢华', NULL, '男', '13912341019', 'TEACHER', 1, 'xiehua@cs.edu.cn');
-INSERT INTO `teacher` VALUES (20, 'T2024020', '123456', '宋丽', NULL, '女', '13912341020', 'TEACHER', 1, 'songli@cs.edu.cn');
+INSERT INTO `teacher` VALUES (20, 'T2024020', '123456', '宋丽', 'http://localhost:9090/files/download/1776844315693-0ff7e2e97b44d74ef25052bd7294fb.jpg', '女', '13912341020', 'TEACHER', 1, 'songli@cs.edu.cn');
 
 -- ----------------------------
 -- Table structure for teaching_class
@@ -559,17 +586,23 @@ CREATE TABLE `teaching_class`  (
   `capacity` int NULL DEFAULT 50 COMMENT '容量',
   `selected_count` int NULL DEFAULT 0 COMMENT '已选人数',
   `location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '上课地点',
-  `schedule` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '上课时间，如 周一 3-4节',
   `status` int NULL DEFAULT 1 COMMENT '状态：0-未开启，1-已开启，2-已结束',
+  `day_of_week` int NULL DEFAULT NULL COMMENT '星期几：1-周一，2-周二...',
+  `period_start` int NULL DEFAULT NULL COMMENT '开始节次：1-12',
+  `period_end` int NULL DEFAULT NULL COMMENT '结束节次：1-12',
+  `teacher_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '主讲教师工号',
+  `teacher_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '主讲教师姓名',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_class_code`(`class_code` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '教学班表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '教学班表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of teaching_class
 -- ----------------------------
-INSERT INTO `teaching_class` VALUES (5, 'CS104-2024-1-01', 11, 1, 45, 0, 'D402', '周五 1-2节', 1);
-INSERT INTO `teaching_class` VALUES (6, 'CS40.-2024-2-01', 17, 2, 50, 0, 'A208', '周一 三、四节', 1);
-INSERT INTO `teaching_class` VALUES (7, 'CS403-2024-2-02', 17, 2, 51, 1, 'A202', '周一 三、四节', 1);
+INSERT INTO `teaching_class` VALUES (5, 'CS104-2024-1-01', 11, 1, 45, 0, 'D402', 2, 3, 5, 6, 'T2024016', '林丽');
+INSERT INTO `teaching_class` VALUES (6, 'CS403-2024-2-01', 17, 2, 50, 0, 'A208', 1, 1, 3, 4, 'T2024020', '宋丽');
+INSERT INTO `teaching_class` VALUES (7, 'CS403-2024-2-02', 17, 2, 51, 2, 'A202', 1, 2, 3, 4, 'T2024004', '刘芳');
+INSERT INTO `teaching_class` VALUES (8, 'CS402-2024-2-01', 15, 2, 50, 0, 'A202', 1, 2, 3, 4, 'T2024002', '李华');
+INSERT INTO `teaching_class` VALUES (10, 'CS304-2024-2-01', 18, 2, 50, 0, 'E114', 1, 3, 1, 2, 'T2024005', '陈明亮');
 
 SET FOREIGN_KEY_CHECKS = 1;

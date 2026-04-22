@@ -100,7 +100,7 @@ const load = () => {
     params: {
       pageNum: data.pageNum,
       pageSize: data.pageSize,
-      userType: data.userType,
+      user_type: data.userType,
       status: data.status
     }
   }).then(res => {

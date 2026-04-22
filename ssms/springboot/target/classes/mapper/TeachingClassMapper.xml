@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.lgs.mapper.TeachingClassMapper">
     <insert id="insert" parameterType="com.lgs.entity.TeachingClass" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO teaching_class (class_code, course_id, academic_year_id, capacity, selected_count, location, schedule, status)
-        VALUES (#{class_code}, #{course_id}, #{academic_year_id}, #{capacity}, #{selected_count}, #{location}, #{schedule}, #{status})
+        INSERT INTO teaching_class (class_code, course_id, academic_year_id, capacity, selected_count, location, day_of_week, period_start, period_end, status, teacher_id, teacher_name)
+        VALUES (#{class_code}, #{course_id}, #{academic_year_id}, #{capacity}, #{selected_count}, #{location}, #{day_of_week}, #{period_start}, #{period_end}, #{status}, #{teacher_id}, #{teacher_name})
     </insert>
 
     <update id="updateById" parameterType="com.lgs.entity.TeachingClass">
@@ -14,8 +14,12 @@
             capacity = #{capacity},
             selected_count = #{selected_count},
             location = #{location},
-            schedule = #{schedule},
-            status = #{status}
+            day_of_week = #{day_of_week},
+            period_start = #{period_start},
+            period_end = #{period_end},
+            status = #{status},
+            teacher_id = #{teacher_id},
+            teacher_name = #{teacher_name}
         WHERE id = #{id}
     </update>
 
@@ -24,23 +28,19 @@
     </delete>
 
     <select id="selectById" parameterType="java.lang.Integer" resultType="com.lgs.entity.TeachingClass">
-        SELECT tc.*, c.course_name, c.course_code, ay.year as academic_year_name, ay.semester,
-               ct.teacher_name, ct.teacher_id
+        SELECT tc.*, c.course_name, c.course_code, ay.year as academic_year_name, ay.semester
         FROM teaching_class tc
         LEFT JOIN course c ON tc.course_id = c.id
         LEFT JOIN academic_year ay ON tc.academic_year_id = ay.id
-        LEFT JOIN course_teacher ct ON tc.id = ct.teaching_class_id AND ct.is_main_teacher = 1
         WHERE tc.id = #{id}
     </select>
 
     <select id="selectAll" parameterType="com.lgs.entity.TeachingClass" resultType="com.lgs.entity.TeachingClass">
         SELECT tc.*, c.course_name, c.course_code, ay.year, ay.semester,
-               (CASE WHEN ay.semester = 1 THEN CONCAT(ay.year, ' 第一学期') ELSE CONCAT(ay.year, ' 第二学期') END) as academic_year_name,
-               ct.teacher_name, ct.teacher_id
+               (CASE WHEN ay.semester = 1 THEN CONCAT(ay.year, ' 第一学期') ELSE CONCAT(ay.year, ' 第二学期') END) as academic_year_name
         FROM teaching_class tc
         LEFT JOIN course c ON tc.course_id = c.id
         LEFT JOIN academic_year ay ON tc.academic_year_id = ay.id
-        LEFT JOIN course_teacher ct ON tc.id = ct.teaching_class_id AND ct.is_main_teacher = 1
         <where>
             <if test="course_id != null">
                 AND tc.course_id = #{course_id}
@@ -59,20 +59,16 @@
     </select>
 
     <select id="selectByAcademicYearId" parameterType="java.lang.Integer" resultType="com.lgs.entity.TeachingClass">
-        SELECT tc.*, c.course_name, c.course_code,
-               ct.teacher_name, ct.teacher_id
+        SELECT tc.*, c.course_name, c.course_code
         FROM teaching_class tc
         LEFT JOIN course c ON tc.course_id = c.id
-        LEFT JOIN course_teacher ct ON tc.id = ct.teaching_class_id AND ct.is_main_teacher = 1
         WHERE tc.academic_year_id = #{academic_year_id}
     </select>
 
     <select id="selectAvailable" parameterType="java.lang.Integer" resultType="com.lgs.entity.TeachingClass">
-        SELECT tc.*, c.course_name, c.course_code, c.credit,
-               ct.teacher_name, ct.teacher_id
+        SELECT tc.*, c.course_name, c.course_code, c.credit
         FROM teaching_class tc
         LEFT JOIN course c ON tc.course_id = c.id
-        LEFT JOIN course_teacher ct ON tc.id = ct.teaching_class_id AND ct.is_main_teacher = 1
         WHERE tc.academic_year_id = #{academic_year_id}
           AND tc.status = 1
           AND tc.selected_count &lt; tc.capacity

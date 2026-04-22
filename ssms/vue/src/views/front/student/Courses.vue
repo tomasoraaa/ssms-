@@ -247,31 +247,32 @@ const showWithdrawalDialog = (course) => {
 
 // 提交退课申请
 const submitWithdrawal = () => {
-  const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
-  if (user.username && data.selectedCourse) {
-    const withdrawal = {
-      student_id: user.username,
-      course_id: data.selectedCourse.id.toString(),
-      teacher_id: data.selectedCourse.teacher_id || '',
-      teacher_name: data.selectedCourse.teacher_name || '',
-      reason: data.withdrawalReason,
-      status: 0
-    };
-    request.post('/courseWithdrawal/add', withdrawal).then(res => {
-      if (res.code === '200') {
-        ElMessage.success('退课申请已提交，请等待管理员审核');
-        data.withdrawalDialogVisible = false;
-        data.selectedCourse = null;
-        data.withdrawalReason = '';
-      } else {
-        ElMessage.error(res.msg);
-      }
-    }).catch(err => {
-      console.error('提交退课申请失败:', err);
-      ElMessage.error('提交退课申请失败');
-    });
-  }
-};
+    const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
+    if (user.username && data.selectedCourse) {
+      const withdrawal = {
+        student_id: user.username,
+        course_id: data.selectedCourse.id.toString(),
+        teaching_class_id: data.selectedCourse.teaching_class_id || null,
+        teacher_id: data.selectedCourse.teacher_id || '',
+        teacher_name: data.selectedCourse.teacher_name || '',
+        reason: data.withdrawalReason,
+        status: 0
+      };
+      request.post('/courseWithdrawal/add', withdrawal).then(res => {
+        if (res.code === '200') {
+          ElMessage.success('退课申请已提交，请等待管理员审核');
+          data.withdrawalDialogVisible = false;
+          data.selectedCourse = null;
+          data.withdrawalReason = '';
+        } else {
+          ElMessage.error(res.msg);
+        }
+      }).catch(err => {
+        console.error('提交退课申请失败:', err);
+        ElMessage.error('提交退课申请失败');
+      });
+    }
+  };
 
 // 检查选课状态
 const checkCourseSelectionStatus = () => {
