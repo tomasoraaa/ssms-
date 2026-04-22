@@ -86,10 +86,6 @@
               <span>教学班管理</span>
             </el-menu-item>
           </el-sub-menu>
-          <el-menu-item index="/manager/courseSelection">
-            <el-icon><Document /></el-icon>
-            <span>选课管理</span>
-          </el-menu-item>
           <el-menu-item index="/manager/withdrawalRequest">
             <el-icon><Message /></el-icon>
             <span>退课申请管理</span>

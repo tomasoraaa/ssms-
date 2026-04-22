@@ -11,7 +11,7 @@
  Target Server Version : 80042 (8.0.42)
  File Encoding         : 65001
 
- Date: 22/04/2026 20:04:35
+ Date: 22/04/2026 20:28:29
 */
 
 SET NAMES utf8mb4;
@@ -620,5 +620,23 @@ INSERT INTO `teaching_class` VALUES (7, 'CS403-2024-2-02', 17, 2, 51, 2, 'A202',
 INSERT INTO `teaching_class` VALUES (8, 'CS402-2024-2-01', 15, 2, 50, 0, 'A202', 1, 2, 3, 4, 'T2024002', '李华');
 INSERT INTO `teaching_class` VALUES (10, 'CS304-2024-2-01', 18, 2, 50, 0, 'E114', 1, 3, 1, 2, 'T2024005', '陈明亮');
 INSERT INTO `teaching_class` VALUES (12, 'CS403-2024-2-03', 17, 2, 50, 1, 'A403', 1, 2, 4, 5, 'T2024004', '刘芳');
+
+-- ----------------------------
+-- View structure for student_course_view
+-- ----------------------------
+DROP VIEW IF EXISTS `student_course_view`;
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `student_course_view` AS select `sc`.`id` AS `id`,`sc`.`student_id` AS `student_id`,`s`.`username` AS `student_username`,`s`.`name` AS `student_name`,`sc`.`course_id` AS `course_id`,`c`.`course_name` AS `course_name`,`sc`.`teaching_class_id` AS `teaching_class_id`,`sc`.`academic_year_id` AS `academic_year_id`,`sc`.`score` AS `score`,`sc`.`teacher_id` AS `teacher_id`,`t`.`username` AS `teacher_username`,`t`.`name` AS `teacher_name`,`sc`.`status` AS `status`,`sc`.`is_makeup` AS `is_makeup`,`sc`.`original_score` AS `original_score` from (((`student_course` `sc` left join `student` `s` on((`sc`.`student_id` = `s`.`username`))) left join `teacher` `t` on((`sc`.`teacher_id` = `t`.`username`))) left join `course` `c` on((`sc`.`course_id` = `c`.`id`)));
+
+-- ----------------------------
+-- View structure for student_view
+-- ----------------------------
+DROP VIEW IF EXISTS `student_view`;
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `student_view` AS select `student`.`id` AS `id`,`student`.`username` AS `username`,`student`.`username` AS `student_id`,`student`.`password` AS `password`,`student`.`name` AS `name`,`student`.`avatar` AS `avatar`,`student`.`age` AS `age`,`student`.`gender` AS `gender`,`student`.`phone` AS `phone`,`student`.`profession` AS `profession`,`student`.`role` AS `role`,`student`.`status` AS `status`,`student`.`email` AS `email` from `student`;
+
+-- ----------------------------
+-- View structure for teacher_view
+-- ----------------------------
+DROP VIEW IF EXISTS `teacher_view`;
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `teacher_view` AS select `teacher`.`id` AS `id`,`teacher`.`username` AS `username`,`teacher`.`username` AS `teacher_id`,`teacher`.`password` AS `password`,`teacher`.`name` AS `name`,`teacher`.`avatar` AS `avatar`,`teacher`.`gender` AS `gender`,`teacher`.`phone` AS `phone`,`teacher`.`role` AS `role`,`teacher`.`status` AS `status`,`teacher`.`email` AS `email` from `teacher`;
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -16,7 +16,6 @@ const router = createRouter({
         { path: 'student', component: () => import('@/views/manager/Student.vue')},
         { path: 'teacher', component: () => import('@/views/manager/Teacher.vue')},
         { path: 'course', component: () => import('@/views/manager/Course.vue')},
-        { path: 'courseSelection', component: () => import('@/views/manager/CourseSelection.vue')},
         { path: 'withdrawalRequest', component: () => import('@/views/manager/WithdrawalRequest.vue')},
         { path: 'courseEvaluation', component: () => import('@/views/manager/CourseEvaluation.vue')},
         { path: 'modifyRequest', component: () => import('@/views/manager/ModifyRequest.vue')},

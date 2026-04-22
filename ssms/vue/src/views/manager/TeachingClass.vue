@@ -60,6 +60,7 @@
                 <el-dropdown-menu>
                   <el-dropdown-item @click="handleEdit(scope.row)">编辑</el-dropdown-item>
                   <el-dropdown-item @click="handleDelete(scope.row.id)" type="danger">删除</el-dropdown-item>
+                  <el-dropdown-item @click="manageStudents(scope.row)">管理学生</el-dropdown-item>
                   <el-dropdown-item @click="viewScoreStatistics(scope.row)">查看成绩</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
@@ -209,6 +210,88 @@
           </span>
         </template>
       </el-dialog>
+
+      <!-- 学生管理对话框 -->
+      <el-dialog
+        v-model="data.studentDialogVisible"
+        :title="data.currentTeachingClass ? `管理 ${data.currentTeachingClass.class_code} 学生` : '管理学生'"
+        width="80%"
+      >
+        <div style="margin-bottom: 20px">
+          <el-input v-model="data.studentSearchKey" placeholder="请输入学生姓名或学号搜索" style="width: 300px; margin-right: 10px"></el-input>
+          <el-button type="primary" @click="loadClassStudents">查询</el-button>
+          <el-button type="success" @click="showAddStudentDialog">添加学生</el-button>
+        </div>
+
+        <el-table :data="data.classStudents" stripe>
+          <el-table-column type="selection" width="55"></el-table-column>
+          <el-table-column label="学生学号" prop="username"></el-table-column>
+          <el-table-column label="学生姓名" prop="name"></el-table-column>
+          <el-table-column label="专业" prop="profession"></el-table-column>
+          <el-table-column label="成绩" prop="score">
+            <template #default="scope">
+              <span>{{ scope.row.score || 0 }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="100">
+            <template #default="scope">
+              <el-button type="danger" size="small" @click="removeStudent(scope.row)">移除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <div class="pagination" style="margin-top: 10px; text-align: right">
+          <el-pagination
+            v-model:current-page="data.studentPageNum"
+            v-model:page-size="data.studentPageSize"
+            :page-sizes="[10, 20, 50, 100]"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="data.studentTotal"
+            @size-change="handleStudentSizeChange"
+            @current-change="handleStudentCurrentChange"
+          />
+        </div>
+
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="data.studentDialogVisible = false">关闭</el-button>
+            <el-button type="danger" @click="batchRemoveStudents">批量移除</el-button>
+          </span>
+        </template>
+      </el-dialog>
+
+      <!-- 添加学生对话框 -->
+      <el-dialog
+        v-model="data.addStudentDialogVisible"
+        title="添加学生到教学班"
+        width="600px"
+      >
+        <el-form :model="data.addStudentForm" label-width="120px" style="padding-right: 50px">
+          <el-form-item label="学生">
+            <el-select
+              v-model="data.addStudentForm.student_id"
+              filterable
+              remote
+              :remote-method="searchStudent"
+              placeholder="请输入学生姓名或学号搜索"
+              style="width: 100%"
+            >
+              <el-option
+                v-for="student in data.availableStudents"
+                :key="student.username"
+                :label="`${student.name} (${student.username})`"
+                :value="student.username"
+              />
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="data.addStudentDialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="addStudent">添加</el-button>
+          </span>
+        </template>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -241,7 +324,21 @@ const data = reactive({
     passRate: 0,
     students: []
   },
-  scoreDialogVisible: false
+  scoreDialogVisible: false,
+  // 学生管理相关
+  studentDialogVisible: false,
+  addStudentDialogVisible: false,
+  currentTeachingClass: null,
+  classStudents: [],
+  availableStudents: [],
+  studentSearchKey: '',
+  addStudentForm: {
+    student_id: ''
+  },
+  studentPageNum: 1,
+  studentPageSize: 10,
+  studentTotal: 0,
+  selectedStudents: []
 })
 
 const formatAcademicYear = (row) => {
@@ -584,6 +681,401 @@ const viewScoreStatistics = (teachingClass) => {
       }
     }
   });
+}
+
+// 管理学生
+const manageStudents = (teachingClass) => {
+  data.currentTeachingClass = teachingClass
+  data.studentPageNum = 1
+  data.studentPageSize = 10
+  data.studentSearchKey = ''
+  loadClassStudents()
+  data.studentDialogVisible = true
+}
+
+// 加载教学班的学生
+const loadClassStudents = () => {
+  if (!data.currentTeachingClass) return
+  
+  request.get('/studentCourse/selectByTeachingClassId/' + data.currentTeachingClass.id).then(res => {
+    if (res.code === '200') {
+      const studentCourses = res.data
+      if (studentCourses.length > 0) {
+        // 获取学生信息
+        const studentIds = studentCourses.map(sc => sc.student_id)
+        request.post('/student/selectByUsernames', studentIds).then(studentRes => {
+          if (studentRes.code === '200') {
+            const students = studentRes.data
+            // 构建学生ID到成绩的映射
+            const scoreMap = {}
+            studentCourses.forEach(sc => {
+              scoreMap[sc.student_id] = sc.score || 0
+            })
+            // 为学生添加成绩信息
+            let studentsWithScore = students.map(student => ({
+              ...student,
+              score: scoreMap[student.username] || 0
+            }))
+            
+            // 根据搜索关键词过滤
+            if (data.studentSearchKey) {
+              const searchKey = data.studentSearchKey.toLowerCase().trim()
+              studentsWithScore = studentsWithScore.filter(student => {
+                return student.username.toLowerCase().includes(searchKey) || 
+                       student.name.toLowerCase().includes(searchKey)
+              })
+            }
+            
+            data.classStudents = studentsWithScore
+            data.studentTotal = data.classStudents.length
+          } else {
+            data.classStudents = []
+            data.studentTotal = 0
+          }
+        })
+      } else {
+        data.classStudents = []
+        data.studentTotal = 0
+      }
+    }
+  })
+}
+
+// 显示添加学生对话框
+const showAddStudentDialog = () => {
+  data.addStudentForm = { student_id: '' }
+  data.availableStudents = []
+  data.addStudentDialogVisible = true
+}
+
+// 搜索学生
+const searchStudent = (query) => {
+  if (query) {
+    request.get('/student/selectPage', {
+      params: {
+        pageNum: 1,
+        pageSize: 50,
+        name: query
+      }
+    }).then(res => {
+      if (res.code === '200') {
+        data.availableStudents = res.data.list
+      }
+    })
+  } else {
+    data.availableStudents = []
+  }
+}
+
+// 添加学生到教学班
+const addStudent = () => {
+  if (!data.addStudentForm.student_id) {
+    ElMessage.warning('请选择学生')
+    return
+  }
+  
+  if (!data.currentTeachingClass) {
+    ElMessage.warning('请选择教学班')
+    return
+  }
+  
+  // 检查教学班容量
+  if (data.currentTeachingClass.selected_count >= data.currentTeachingClass.capacity) {
+    ElMessage.error('教学班容量已满')
+    return
+  }
+  
+  // 检查学生是否已选该课程
+  request.get('/studentCourse/selectAll', {
+    params: {
+      student_id: data.addStudentForm.student_id,
+      course_id: data.currentTeachingClass.course_id.toString()
+    }
+  }).then(existingRes => {
+    if (existingRes.code === '200' && existingRes.data && existingRes.data.length > 0) {
+      ElMessage.error('该学生已选过该课程')
+      return
+    }
+    
+    // 检查时间冲突
+    request.get('/studentCourse/selectByStudentId/' + data.addStudentForm.student_id).then(studentCoursesRes => {
+      if (studentCoursesRes.code === '200' && studentCoursesRes.data && studentCoursesRes.data.length > 0) {
+        // 获取当前教学班信息
+        request.get('/teachingClass/selectById/' + data.currentTeachingClass.id).then(classRes => {
+          if (classRes.code === '200' && classRes.data) {
+            const currentClass = classRes.data
+            
+            // 检查时间冲突
+            const timeConflictCourses = []
+            studentCoursesRes.data.forEach(sc => {
+              if (sc.teaching_class_id) {
+                request.get('/teachingClass/selectById/' + sc.teaching_class_id).then(existingClassRes => {
+                  if (existingClassRes.code === '200' && existingClassRes.data) {
+                    const existingClass = existingClassRes.data
+                    // 简单的时间冲突检查：同一天且时间段重叠
+                    if (existingClass.day_of_week === currentClass.day_of_week) {
+                      if ((existingClass.period_start <= currentClass.period_end && existingClass.period_end >= currentClass.period_start)) {
+                        timeConflictCourses.push(existingClass.class_code)
+                      }
+                    }
+                  }
+                })
+              }
+            })
+            
+            // 延迟检查，确保所有请求都完成
+            setTimeout(() => {
+              if (timeConflictCourses.length > 0) {
+                ElMessage.error(`时间冲突: ${timeConflictCourses.join(', ')}`)
+                return
+              }
+              
+              // 所有检查通过，添加学生
+              const studentCourse = {
+                student_id: data.addStudentForm.student_id,
+                course_id: data.currentTeachingClass.course_id.toString(),
+                teaching_class_id: data.currentTeachingClass.id.toString(),
+                teacher_id: data.currentTeachingClass.teacher_id,
+                teacher_name: data.currentTeachingClass.teacher_name,
+                academic_year_id: data.currentTeachingClass.academic_year_id,
+                status: 1
+              }
+              
+              request.post('/studentCourse/add', studentCourse).then(res => {
+                if (res.code === '200') {
+                  ElMessage.success('添加成功')
+                  data.addStudentDialogVisible = false
+                  loadClassStudents()
+                } else {
+                  ElMessage.error(res.msg)
+                }
+              })
+            }, 1000)
+          }
+        })
+      } else {
+        // 学生没有其他课程，可以直接添加
+        const studentCourse = {
+          student_id: data.addStudentForm.student_id,
+          course_id: data.currentTeachingClass.course_id.toString(),
+          teaching_class_id: data.currentTeachingClass.id.toString(),
+          teacher_id: data.currentTeachingClass.teacher_id,
+          teacher_name: data.currentTeachingClass.teacher_name,
+          academic_year_id: data.currentTeachingClass.academic_year_id,
+          status: 1
+        }
+        
+        request.post('/studentCourse/add', studentCourse).then(res => {
+          if (res.code === '200') {
+            ElMessage.success('添加成功')
+            data.addStudentDialogVisible = false
+            loadClassStudents()
+          } else {
+            ElMessage.error(res.msg)
+          }
+        })
+      }
+    })
+  })
+}
+
+// 移除学生
+const removeStudent = (student) => {
+  if (!data.currentTeachingClass) return
+  
+  // 检查是否已有成绩
+  if (student.score && student.score > 0) {
+    ElMessageBox.confirm('该学生已有成绩，确认移除吗？', '警告', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      performRemoveStudent(student)
+    }).catch(() => {})
+  } else {
+    ElMessageBox.confirm('确认移除该学生吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      performRemoveStudent(student)
+    }).catch(() => {})
+  }
+}
+
+// 执行移除学生操作
+const performRemoveStudent = (student) => {
+  const studentCourse = {
+    student_id: student.username,
+    course_id: data.currentTeachingClass.course_id.toString()
+  }
+  
+  // 先删除 student_course 记录
+  request.delete('/studentCourse/deleteByStudentIdAndCourseId', {
+    data: studentCourse
+  }).then(res => {
+    if (res.code === '200') {
+      // 减少教学班的选中人数
+      if (data.currentTeachingClass && data.currentTeachingClass.selected_count > 0) {
+        const updatedClass = {
+          id: data.currentTeachingClass.id,
+          selected_count: data.currentTeachingClass.selected_count - 1
+        }
+        request.put('/teachingClass/update', updatedClass).then(updateRes => {
+          if (updateRes.code === '200') {
+            // 更新本地状态
+            data.currentTeachingClass.selected_count = updatedClass.selected_count
+          }
+        })
+      }
+      
+      // 再删除相关的 course_selection 记录
+      request.get('/courseSelection/selectAll', {
+        params: {
+          user_id: student.username,
+          course_id: data.currentTeachingClass.course_id.toString()
+        }
+      }).then(selectionRes => {
+        if (selectionRes.code === '200' && selectionRes.data && selectionRes.data.length > 0) {
+          // 批量删除选课申请记录
+          const deletePromises = selectionRes.data.map(selection => {
+            return request.delete(`/courseSelection/delete/${selection.id}`)
+          })
+          
+          Promise.all(deletePromises).then(deleteResults => {
+            const allSuccess = deleteResults.every(result => result.code === '200')
+            if (allSuccess) {
+              ElMessage.success('移除成功')
+              loadClassStudents()
+            } else {
+              ElMessage.success('学生已移除，但选课申请记录处理可能存在问题')
+              loadClassStudents()
+            }
+          })
+        } else {
+          ElMessage.success('移除成功')
+          loadClassStudents()
+        }
+      })
+    } else {
+      ElMessage.error(res.msg)
+    }
+  })
+}
+
+// 批量移除学生
+const batchRemoveStudents = () => {
+  if (!data.selectedStudents || data.selectedStudents.length === 0) {
+    ElMessage.warning('请选择要移除的学生')
+    return
+  }
+  
+  if (!data.currentTeachingClass) return
+  
+  // 检查是否有学生已有成绩
+  const studentsWithScore = data.selectedStudents.filter(student => student.score && student.score > 0)
+  
+  if (studentsWithScore.length > 0) {
+    ElMessageBox.confirm(`选中的 ${data.selectedStudents.length} 名学生中有 ${studentsWithScore.length} 名已有成绩，确认移除吗？`, '警告', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      performBatchRemoveStudents()
+    }).catch(() => {})
+  } else {
+    ElMessageBox.confirm(`确认移除选中的 ${data.selectedStudents.length} 名学生吗？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      performBatchRemoveStudents()
+    }).catch(() => {})
+  }
+}
+
+// 执行批量移除学生操作
+const performBatchRemoveStudents = () => {
+  // 批量移除学生
+  const removePromises = data.selectedStudents.map(student => {
+    const studentCourse = {
+      student_id: student.username,
+      course_id: data.currentTeachingClass.course_id.toString()
+    }
+    return request.delete('/studentCourse/deleteByStudentIdAndCourseId', {
+      data: studentCourse
+    })
+  })
+  
+  Promise.all(removePromises).then(results => {
+    const success = results.every(res => res.code === '200')
+    if (success) {
+      // 减少教学班的选中人数
+      if (data.currentTeachingClass && data.currentTeachingClass.selected_count >= data.selectedStudents.length) {
+        const updatedClass = {
+          id: data.currentTeachingClass.id,
+          selected_count: data.currentTeachingClass.selected_count - data.selectedStudents.length
+        }
+        request.put('/teachingClass/update', updatedClass).then(updateRes => {
+          if (updateRes.code === '200') {
+            // 更新本地状态
+            data.currentTeachingClass.selected_count = updatedClass.selected_count
+          }
+        })
+      }
+      
+      // 批量删除相关的 course_selection 记录
+      const selectionPromises = data.selectedStudents.map(student => {
+        return request.get('/courseSelection/selectAll', {
+          params: {
+            user_id: student.username,
+            course_id: data.currentTeachingClass.course_id.toString()
+          }
+        })
+      })
+      
+      Promise.all(selectionPromises).then(selectionResults => {
+        const deletePromises = []
+        selectionResults.forEach(selectionRes => {
+          if (selectionRes.code === '200' && selectionRes.data && selectionRes.data.length > 0) {
+            selectionRes.data.forEach(selection => {
+              deletePromises.push(request.delete(`/courseSelection/delete/${selection.id}`))
+            })
+          }
+        })
+        
+        if (deletePromises.length > 0) {
+          Promise.all(deletePromises).then(deleteResults => {
+            const allSuccess = deleteResults.every(result => result.code === '200')
+            if (allSuccess) {
+              ElMessage.success('批量移除成功')
+            } else {
+              ElMessage.success('学生已移除，但部分选课申请记录处理可能存在问题')
+            }
+            data.selectedStudents = []
+            loadClassStudents()
+          })
+        } else {
+          ElMessage.success('批量移除成功')
+          data.selectedStudents = []
+          loadClassStudents()
+        }
+      })
+    } else {
+      ElMessage.error('批量移除失败')
+    }
+  })
+}
+
+// 学生分页处理
+const handleStudentSizeChange = (val) => {
+  data.studentPageSize = val
+  loadClassStudents()
+}
+
+const handleStudentCurrentChange = (val) => {
+  data.studentPageNum = val
+  loadClassStudents()
 }
 
 onMounted(() => {
