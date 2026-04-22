@@ -130,7 +130,14 @@
             <el-input v-model="data.form.phone" autocomplete="off" />
           </el-form-item>
           <el-form-item label="专业" prop="profession">
-            <el-input v-model="data.form.profession" autocomplete="off" />
+            <el-select v-model="data.form.profession" placeholder="请选择专业">
+              <el-option
+                  v-for="item in professionOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+              />
+            </el-select>
           </el-form-item>
         </el-form>
         <template #footer>
@@ -241,6 +248,15 @@ const options = [
     label: '女',
   }
 ]
+
+const professionOptions = ref([
+  { value: '计算机科学与技术', label: '计算机科学与技术' },
+  { value: '软件工程', label: '软件工程' },
+  { value: '数据科学与大数据技术', label: '数据科学与大数据技术' },
+  { value: '人工智能', label: '人工智能' },
+  { value: '网络工程', label: '网络工程' },
+  { value: '信息安全', label: '信息安全' }
+])
 
 const uploadUrl = import.meta.env.VITE_BASE_URL + '/files/upload'
 const importUrl = import.meta.env.VITE_BASE_URL + '/student/import'

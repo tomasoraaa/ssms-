@@ -4,6 +4,7 @@ public class CustomException extends RuntimeException {
     private String msg;
 
     public CustomException(String msg) {
+        super(msg);
         this.msg = msg;
     }
 
@@ -13,5 +14,10 @@ public class CustomException extends RuntimeException {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    @Override
+    public String getMessage() {
+        return msg;
     }
 }

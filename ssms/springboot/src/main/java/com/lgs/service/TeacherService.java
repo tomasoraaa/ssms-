@@ -45,6 +45,11 @@ public class TeacherService {
     }
 
     public void updateById(Teacher teacher) {
+        // 检查用户名是否已存在（排除当前记录）
+        Teacher existingTeacher = teacherMapper.selectByUsername(teacher.getUsername());
+        if (existingTeacher != null && !existingTeacher.getId().equals(teacher.getId())) {
+            throw new CustomException("用户名已存在，请重新输入");
+        }
         teacherMapper.updateById(teacher);
     }
 

@@ -50,10 +50,20 @@
             <el-tag v-else-if="scope.row.status === 2" type="warning">已结束</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" width="200">
+        <el-table-column label="操作" align="center" width="120">
           <template #default="scope">
-            <el-button type="primary" @click="handleEdit(scope.row)">编辑</el-button>
-            <el-button type="danger" @click="handleDelete(scope.row.id)">删除</el-button>
+            <el-dropdown trigger="click">
+              <el-button type="primary">
+                操作 <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="handleEdit(scope.row)">编辑</el-dropdown-item>
+                  <el-dropdown-item @click="handleDelete(scope.row.id)" type="danger">删除</el-dropdown-item>
+                  <el-dropdown-item @click="viewScoreStatistics(scope.row)">查看成绩</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -128,6 +138,77 @@
           </span>
         </template>
       </el-dialog>
+
+      <!-- 成绩统计对话框 -->
+      <el-dialog
+        v-model="data.scoreDialogVisible"
+        :title="data.scoreStatistics.class_name + ' 成绩统计'"
+        width="80%"
+      >
+        <div style="margin-bottom: 20px">
+          <el-row :gutter="20">
+            <el-col :span="6">
+              <el-card shadow="hover">
+                <template #header>
+                  <div class="card-header">
+                    <span>平均分</span>
+                  </div>
+                </template>
+                <div class="card-content">{{ data.scoreStatistics.averageScore.toFixed(2) }}</div>
+              </el-card>
+            </el-col>
+            <el-col :span="6">
+              <el-card shadow="hover">
+                <template #header>
+                  <div class="card-header">
+                    <span>最高分</span>
+                  </div>
+                </template>
+                <div class="card-content">{{ data.scoreStatistics.highestScore }}</div>
+              </el-card>
+            </el-col>
+            <el-col :span="6">
+              <el-card shadow="hover">
+                <template #header>
+                  <div class="card-header">
+                    <span>最低分</span>
+                  </div>
+                </template>
+                <div class="card-content">{{ data.scoreStatistics.lowestScore }}</div>
+              </el-card>
+            </el-col>
+            <el-col :span="6">
+              <el-card shadow="hover">
+                <template #header>
+                  <div class="card-header">
+                    <span>及格率</span>
+                  </div>
+                </template>
+                <div class="card-content">{{ (data.scoreStatistics.passRate * 100).toFixed(2) }}%</div>
+              </el-card>
+            </el-col>
+          </el-row>
+        </div>
+
+        <el-table :data="data.scoreStatistics.students" stripe>
+          <el-table-column label="学生学号" prop="studentId"></el-table-column>
+          <el-table-column label="学生姓名" prop="studentName"></el-table-column>
+          <el-table-column label="成绩" prop="score"></el-table-column>
+          <el-table-column label="状态">
+            <template #default="scope">
+              <el-tag :type="scope.row.score >= 60 ? 'success' : 'danger'">
+                {{ scope.row.score >= 60 ? '及格' : '不及格' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="data.scoreDialogVisible = false">关闭</el-button>
+          </span>
+        </template>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -136,6 +217,7 @@
 import request from "@/utils/request";
 import {reactive, ref, onMounted} from "vue";
 import {ElMessage, ElMessageBox} from "element-plus";
+import {ArrowDown} from "@element-plus/icons-vue";
 
 const academicYears = ref([])
 const courses = ref([])
@@ -151,6 +233,15 @@ const data = reactive({
   pageSize: 10,
   total: 0,
   tableData: [],
+  scoreStatistics: {
+    class_name: '',
+    averageScore: 0,
+    highestScore: 0,
+    lowestScore: 0,
+    passRate: 0,
+    students: []
+  },
+  scoreDialogVisible: false
 })
 
 const formatAcademicYear = (row) => {
@@ -394,9 +485,32 @@ const save = () => {
       data.formVisible = false
       load()
     } else {
-      ElMessage.error(res.msg)
+      handleSaveError(res.msg)
+    }
+  }).catch(error => {
+    // 处理网络错误或其他异常
+    console.log('错误信息:', error)
+    if (error.response && error.response.data) {
+      const errorData = error.response.data
+      const errorMsg = errorData.msg || errorData.message || JSON.stringify(errorData)
+      console.log('错误消息:', errorMsg)
+      handleSaveError(errorMsg)
+    } else if (error.message) {
+      console.log('错误消息:', error.message)
+      handleSaveError(error.message)
+    } else {
+      ElMessage.error('网络错误，请检查网络连接')
     }
   })
+}
+
+// 统一错误处理函数
+function handleSaveError(errorMsg) {
+  if (errorMsg && (errorMsg.includes('Duplicate entry') && errorMsg.includes('class_code') || errorMsg.includes('教学班编号已存在'))) {
+    ElMessage.error('教学班编号已存在，请重新输入')
+  } else {
+    ElMessage.error(errorMsg || '操作失败，请重试')
+  }
 }
 
 const handleSizeChange = (val) => {
@@ -409,9 +523,86 @@ const handleCurrentChange = (val) => {
   load()
 }
 
+// 查看成绩统计
+const viewScoreStatistics = (teachingClass) => {
+  data.scoreStatistics.class_name = teachingClass.class_code + ' ' + teachingClass.course_name;
+  // 获取该教学班的所有学生成绩
+  request.get('/studentCourse/selectByTeachingClassId/' + teachingClass.id).then(res => {
+    if (res.code === '200') {
+      const studentCourses = res.data;
+      if (studentCourses.length > 0) {
+        // 获取所有学生信息
+        request.get('/student/selectAll').then(studentRes => {
+          if (studentRes.code === '200') {
+            const allStudents = studentRes.data;
+            // 构建学生ID到姓名的映射
+            const studentMap = {};
+            allStudents.forEach(student => {
+              studentMap[student.username] = student.name;
+            });
+            // 计算统计数据
+            let totalScore = 0;
+            let highestScore = 0;
+            let lowestScore = 100;
+            let passCount = 0;
+            const students = studentCourses.map(sc => {
+              const score = sc.score || 0;
+              totalScore += score;
+              highestScore = Math.max(highestScore, score);
+              lowestScore = Math.min(lowestScore, score);
+              if (score >= 60) {
+                passCount++;
+              }
+              return {
+                studentId: sc.student_id,
+                studentName: studentMap[sc.student_id] || sc.student_id,
+                score: score
+              };
+            });
+            // 计算平均分和及格率
+            const averageScore = totalScore / students.length;
+            const passRate = passCount / students.length;
+            // 更新统计数据
+            data.scoreStatistics.averageScore = averageScore;
+            data.scoreStatistics.highestScore = highestScore;
+            data.scoreStatistics.lowestScore = lowestScore;
+            data.scoreStatistics.passRate = passRate;
+            data.scoreStatistics.students = students;
+          } else {
+            data.scoreStatistics.students = [];
+          }
+          data.scoreDialogVisible = true;
+        });
+      } else {
+        // 没有学生选该课程
+        data.scoreStatistics.averageScore = 0;
+        data.scoreStatistics.highestScore = 0;
+        data.scoreStatistics.lowestScore = 0;
+        data.scoreStatistics.passRate = 0;
+        data.scoreStatistics.students = [];
+        data.scoreDialogVisible = true;
+      }
+    }
+  });
+}
+
 onMounted(() => {
   loadAcademicYears()
   loadCourses()
   loadTeachers()
 })
 </script>
+
+<style scoped>
+.card-header {
+  display: flex;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.card-content {
+  font-size: 24px;
+  text-align: center;
+  margin-top: 10px;
+}
+</style>

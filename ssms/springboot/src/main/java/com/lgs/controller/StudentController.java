@@ -23,9 +23,13 @@ public class StudentController {
      */
     @PostMapping("/add")
     public Result add(@RequestBody Student student) {
-        studentService.add(student);
-        activityLogService.recordLog("用户", "admin", "新增学生 " + student.getName(), "ADMIN");
-        return Result.success();
+        try {
+            studentService.add(student);
+            activityLogService.recordLog("用户", "admin", "新增学生 " + student.getName(), "ADMIN");
+            return Result.success();
+        } catch (RuntimeException e) {
+            return Result.error(e.getMessage());
+        }
     }
 
     /**
@@ -33,9 +37,13 @@ public class StudentController {
      */
     @PutMapping("/update")
     public Result updateById(@RequestBody Student student) {
-        studentService.updateById(student);
-        activityLogService.recordLog("用户", "admin", "修改学生 " + student.getName() + " 的信息", "ADMIN");
-        return Result.success();
+        try {
+            studentService.updateById(student);
+            activityLogService.recordLog("用户", "admin", "修改学生 " + student.getName() + " 的信息", "ADMIN");
+            return Result.success();
+        } catch (RuntimeException e) {
+            return Result.error(e.getMessage());
+        }
     }
 
     /**

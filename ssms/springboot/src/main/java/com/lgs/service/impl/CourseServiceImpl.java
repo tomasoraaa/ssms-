@@ -42,6 +42,11 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void add(Course course) {
+        // 检查课程代码是否已存在
+        Course existingCourse = courseMapper.selectByCourseCode(course.getCourse_code());
+        if (existingCourse != null) {
+            throw new RuntimeException("课程代码已存在，请重新输入");
+        }
         courseMapper.insert(course);
     }
 
@@ -54,6 +59,11 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void updateById(Course course) {
+        // 检查课程代码是否已存在（排除当前记录）
+        Course existingCourse = courseMapper.selectByCourseCode(course.getCourse_code());
+        if (existingCourse != null && !existingCourse.getId().equals(course.getId())) {
+            throw new RuntimeException("课程代码已存在，请重新输入");
+        }
         courseMapper.updateById(course);
     }
 

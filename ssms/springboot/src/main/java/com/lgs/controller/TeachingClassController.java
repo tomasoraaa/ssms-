@@ -26,16 +26,24 @@ public class TeachingClassController {
 
     @PostMapping("/add")
     public Result add(@RequestBody TeachingClass teachingClass) {
-        teachingClassService.add(teachingClass);
-        activityLogService.recordLog("系统", "admin", "新增教学班 " + teachingClass.getClass_code(), "ADMIN");
-        return Result.success(teachingClass.getId());
+        try {
+            teachingClassService.add(teachingClass);
+            activityLogService.recordLog("系统", "admin", "新增教学班 " + teachingClass.getClass_code(), "ADMIN");
+            return Result.success(teachingClass.getId());
+        } catch (RuntimeException e) {
+            return Result.error(e.getMessage());
+        }
     }
 
     @PutMapping("/update")
     public Result update(@RequestBody TeachingClass teachingClass) {
-        teachingClassService.updateById(teachingClass);
-        activityLogService.recordLog("系统", "admin", "修改教学班 " + teachingClass.getClass_code(), "ADMIN");
-        return Result.success();
+        try {
+            teachingClassService.updateById(teachingClass);
+            activityLogService.recordLog("系统", "admin", "修改教学班 " + teachingClass.getClass_code(), "ADMIN");
+            return Result.success();
+        } catch (RuntimeException e) {
+            return Result.error(e.getMessage());
+        }
     }
 
     @DeleteMapping("/delete/{id}")

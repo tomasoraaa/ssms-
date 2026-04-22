@@ -7,7 +7,7 @@
     <div class="card" style="margin-bottom: 15px">
       <el-form :inline="true">
         <el-form-item label="选择课程">
-          <el-select v-model="selectedCourseId" placeholder="请选择课程" @change="loadScoreData">
+          <el-select v-model="selectedCourseId" placeholder="请选择课程" @change="handleCourseChange">
             <el-option
               v-for="course in data.courses"
               :key="course.id"
@@ -16,10 +16,26 @@
             ></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="选择教学班" v-if="selectedCourse && teachingClasses.length > 0">
+          <el-select v-model="selectedTeachingClassId" placeholder="请选择教学班" @change="loadScoreData">
+            <el-option
+              v-for="classItem in teachingClasses"
+              :key="classItem.id"
+              :label="`${classItem.class_code} (${classItem.academic_year_name})`"
+              :value="classItem.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item v-if="selectedCourse">
           <div class="selected-course">
             <span class="course-label">当前课程：</span>
             <span class="course-value">{{ selectedCourse.course_name }} ({{ selectedCourse.course_code }})</span>
+          </div>
+        </el-form-item>
+        <el-form-item v-if="selectedTeachingClass">
+          <div class="selected-course">
+            <span class="course-label">当前教学班：</span>
+            <span class="course-value">{{ selectedTeachingClass.class_code }} ({{ selectedTeachingClass.academic_year_name }})</span>
           </div>
         </el-form-item>
       </el-form>
@@ -81,9 +97,15 @@ const data = reactive({
 });
 
 const selectedCourseId = ref('');
+const selectedTeachingClassId = ref('');
+const teachingClasses = ref([]);
 
 const selectedCourse = computed(() => {
   return data.courses.find(course => course.id === selectedCourseId.value) || null;
+});
+
+const selectedTeachingClass = computed(() => {
+  return teachingClasses.value.find(classItem => classItem.id === selectedTeachingClassId.value) || null;
 });
 const scoreStats = ref({
   average: 0,
@@ -104,7 +126,45 @@ const loadCourses = () => {
         data.courses = res.data;
         if (data.courses.length > 0) {
           selectedCourseId.value = data.courses[0].id;
+          handleCourseChange();
+        }
+      }
+    });
+  }
+};
+
+const handleCourseChange = () => {
+  if (!selectedCourseId.value) {
+    teachingClasses.value = [];
+    selectedTeachingClassId.value = '';
+    return;
+  }
+  
+  // 加载该课程的所有教学班
+  const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
+  if (user.username) {
+    request.get('/teachingClass/selectAll', {
+      params: {
+        course_id: selectedCourseId.value,
+        teacher_id: user.username
+      }
+    }).then(res => {
+      if (res.code === '200') {
+        teachingClasses.value = res.data;
+        if (teachingClasses.value.length > 0) {
+          selectedTeachingClassId.value = teachingClasses.value[0].id;
           loadScoreData();
+        } else {
+          selectedTeachingClassId.value = '';
+          data.studentsWithScore = [];
+          data.scores = [];
+          scoreStats.value = {
+            average: 0,
+            max: 0,
+            min: 0,
+            passRate: 0
+          };
+          drawScoreDistributionChart();
         }
       }
     });
@@ -116,8 +176,14 @@ const loadScoreData = () => {
     return;
   }
 
+  // 根据是否选择了教学班来决定查询参数
+  const params = { course_id: selectedCourseId.value.toString() };
+  if (selectedTeachingClassId.value) {
+    params.teaching_class_id = selectedTeachingClassId.value;
+  }
+
   request.get('/studentCourse/selectAll', {
-    params: { course_id: selectedCourseId.value.toString() }
+    params: params
   }).then(res => {
     if (res.code === '200') {
       const studentCourses = res.data;

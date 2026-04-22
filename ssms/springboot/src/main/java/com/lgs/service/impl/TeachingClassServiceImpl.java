@@ -23,11 +23,26 @@ public class TeachingClassServiceImpl implements TeachingClassService {
         if (teachingClass.getStatus() == null) {
             teachingClass.setStatus(1);
         }
+        // 检查教学班编号是否已存在
+        TeachingClass existingClass = teachingClassMapper.selectByClassCode(teachingClass.getClass_code());
+        if (existingClass != null) {
+            throw new RuntimeException("教学班编号已存在，请重新输入");
+        }
         teachingClassMapper.insert(teachingClass);
     }
 
     @Override
+    public TeachingClass selectByClassCode(String class_code) {
+        return teachingClassMapper.selectByClassCode(class_code);
+    }
+
+    @Override
     public void updateById(TeachingClass teachingClass) {
+        // 检查教学班编号是否已存在（排除当前记录）
+        TeachingClass existingClass = teachingClassMapper.selectByClassCode(teachingClass.getClass_code());
+        if (existingClass != null && !existingClass.getId().equals(teachingClass.getId())) {
+            throw new RuntimeException("教学班编号已存在，请重新输入");
+        }
         teachingClassMapper.updateById(teachingClass);
     }
 

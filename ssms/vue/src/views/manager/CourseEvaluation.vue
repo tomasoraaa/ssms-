@@ -96,7 +96,19 @@ const filteredEvaluations = computed(() => {
 const loadEvaluations = () => {
   request.get('/courseEvaluation/selectAll').then(res => {
     if (res.code === '200') {
-      data.evaluations = res.data || [];
+      // 转换后端下划线命名为前端驼峰命名
+      data.evaluations = (res.data || []).map(evaluation => ({
+        id: evaluation.id,
+        studentId: evaluation.student_id,
+        studentName: evaluation.student_name,
+        courseId: evaluation.course_id,
+        courseName: evaluation.course_name,
+        teacherId: evaluation.teacher_id,
+        rating: evaluation.rating,
+        content: evaluation.content,
+        teacherEvaluation: evaluation.teacher_evaluation,
+        evaluationTime: evaluation.evaluation_time
+      }));
     } else {
       ElMessage.error('加载评价列表失败');
     }

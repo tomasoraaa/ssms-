@@ -45,4 +45,8 @@
         group by c.id
     </select>
 
+    <select id="selectByCourseCode" parameterType="java.lang.String" resultType="com.lgs.entity.Course">
+        select * from course where course_code = #{course_code}
+    </select>
+
 </mapper>

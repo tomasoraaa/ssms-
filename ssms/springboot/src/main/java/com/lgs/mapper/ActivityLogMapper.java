@@ -14,7 +14,7 @@ public interface ActivityLogMapper {
      * 插入活动日志
      */
     @Insert("insert into activity_log (operate_time, operate_type, operate_user, description, user_type) " +
-            "values (#{operateTime}, #{operateType}, #{operateUser}, #{description}, #{userType})")
+            "values (#{operate_time}, #{operate_type}, #{operate_user}, #{description}, #{user_type})")
     void insert(ActivityLog activityLog);
     
     /**

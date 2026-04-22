@@ -57,4 +57,9 @@ public class StudentCourseController {
     public Result selectByStudentId(@PathVariable String studentId) {
         return Result.success(studentCourseService.selectByStudentId(studentId));
     }
+
+    @GetMapping("/selectByTeachingClassId/{teachingClassId}")
+    public Result selectByTeachingClassId(@PathVariable Integer teachingClassId) {
+        return Result.success(studentCourseService.selectByTeachingClassId(teachingClassId));
+    }
 }

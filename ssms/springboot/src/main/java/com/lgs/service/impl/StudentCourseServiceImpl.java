@@ -56,4 +56,9 @@ public class StudentCourseServiceImpl implements StudentCourseService {
     public List<StudentCourse> selectByStudentId(String studentId) {
         return studentCourseMapper.selectByStudentId(studentId);
     }
+
+    @Override
+    public List<StudentCourse> selectByTeachingClassId(Integer teachingClassId) {
+        return studentCourseMapper.selectByTeachingClassId(teachingClassId);
+    }
 }

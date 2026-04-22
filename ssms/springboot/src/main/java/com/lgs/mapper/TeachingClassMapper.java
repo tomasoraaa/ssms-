@@ -11,4 +11,5 @@ public interface TeachingClassMapper {
     List<TeachingClass> selectAll(TeachingClass teachingClass);
     List<TeachingClass> selectByAcademicYearId(Integer academic_year_id);
     List<TeachingClass> selectAvailable(Integer academic_year_id);
+    TeachingClass selectByClassCode(String class_code);
 }

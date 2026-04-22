@@ -24,7 +24,7 @@ public class StudentService {
     public void add(Student student) {
         Student dbStudent = studentMapper.selectByUsername(student.getUsername());
         if (ObjectUtil.isNotNull(dbStudent)) {
-            throw new CustomException("用户已存在");
+            throw new CustomException("该学号对应学生已存在");
         }
         if (ObjectUtil.isEmpty(student.getPassword())) {
             student.setPassword("123456");
@@ -45,6 +45,11 @@ public class StudentService {
     }
 
     public void updateById(Student student) {
+        // 检查用户名是否已存在（排除当前记录）
+        Student existingStudent = studentMapper.selectByUsername(student.getUsername());
+        if (existingStudent != null && !existingStudent.getId().equals(student.getId())) {
+            throw new CustomException("用户名已存在，请重新输入");
+        }
         studentMapper.updateById(student);
     }
 

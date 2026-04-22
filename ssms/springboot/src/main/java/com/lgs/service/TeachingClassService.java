@@ -9,6 +9,7 @@ public interface TeachingClassService {
     void updateById(TeachingClass teachingClass);
     void deleteById(Integer id);
     TeachingClass selectById(Integer id);
+    TeachingClass selectByClassCode(String class_code);
     PageInfo<TeachingClass> selectPage(TeachingClass teachingClass, Integer pageNum, Integer pageSize);
     List<TeachingClass> selectAll(TeachingClass teachingClass);
     List<TeachingClass> selectByAcademicYearId(Integer academic_year_id);

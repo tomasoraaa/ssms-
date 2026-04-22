@@ -12,4 +12,5 @@ public interface StudentCourseMapper {
     void deleteByStudentIdAndCourseId(StudentCourse studentCourse);
     List<StudentCourse> selectByCourseId(String courseId);
     List<StudentCourse> selectByStudentId(String studentId);
+    List<StudentCourse> selectByTeachingClassId(Integer teachingClassId);
 }

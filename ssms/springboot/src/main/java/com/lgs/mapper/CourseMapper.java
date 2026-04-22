@@ -11,6 +11,7 @@ public interface CourseMapper {
     void updateById(Course course);
     void deleteById(Integer id);
     Course selectById(Integer id);
+    Course selectByCourseCode(String course_code);
     
     /**
      * 查询课程及其教师信息

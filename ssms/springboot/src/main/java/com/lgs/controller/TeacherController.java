@@ -23,9 +23,13 @@ public class TeacherController {
      */
     @PostMapping("/add")
     public Result add(@RequestBody Teacher teacher) {
-        teacherService.add(teacher);
-        activityLogService.recordLog("用户", "admin", "新增教师 " + teacher.getName(), "ADMIN");
-        return Result.success();
+        try {
+            teacherService.add(teacher);
+            activityLogService.recordLog("用户", "admin", "新增教师 " + teacher.getName(), "ADMIN");
+            return Result.success();
+        } catch (RuntimeException e) {
+            return Result.error(e.getMessage());
+        }
     }
 
     /**
@@ -33,9 +37,13 @@ public class TeacherController {
      */
     @PutMapping("/update")
     public Result updateById(@RequestBody Teacher teacher) {
-        teacherService.updateById(teacher);
-        activityLogService.recordLog("用户", "admin", "修改教师 " + teacher.getName() + " 的信息", "ADMIN");
-        return Result.success();
+        try {
+            teacherService.updateById(teacher);
+            activityLogService.recordLog("用户", "admin", "修改教师 " + teacher.getName() + " 的信息", "ADMIN");
+            return Result.success();
+        } catch (RuntimeException e) {
+            return Result.error(e.getMessage());
+        }
     }
 
     /**

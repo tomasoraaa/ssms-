@@ -2,10 +2,13 @@ package com.lgs.controller;
 
 import com.lgs.common.Result;
 import com.lgs.entity.Course;
+import com.lgs.exception.CustomException;
 import com.lgs.service.AcademicYearService;
 import com.lgs.service.CourseService;
 import com.lgs.service.ActivityLogService;
 import jakarta.annotation.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,6 +16,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/course")
 public class CourseController {
+
+    private static final Logger logger = LoggerFactory.getLogger(CourseController.class);
 
     @Resource
     private CourseService courseService;
@@ -25,16 +30,30 @@ public class CourseController {
 
     @PostMapping("/add")
     public Result add(@RequestBody Course course) {
-        courseService.add(course);
-        activityLogService.recordLog("课程", "admin", "新增课程 \"" + course.getCourse_name() + "\"", "ADMIN");
-        return Result.success();
+        try {
+            courseService.add(course);
+            activityLogService.recordLog("课程", "admin", "新增课程 \"" + course.getCourse_name() + "\"", "ADMIN");
+            return Result.success();
+        } catch (CustomException e) {
+            return Result.error(e.getMessage());
+        } catch (Exception e) {
+            logger.error("新增课程异常", e);
+            return Result.error("系统异常");
+        }
     }
 
     @PutMapping("/update")
     public Result update(@RequestBody Course course) {
-        courseService.updateById(course);
-        activityLogService.recordLog("课程", "admin", "修改课程 \"" + course.getCourse_name() + "\" 的信息", "ADMIN");
-        return Result.success();
+        try {
+            courseService.updateById(course);
+            activityLogService.recordLog("课程", "admin", "修改课程 \"" + course.getCourse_name() + "\" 的信息", "ADMIN");
+            return Result.success();
+        } catch (CustomException e) {
+            return Result.error(e.getMessage());
+        } catch (Exception e) {
+            logger.error("修改课程异常", e);
+            return Result.error("系统异常");
+        }
     }
 
     @DeleteMapping("/delete/{id}")

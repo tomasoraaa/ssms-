@@ -54,6 +54,9 @@
             <if test="class_code != null and class_code != ''">
                 AND tc.class_code LIKE CONCAT('%', #{class_code}, '%')
             </if>
+            <if test="teacher_id != null and teacher_id != ''">
+                AND tc.teacher_id = #{teacher_id}
+            </if>
         </where>
         ORDER BY ay.year DESC, ay.semester, tc.class_code
     </select>
@@ -72,5 +75,9 @@
         WHERE tc.academic_year_id = #{academic_year_id}
           AND tc.status = 1
           AND tc.selected_count &lt; tc.capacity
+    </select>
+
+    <select id="selectByClassCode" parameterType="java.lang.String" resultType="com.lgs.entity.TeachingClass">
+        SELECT * FROM teaching_class WHERE class_code = #{class_code}
     </select>
 </mapper>
