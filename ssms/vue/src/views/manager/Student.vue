@@ -117,7 +117,7 @@
             <el-input v-model="data.form.age" autocomplete="off" />
           </el-form-item>
           <el-form-item label="性别" prop="gender">
-            <el-select v-model="data.form.gender" placeholder="Select">
+            <el-select v-model="data.form.gender" placeholder="请选择性别">
               <el-option
                   v-for="item in options"
                   :key="item.value"

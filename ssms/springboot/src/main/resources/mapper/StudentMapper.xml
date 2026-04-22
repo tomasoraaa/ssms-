@@ -36,4 +36,13 @@
         where id = #{id}
     </update>
 
+    <select id="selectByUsernames" parameterType="java.util.List" resultType="com.lgs.entity.Student">
+        select * from student
+        where username in
+        <foreach collection="list" item="username" open="(" separator="," close=")">
+            #{username}
+        </foreach>
+        order by username asc
+    </select>
+
 </mapper>

@@ -5,9 +5,11 @@ import com.lgs.common.Result;
 import com.lgs.entity.Student;
 import com.lgs.service.StudentService;
 import com.lgs.service.ActivityLogService;
+import java.util.ArrayList;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
 
 @RestController
 @RequestMapping("/student")
@@ -102,5 +104,18 @@ public class StudentController {
     public Result selectAll() {
         Student student = new Student();
         return Result.success(studentService.selectAll(student));
+    }
+
+    /**
+     * 根据学生用户名列表查询
+     */
+    @PostMapping("/selectByUsernames")
+    public Result selectByUsernames(@RequestBody List<String> usernames) {
+        // 验证输入参数
+        if (usernames == null || usernames.isEmpty()) {
+            return Result.success(new ArrayList<>());
+        }
+        List<Student> students = studentService.selectByUsernames(usernames);
+        return Result.success(students);
     }
 }

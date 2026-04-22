@@ -17,7 +17,7 @@
         <el-button type="primary" @click="dialogImportVisible = true">批量导入</el-button>
       </div>
 
-      <div class="card" style="margin-bottom: 5px">
+      <div class="card" style="margin-bottom: 15px">
         <el-table :data="data.courses" stripe>
           <el-table-column label="课程代码" prop="course_code"></el-table-column>
           <el-table-column label="课程名称" prop="course_name"></el-table-column>
@@ -25,11 +25,40 @@
           <el-table-column label="课程描述" prop="description"></el-table-column>
           <el-table-column label="操作">
             <template #default="scope">
-              <el-button type="primary" @click="viewStudents(scope.row)">录入成绩</el-button>
+              <el-button type="primary" @click="showClassSelection(scope.row)">录入成绩</el-button>
             </template>
           </el-table-column>
         </el-table>
       </div>
+
+      <!-- 教学班选择对话框 -->
+      <el-dialog
+        v-model="classSelectionVisible"
+        :title="`选择教学班：${currentCourse?.course_name || ''}`"
+        width="50%"
+      >
+        <div v-if="currentCourse?.teachingClasses && currentCourse.teachingClasses.length > 0">
+          <el-radio-group v-model="selectedClassId">
+            <el-radio 
+              v-for="cls in currentCourse.teachingClasses" 
+              :key="cls.id"
+              :label="cls.id"
+              style="margin-bottom: 10px; display: block;"
+            >
+              {{ cls.class_code }}
+            </el-radio>
+          </el-radio-group>
+        </div>
+        <div v-else style="color: #999; text-align: center; padding: 20px;">
+          该课程暂无教学班
+        </div>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="classSelectionVisible = false">取消</el-button>
+            <el-button type="primary" @click="confirmClassSelection" :disabled="!selectedClassId">确定</el-button>
+          </span>
+        </template>
+      </el-dialog>
     </template>
 
     <!-- 学生列表对话框 -->
@@ -43,16 +72,20 @@
         <el-table-column label="学生姓名" prop="name"></el-table-column>
         <el-table-column label="联系电话" prop="phone"></el-table-column>
         <el-table-column label="专业" prop="profession"></el-table-column>
-        <el-table-column label="成绩">
+        <el-table-column label="成绩" width="225">
           <template #default="scope">
             <template v-if="!scope.row.isEditing">
-              <span>{{ scope.row.score || 0 }}</span>
-              <el-button type="primary" size="small" style="margin-left: 80px;" @click="startEdit(scope.row)">编辑</el-button>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span>{{ scope.row.score || 0 }}</span>
+                <el-button type="primary" size="small" @click="startEdit(scope.row)">编辑</el-button>
+              </div>
             </template>
             <template v-else>
-              <el-input-number v-model="scope.row.score" :min="0" :max="100" :step="1" size="small" style="width: 100px;"></el-input-number>
-              <el-button type="success" size="small" style="margin-left: 5px;" @click="saveScore(scope.row)">保存</el-button>
-              <el-button type="info" size="small" style="margin-left: 5px;" @click="cancelEdit(scope.row)">取消</el-button>
+              <div style="display: flex; align-items: center;">
+                <el-input-number v-model="scope.row.score" :min="0" :max="100" :step="1" size="small" style="width: 100px;"></el-input-number>
+                <el-button type="success" size="small" style="margin-left: 10px;" @click="saveScore(scope.row)">保存</el-button>
+                <el-button type="info" size="small" style="margin-left: 10px;" @click="cancelEdit(scope.row)">取消</el-button>
+              </div>
             </template>
           </template>
         </el-table-column>
@@ -75,7 +108,8 @@
         <h4>操作步骤：</h4>
         <ol>
           <li>选择一门课程</li>
-          <li>下载该课程的成绩模板</li>
+          <li>选择该课程的一个教学班</li>
+          <li>下载该教学班的成绩模板</li>
           <li>在模板中填写学生成绩</li>
           <li>上传填写好的模板文件</li>
           <li>点击导入按钮完成批量导入</li>
@@ -84,7 +118,7 @@
       
       <el-form label-width="100px">
         <el-form-item label="选择课程">
-          <el-select v-model="selectedCourseId" placeholder="请选择课程">
+          <el-select v-model="selectedCourseId" placeholder="请选择课程" @change="handleCourseChange">
             <el-option
               v-for="course in data.courses"
               :key="course.id"
@@ -94,8 +128,19 @@
           </el-select>
         </el-form-item>
         
+        <el-form-item label="选择教学班">
+          <el-select v-model="selectedClassId" placeholder="请先选择课程">
+            <el-option
+              v-for="cls in teachingClasses"
+              :key="cls.id"
+              :label="cls.class_code"
+              :value="cls.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        
         <el-form-item label="下载模板">
-          <el-button type="primary" @click="downloadCourseTemplate" :disabled="!selectedCourseId">下载模板</el-button>
+          <el-button type="primary" @click="downloadCourseTemplate" :disabled="!selectedCourseId || !selectedClassId">下载模板</el-button>
         </el-form-item>
         
         <el-form-item label="上传文件">
@@ -115,7 +160,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogImportVisible = false">取消</el-button>
-          <el-button type="success" @click="importScores" :disabled="!fileList.length || !selectedCourseId">导入成绩</el-button>
+          <el-button type="success" @click="importScores" :disabled="!fileList.length || !selectedCourseId || !selectedClassId">导入成绩</el-button>
         </span>
       </template>
     </el-dialog>
@@ -128,6 +173,7 @@ import request from "@/utils/request";
 import {reactive, ref, onMounted} from "vue";
 import * as XLSX from 'xlsx';
 import { WarningFilled } from '@element-plus/icons-vue';
+import { ElMessage } from 'element-plus';
 
 // 计算绩点的函数
 const calculateGPA = (score) => {
@@ -167,7 +213,10 @@ const data = reactive({
 const dialogVisible = ref(false);
 const currentCourse = ref(null);
 const dialogImportVisible = ref(false);
+const classSelectionVisible = ref(false);
 const selectedCourseId = ref('');
+const selectedClassId = ref('');
+const teachingClasses = ref([]);
 const fileList = ref([]);
 const selectedFile = ref(null);
 
@@ -180,10 +229,90 @@ const loadCourses = () => {
     }).then(res => {
       if (res.code === '200') {
         data.courses = res.data;
+        
+        // 为每个课程加载教学班级信息
+        data.courses.forEach(course => {
+          request.get('/teachingClass/selectAll', {
+            params: {
+              course_id: course.id,
+              teacher_id: user.username
+            }
+          }).then(classRes => {
+            if (classRes.code === '200') {
+              course.teachingClasses = classRes.data;
+            }
+          });
+        });
       }
     })
   }
 }
+
+// 显示教学班级选择对话框
+const showClassSelection = (course) => {
+  currentCourse.value = course;
+  selectedClassId.value = '';
+  classSelectionVisible.value = true;
+};
+
+// 确认选择教学班级
+const confirmClassSelection = () => {
+  if (!selectedClassId.value) return;
+  
+  // 关闭选择对话框
+  classSelectionVisible.value = false;
+  
+  // 查看该教学班级的学生列表
+  viewStudentsByClass(currentCourse.value, selectedClassId.value);
+};
+
+// 查看教学班级学生列表
+const viewStudentsByClass = (course, classId) => {
+  currentCourse.value = course;
+  // 先获取学生课程关联（按教学班级筛选）
+  request.get('/studentCourse/selectAll', {
+    params: { 
+      course_id: course.id.toString(),
+      teaching_class_id: classId.toString()
+    }
+  }).then(res => {
+    if (res.code === '200') {
+      const studentCourses = res.data;
+      // 构建学生ID到成绩的映射
+      data.studentCourseMap = {};
+      studentCourses.forEach(sc => {
+        data.studentCourseMap[sc.student_id] = sc.score || 0;
+      });
+      
+      if (studentCourses.length > 0) {
+        // 获取学生用户名列表（student_id 实际存储的是用户名）
+        const usernames = studentCourses.map(sc => sc.student_id);
+        // 根据学生用户名列表查询学生信息
+        request.post('/student/selectByUsernames', usernames).then(studentRes => {
+          if (studentRes.code === '200') {
+            const students = studentRes.data;
+            // 为学生添加成绩信息和绩点
+            data.studentsWithScore = students.map(student => {
+              const score = data.studentCourseMap[student.username] || 0;
+              const gpa = calculateGPA(score);
+              return {
+                ...student,
+                score: score,
+                gpa: gpa.toFixed(1)
+              };
+            });
+          } else {
+            data.studentsWithScore = [];
+          }
+          dialogVisible.value = true;
+        });
+      } else {
+        data.studentsWithScore = [];
+        dialogVisible.value = true;
+      }
+    }
+  });
+};
 
 // 查看课程学生列表
 const viewStudents = (course) => {
@@ -201,13 +330,14 @@ const viewStudents = (course) => {
       });
       
       if (studentCourses.length > 0) {
-        // 获取所有学生信息
-        request.get('/student/selectAll').then(studentRes => {
+        // 获取学生用户名列表（student_id 实际存储的是用户名）
+        const usernames = studentCourses.map(sc => sc.student_id);
+        // 根据学生用户名列表查询学生信息
+        request.post('/student/selectByUsernames', usernames).then(studentRes => {
           if (studentRes.code === '200') {
-            const allStudents = studentRes.data;
-            const studentIds = studentCourses.map(sc => sc.student_id);
-            // 筛选出选该课程的学生，并添加成绩信息和绩点
-            data.studentsWithScore = allStudents.filter(student => studentIds.includes(student.username)).map(student => {
+            const students = studentRes.data;
+            // 为学生添加成绩信息和绩点
+            data.studentsWithScore = students.map(student => {
               const score = data.studentCourseMap[student.username] || 0;
               const gpa = calculateGPA(score);
               return {
@@ -239,9 +369,16 @@ const startEdit = (student) => {
 // 保存成绩
 const saveScore = (student) => {
   if (currentCourse.value) {
+    // 验证教学班级是否已选择
+    if (!selectedClassId.value) {
+      ElMessage.error('请选择教学班级');
+      return;
+    }
+    
     const studentCourse = {
       student_id: student.username,
       course_id: currentCourse.value.id.toString(),
+      teaching_class_id: selectedClassId.value,
       score: student.score
     };
     request.put('/studentCourse/updateScore', studentCourse).then(res => {
@@ -271,6 +408,35 @@ const cancelEdit = (student) => {
   student.gpa = calculateGPA(student.score).toFixed(1);
   student.isEditing = false;
   delete student.originalScore;
+};
+
+// 课程选择变化时加载教学班级
+const handleCourseChange = () => {
+  if (!selectedCourseId.value) {
+    teachingClasses.value = [];
+    selectedClassId.value = '';
+    return;
+  }
+  
+  // 加载该课程的所有教学班
+  const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
+  if (user.username) {
+    request.get('/teachingClass/selectAll', {
+      params: {
+        course_id: selectedCourseId.value,
+        teacher_id: user.username
+      }
+    }).then(res => {
+      if (res.code === '200') {
+        teachingClasses.value = res.data;
+        if (teachingClasses.value.length > 0) {
+          selectedClassId.value = teachingClasses.value[0].id;
+        } else {
+          selectedClassId.value = '';
+        }
+      }
+    });
+  }
 };
 
 // 处理文件选择
@@ -312,11 +478,12 @@ const processImportedData = (data) => {
     const studentCourse = {
       student_id: item.studentId || item.学号,
       course_id: selectedCourseId.value,
+      teaching_class_id: selectedClassId.value,
       score: item.score || item.成绩
     };
     
     // 验证必填字段
-    if (!studentCourse.student_id || !studentCourse.course_id || studentCourse.score === undefined) {
+    if (!studentCourse.student_id || !studentCourse.course_id || !studentCourse.teaching_class_id || studentCourse.score === undefined) {
       console.error('数据格式错误:', item);
       return Promise.resolve(null);
     }
@@ -340,7 +507,7 @@ const processImportedData = (data) => {
 
 // 下载课程模板
 const downloadCourseTemplate = () => {
-  if (!selectedCourseId.value) {
+  if (!selectedCourseId.value || !selectedClassId.value) {
     return;
   }
   
@@ -350,9 +517,18 @@ const downloadCourseTemplate = () => {
     return;
   }
   
-  // 获取该课程的学生列表
+  // 获取教学班级信息
+  const teachingClass = teachingClasses.value.find(cls => cls.id === selectedClassId.value);
+  if (!teachingClass) {
+    return;
+  }
+  
+  // 获取该教学班级的学生列表
   request.get('/studentCourse/selectAll', {
-    params: { course_id: selectedCourseId.value.toString() }
+    params: { 
+      course_id: selectedCourseId.value.toString(),
+      teaching_class_id: selectedClassId.value.toString()
+    }
   }).then(res => {
     if (res.code === '200') {
       const studentCourses = res.data;
@@ -363,8 +539,8 @@ const downloadCourseTemplate = () => {
           if (studentRes.code === '200') {
             const allStudents = studentRes.data;
             const studentIds = studentCourses.map(sc => sc.student_id);
-            // 筛选出选该课程的学生
-            const courseStudents = allStudents.filter(student => studentIds.includes(student.username));
+            // 筛选出选该教学班级的学生
+            const classStudents = allStudents.filter(student => studentIds.includes(student.username));
             
             // 创建模板数据
             const templateData = [
@@ -372,7 +548,7 @@ const downloadCourseTemplate = () => {
             ];
             
             // 添加学生数据
-            courseStudents.forEach(student => {
+            classStudents.forEach(student => {
               templateData.push({
                 studentId: student.username,
                 studentName: student.name,
@@ -386,7 +562,7 @@ const downloadCourseTemplate = () => {
             XLSX.utils.book_append_sheet(workbook, worksheet, '成绩模板');
             
             // 下载文件
-            XLSX.writeFile(workbook, `${course.course_name}_成绩导入模板.xlsx`);
+            XLSX.writeFile(workbook, `${course.course_name}_${teachingClass.class_code}_成绩导入模板.xlsx`);
           }
         });
       }

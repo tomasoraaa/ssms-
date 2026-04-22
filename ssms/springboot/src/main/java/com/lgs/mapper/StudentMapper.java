@@ -27,4 +27,9 @@ public interface StudentMapper {
      */
     @Select("select count(*) from student")
     int count();
+
+    /**
+     * 根据学生用户名列表查询
+     */
+    List<Student> selectByUsernames(List<String> usernames);
 }

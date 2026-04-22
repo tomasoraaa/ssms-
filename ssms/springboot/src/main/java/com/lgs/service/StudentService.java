@@ -8,6 +8,7 @@ import com.github.pagehelper.PageInfo;
 import com.lgs.entity.Account;
 import com.lgs.entity.Student;
 import com.lgs.exception.CustomException;
+import java.util.ArrayList;
 import com.lgs.mapper.StudentMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -193,5 +194,16 @@ public class StudentService {
         }
         dbStudent.setPassword(account.getNewPassword());
         studentMapper.updateById(dbStudent);
+    }
+
+    /**
+     * 根据学生用户名列表查询
+     */
+    public List<Student> selectByUsernames(List<String> usernames) {
+        // 验证输入参数
+        if (usernames == null || usernames.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return studentMapper.selectByUsernames(usernames);
     }
 }
