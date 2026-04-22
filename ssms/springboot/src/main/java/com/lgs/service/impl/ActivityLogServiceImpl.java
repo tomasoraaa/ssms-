@@ -19,13 +19,13 @@ public class ActivityLogServiceImpl implements ActivityLogService {
     private ActivityLogMapper activityLogMapper;
     
     @Override
-    public void recordLog(String operateType, String operateUser, String description, String userType) {
+    public void recordLog(String operate_type, String operate_user, String description, String user_type) {
         ActivityLog log = new ActivityLog();
-        log.setOperateTime(LocalDateTime.now());
-        log.setOperateType(operateType);
-        log.setOperateUser(operateUser);
+        log.setOperate_time(LocalDateTime.now());
+        log.setOperate_type(operate_type);
+        log.setOperate_user(operate_user);  
         log.setDescription(description);
-        log.setUserType(userType);
+        log.setUser_type(user_type);    
         activityLogMapper.insert(log);
     }
     

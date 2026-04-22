@@ -17,17 +17,17 @@ public class ActivityLog {
     /**
      * 操作时间
      */
-    private LocalDateTime operateTime;
+    private LocalDateTime operate_time;
     
     /**
      * 操作类型
      */
-    private String operateType;
+    private String operate_type;
     
     /**
      * 操作用户
      */
-    private String operateUser;
+    private String operate_user;
     
     /**
      * 操作描述
@@ -37,5 +37,6 @@ public class ActivityLog {
     /**
      * 用户类型
      */
-    private String userType;
+    private String user_type;
+    
 }

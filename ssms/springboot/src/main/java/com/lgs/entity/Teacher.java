@@ -1,8 +1,11 @@
 package com.lgs.entity;
 
+import lombok.Data;
+
 /**
  * 管理员
 */
+@Data
 public class Teacher extends Account {
 
     /** ID */
@@ -26,95 +29,4 @@ public class Teacher extends Account {
     /** 审核状态：0-待审核，1-已通过，2-已拒绝 */
     private Integer status;
 
-    @Override
-    public Integer getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getAvatar() {
-        return avatar;
-    }
-
-    @Override
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @Override
-    public String getRole() {
-        return role;
-    }
-
-    @Override
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
 }

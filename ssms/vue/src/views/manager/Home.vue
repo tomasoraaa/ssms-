@@ -170,11 +170,29 @@ const loadRecentActivities = () => {
       // 转换数据格式
       data.recentActivities = res.data.map(log => {
         // 格式化时间
-        const time = new Date(log.operateTime);
-        const formattedTime = `${time.getFullYear()}-${String(time.getMonth() + 1).padStart(2, '0')}-${String(time.getDate()).padStart(2, '0')} ${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}`;
+        let time = null;
+        try {
+          // 处理数据库返回的时间格式，如 "2026-04-22 15:28:04"
+          if (log.operate_time) {
+            if (typeof log.operate_time === 'string') {
+              // 直接使用字符串创建Date对象，处理 "YYYY-MM-DD HH:mm:ss" 格式
+              time = new Date(log.operate_time);
+            } else {
+              time = new Date(log.operate_time);
+            }
+          }
+        } catch (error) {
+          console.error('时间解析错误:', error);
+        }
+        
+        let formattedTime = "未知时间";
+        if (time && !isNaN(time.getTime())) {
+          formattedTime = `${time.getFullYear()}-${String(time.getMonth() + 1).padStart(2, '0')}-${String(time.getDate()).padStart(2, '0')} ${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}`;
+        }
+        
         return {
           time: formattedTime,
-          type: log.operateType,
+          type: log.operateType || log.operate_type || "未知类型",
           description: log.description
         };
       });
