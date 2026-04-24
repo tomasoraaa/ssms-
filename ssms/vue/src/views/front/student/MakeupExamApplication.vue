@@ -9,18 +9,18 @@
       </template>
 
       <el-form :inline="true" :model="searchForm" class="search-form">
-        <el-form-item label="课程">
+        <el-form-item label="课程" style="width: 150px;">
           <el-select v-model="searchForm.course_id" placeholder="选择课程">
             <el-option v-for="course in courses" :key="course.id" :label="course.course_name" :value="course.id"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="考试类型">
+        <el-form-item label="考试类型" style="width: 200px;">
           <el-select v-model="searchForm.exam_type" placeholder="选择考试类型">
             <el-option label="缓考" value="缓考"></el-option>
             <el-option label="补考" value="补考"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="状态">
+        <el-form-item label="状态" style="width: 200px;">
           <el-select v-model="searchForm.status" placeholder="选择状态">
             <el-option label="待审批" value="待审批"></el-option>
             <el-option label="已通过" value="已通过"></el-option>
@@ -45,7 +45,11 @@
           </template>
         </el-table-column>
         <el-table-column prop="reason" label="申请原因" min-width="200"></el-table-column>
-        <el-table-column prop="created_at" label="申请时间" width="180"></el-table-column>
+        <el-table-column prop="created_at" label="申请时间" width="180">
+          <template #default="scope">
+            {{ formatDate(scope.row.created_at || scope.row.createdAt) }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="120">
           <template #default="scope">
             <el-button type="info" size="small" @click="viewApplication(scope.row)">查看</el-button>
@@ -346,6 +350,20 @@ const submitApplication = () => {
   })
 }
 
+// 时间格式化函数
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) return ''
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+}
+
 // 查看申请详情
 const viewApplication = (row) => {
   viewForm.value = {
@@ -355,7 +373,7 @@ const viewApplication = (row) => {
     makeup_score: row.makeup_score || row.makeupScore,
     status: row.status,
     reason: row.reason,
-    created_at: row.created_at || row.createdAt
+    created_at: formatDate(row.created_at || row.createdAt)
   }
   viewDialogVisible.value = true
 }

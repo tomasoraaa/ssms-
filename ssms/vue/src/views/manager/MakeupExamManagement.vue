@@ -11,20 +11,20 @@
         <el-form-item label="学生ID">
           <el-input v-model="searchForm.student_id" placeholder="输入学生ID"></el-input>
         </el-form-item>
-        <el-form-item label="课程">
-          <el-select v-model="searchForm.course_id" placeholder="选择课程">
+        <el-form-item label="课程" >
+          <el-select v-model="searchForm.course_id" placeholder="选择课程" style="width: 150px;">
             <el-option v-for="course in courses" :key="course.id" :label="course.course_name" :value="course.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="选择状态">
+          <el-select v-model="searchForm.status" placeholder="选择状态" style="width: 100px;">
             <el-option label="待审批" value="待审批"></el-option>
             <el-option label="已通过" value="已通过"></el-option>
             <el-option label="已拒绝" value="已拒绝"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="考试类型">
-          <el-select v-model="searchForm.exam_type" placeholder="选择考试类型">
+          <el-select v-model="searchForm.exam_type" placeholder="选择考试类型" style="width: 150px;">
             <el-option label="缓考" value="缓考"></el-option>
             <el-option label="补考" value="补考"></el-option>
           </el-select>
@@ -39,17 +39,21 @@
         <el-table-column prop="id" label="ID" width="80"></el-table-column>
         <el-table-column prop="student_id" label="学生ID" width="120"></el-table-column>
         <el-table-column prop="studentName" label="学生姓名"></el-table-column>
-        <el-table-column prop="courseName" label="课程名称"></el-table-column>
-        <el-table-column prop="classCode" label="教学班代码"></el-table-column>
+        <el-table-column prop="courseName" label="课程名称" width="150"></el-table-column>
+        <el-table-column prop="classCode" label="教学班代码" width="120"></el-table-column>
         <el-table-column prop="exam_type" label="考试类型" width="100"></el-table-column>
-        <el-table-column prop="makeup_score" label="缓考/补考成绩" width="150"></el-table-column>
+        <el-table-column prop="makeup_score" label="缓考/补考成绩" width="100"></el-table-column>
         <el-table-column prop="status" label="状态" width="100">
           <template #default="scope">
             <el-tag :type="getStatusType(scope.row.status)">{{ scope.row.status }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="reason" label="申请原因" min-width="200"></el-table-column>
-        <el-table-column prop="created_at" label="申请时间" width="180"></el-table-column>
+        <el-table-column prop="created_at" label="申请时间" width="150">
+            <template #default="scope">
+              {{ formatDate(scope.row.created_at || scope.row.createdAt) }}
+            </template>
+        </el-table-column>
         <el-table-column label="操作" width="150">
           <template #default="scope">
             <el-button v-if="scope.row.status === '待审批'" type="primary" size="small" @click="approveMakeupExam(scope.row.id)">批准</el-button>
@@ -257,7 +261,7 @@ const viewMakeupExam = (row) => {
     makeup_score: row.makeup_score || row.makeupScore,
     status: row.status,
     reason: row.reason,
-    created_at: row.created_at || row.createdAt
+     created_at: formatDate(row.created_at || row.createdAt)
   }
   viewDialogVisible.value = true
 }
@@ -283,6 +287,21 @@ const handleCurrentChange = (current) => {
   pagination.value.currentPage = current
   loadMakeupExams()
 }
+
+// 时间格式化函数
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) return ''
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+}
+
 
 // 初始化
 onMounted(() => {

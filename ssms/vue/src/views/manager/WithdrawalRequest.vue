@@ -10,7 +10,7 @@
           <el-input v-model="queryParams.student_id" placeholder="请输入学生ID"></el-input>
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="queryParams.status" placeholder="请选择状态">
+          <el-select v-model="queryParams.status" placeholder="请选择状态" style="width: 150px;">
             <el-option label="全部" value=""></el-option>
             <el-option label="待审核" value="0"></el-option>
             <el-option label="已批准" value="1"></el-option>
