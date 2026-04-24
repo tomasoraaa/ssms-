@@ -71,4 +71,14 @@ public class StudentCourseServiceImpl implements StudentCourseService {
     public double calculateTotalScore(double usualScore, double midtermScore, double finalScore, Integer usualWeight, Integer midtermWeight, Integer finalWeight) {
         return (usualScore * usualWeight / 100) + (midtermScore * midtermWeight / 100) + (finalScore * finalWeight / 100);
     }
+
+    @Override
+    public List<StudentCourse> selectLowScoreCourses(double threshold) {
+        return studentCourseMapper.selectLowScoreCourses(threshold);
+    }
+
+    @Override
+    public void updateById(StudentCourse studentCourse) {
+        studentCourseMapper.updateById(studentCourse);
+    }
 }

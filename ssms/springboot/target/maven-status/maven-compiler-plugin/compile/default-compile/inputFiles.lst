@@ -67,6 +67,7 @@ D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\ja
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\service\ActivityLogService.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\service\AdminClassService.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\service\AdminService.java
+D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\service\AutoMakeupExamService.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\service\CourseEvaluationService.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\service\CourseSelectionService.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\service\CourseService.java
@@ -76,6 +77,7 @@ D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\ja
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\service\impl\ActivityLogServiceImpl.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\service\impl\AdminClassServiceImpl.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\service\impl\AdminServiceImpl.java
+D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\service\impl\AutoMakeupExamServiceImpl.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\service\impl\CourseEvaluationServiceImpl.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\service\impl\CourseSelectionServiceImpl.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\service\impl\CourseServiceImpl.java

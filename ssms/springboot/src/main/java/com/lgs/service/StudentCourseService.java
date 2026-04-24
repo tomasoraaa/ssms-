@@ -15,4 +15,6 @@ public interface StudentCourseService {
     List<StudentCourse> selectByTeachingClassId(Integer teaching_class_id);
     StudentCourse selectByStudentIdAndCourseId(String student_id, Integer course_id);
     double calculateTotalScore(double usualScore, double midtermScore, double finalScore, Integer usualWeight, Integer midtermWeight, Integer finalWeight);
+    List<StudentCourse> selectLowScoreCourses(double threshold);
+    void updateById(StudentCourse studentCourse);
 }

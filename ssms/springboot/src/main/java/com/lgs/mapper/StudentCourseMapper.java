@@ -14,4 +14,6 @@ public interface StudentCourseMapper {
     List<StudentCourse> selectByStudentId(String student_id);
     List<StudentCourse> selectByTeachingClassId(Integer teaching_class_id);
     StudentCourse selectByStudentIdAndCourseId(String student_id, Integer course_id);
+    List<StudentCourse> selectLowScoreCourses(double threshold);
+    void updateById(StudentCourse studentCourse);
 }

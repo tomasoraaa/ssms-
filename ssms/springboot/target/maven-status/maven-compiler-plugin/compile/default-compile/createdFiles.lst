@@ -36,6 +36,7 @@ com\lgs\controller\AcademicYearController.class
 com\lgs\service\ActivityLogService.class
 com\lgs\service\impl\CourseWithdrawalServiceImpl.class
 com\lgs\entity\CourseWithdrawal.class
+com\lgs\service\AutoMakeupExamService.class
 com\lgs\service\impl\SystemConfigServiceImpl.class
 com\lgs\service\impl\AdminClassServiceImpl.class
 com\lgs\controller\AdminClassController.class
@@ -61,6 +62,7 @@ com\lgs\entity\Admin.class
 com\lgs\service\StudentAdminClassService.class
 com\lgs\service\impl\AdminServiceImpl.class
 com\lgs\mapper\AcademicYearMapper.class
+com\lgs\service\impl\AutoMakeupExamServiceImpl.class
 com\lgs\entity\CourseTeacher.class
 com\lgs\service\CourseService.class
 com\lgs\mapper\ScoreRuleMapper.class

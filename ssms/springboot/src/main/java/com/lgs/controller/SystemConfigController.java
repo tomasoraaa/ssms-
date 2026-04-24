@@ -1,5 +1,6 @@
 package com.lgs.controller;
 
+import com.lgs.service.AutoMakeupExamService;
 import com.lgs.service.SystemConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,9 @@ public class SystemConfigController {
 
     @Autowired
     private SystemConfigService systemConfigService;
+
+    @Autowired
+    private AutoMakeupExamService autoMakeupExamService;
 
     @GetMapping("/isCourseSelectionEnabled")
     public Map<String, Object> isCourseSelectionEnabled() {
@@ -65,8 +69,16 @@ public class SystemConfigController {
     public Map<String, Object> setMakeupExamScoreEntryEnabled(@PathVariable boolean enabled) {
         Map<String, Object> result = new HashMap<>();
         boolean success = systemConfigService.updateConfig("makeup_exam_score_entry_enabled", String.valueOf(enabled));
+        
+        // 当开启补考/缓考成绩录入功能时，自动为成绩低于60分的学生提交补考申请
+        if (enabled && success) {
+            int count = autoMakeupExamService.autoSubmitMakeupExams();
+            result.put("msg", "操作成功，已为" + count + "名学生自动提交补考申请");
+        } else {
+            result.put("msg", success ? "操作成功" : "操作失败");
+        }
+        
         result.put("code", success ? "200" : "500");
-        result.put("msg", success ? "操作成功" : "操作失败");
         return result;
     }
 }
