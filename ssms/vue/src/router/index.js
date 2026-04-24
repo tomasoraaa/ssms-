@@ -22,6 +22,8 @@ const router = createRouter({
         { path: 'academicYear', component: () => import('@/views/manager/AcademicYear.vue')},
         { path: 'adminClass', component: () => import('@/views/manager/AdminClass.vue')},
         { path: 'teachingClass', component: () => import('@/views/manager/TeachingClass.vue')},
+        { path: 'scoreRule', component: () => import('@/views/manager/ScoreRuleManagement.vue')},
+        { path: 'makeupExam', component: () => import('@/views/manager/MakeupExamManagement.vue')},
       ]
     },
     {
@@ -32,10 +34,11 @@ const router = createRouter({
         { path: 'student/home', component: () => import('@/views/front/StudentHome.vue'),  },
         { path: 'student/courses', component: () => import('@/views/front/student/Courses.vue'),  },
         { path: 'student/courseSelection', component: () => import('@/views/front/student/CourseSelection.vue'),  },
-        { path: 'student/withdrawalRequests', component: () => import('@/views/front/student/WithdrawalRequests.vue'),  },
         { path: 'student/scoreAnalysis', component: () => import('@/views/front/student/ScoreAnalysis.vue'),  },
         { path: 'student/evaluation', component: () => import('@/views/front/student/CourseEvaluation.vue'),  },
         { path: 'student/password', component: () => import('@/views/front/student/StudentPassword.vue'),  },
+        { path: 'student/makeupExam', component: () => import('@/views/front/student/MakeupExamApplication.vue'),  },
+        { path: 'student/scoreDetail', component: () => import('@/views/front/student/ScoreDetail.vue'),  },
         { path: 'teacher/home', component: () => import('@/views/front/TeacherHome.vue'),  },
         { path: 'teacher/courses', component: () => import('@/views/front/teacher/CourseManagement.vue'),  },
         { path: 'teacher/score', component: () => import('@/views/front/teacher/ScoreManagement.vue'),  },

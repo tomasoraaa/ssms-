@@ -65,31 +65,60 @@
     <el-dialog
       v-model="dialogVisible"
       title="课程学生列表"
-      width="80%"
+      width="90%"
     >
       <el-table :data="data.studentsWithScore" stripe>
         <el-table-column label="学生学号" prop="username"></el-table-column>
         <el-table-column label="学生姓名" prop="name"></el-table-column>
         <el-table-column label="联系电话" prop="phone"></el-table-column>
         <el-table-column label="专业" prop="profession"></el-table-column>
-        <el-table-column label="成绩" width="225">
+        <el-table-column label="平时成绩" width="120">
           <template #default="scope">
             <template v-if="!scope.row.isEditing">
-              <div style="display: flex; align-items: center; justify-content: space-between;">
-                <span>{{ scope.row.score || 0 }}</span>
-                <el-button type="primary" size="small" @click="startEdit(scope.row)">编辑</el-button>
-              </div>
+              <span>{{ scope.row.usual_score || 0 }}</span>
             </template>
             <template v-else>
-              <div style="display: flex; align-items: center;">
-                <el-input-number v-model="scope.row.score" :min="0" :max="100" :step="1" size="small" style="width: 100px;"></el-input-number>
-                <el-button type="success" size="small" style="margin-left: 10px;" @click="saveScore(scope.row)">保存</el-button>
-                <el-button type="info" size="small" style="margin-left: 10px;" @click="cancelEdit(scope.row)">取消</el-button>
-              </div>
+              <el-input-number v-model="scope.row.usual_score" :min="0" :max="100" :step="1" size="small" style="width: 100px;"></el-input-number>
             </template>
           </template>
         </el-table-column>
-        <el-table-column label="绩点" prop="gpa"></el-table-column>
+        <el-table-column label="期中成绩" width="120">
+          <template #default="scope">
+            <template v-if="!scope.row.isEditing">
+              <span>{{ scope.row.midterm_score || 0 }}</span>
+            </template>
+            <template v-else>
+              <el-input-number v-model="scope.row.midterm_score" :min="0" :max="100" :step="1" size="small" style="width: 100px;"></el-input-number>
+            </template>
+          </template>
+        </el-table-column>
+        <el-table-column label="期末成绩" width="120">
+          <template #default="scope">
+            <template v-if="!scope.row.isEditing">
+              <span>{{ scope.row.final_score || 0 }}</span>
+            </template>
+            <template v-else>
+              <el-input-number v-model="scope.row.final_score" :min="0" :max="100" :step="1" size="small" style="width: 100px;"></el-input-number>
+            </template>
+          </template>
+        </el-table-column>
+        <el-table-column label="总评成绩" width="120">
+          <template #default="scope">
+            <span>{{ scope.row.score || 0 }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="绩点" prop="gpa" width="80"></el-table-column>
+        <el-table-column label="操作" width="150">
+          <template #default="scope">
+            <template v-if="!scope.row.isEditing">
+              <el-button type="primary" size="small" @click="startEdit(scope.row)">编辑</el-button>
+            </template>
+            <template v-else>
+              <el-button type="success" size="small" style="margin-right: 5px;" @click="saveScore(scope.row)">保存</el-button>
+              <el-button type="info" size="small" @click="cancelEdit(scope.row)">取消</el-button>
+            </template>
+          </template>
+        </el-table-column>
       </el-table>
       <template #footer>
         <span class="dialog-footer">
@@ -292,19 +321,45 @@ const viewStudentsByClass = (course, classId) => {
           if (studentRes.code === '200') {
             const students = studentRes.data;
             // 为学生添加成绩信息和绩点
-            data.studentsWithScore = students.map(student => {
+            const studentsWithScore = students.map(student => {
               const score = data.studentCourseMap[student.username] || 0;
               const gpa = calculateGPA(score);
               return {
                 ...student,
                 score: score,
+                usual_score: 0,
+                midterm_score: 0,
+                final_score: 0,
                 gpa: gpa.toFixed(1)
               };
             });
+            
+            // 获取成绩详情
+            request.get('/scoreDetail/selectAll', {
+              params: {
+                teaching_class_id: classId.toString()
+              }
+            }).then(scoreDetailRes => {
+              if (scoreDetailRes.code === '200') {
+                const scoreDetails = scoreDetailRes.data;
+                scoreDetails.forEach(detail => {
+                  const student = studentsWithScore.find(s => s.username === detail.student_id);
+                  if (student) {
+                    student.usual_score = detail.usual_score || 0;
+                    student.midterm_score = detail.midterm_score || 0;
+                    student.final_score = detail.final_score || 0;
+                    student.score = detail.total_score || 0;
+                    student.gpa = calculateGPA(detail.total_score || 0).toFixed(1);
+                  }
+                });
+              }
+              data.studentsWithScore = studentsWithScore;
+              dialogVisible.value = true;
+            });
           } else {
             data.studentsWithScore = [];
+            dialogVisible.value = true;
           }
-          dialogVisible.value = true;
         });
       } else {
         data.studentsWithScore = [];
@@ -363,6 +418,9 @@ const viewStudents = (course) => {
 const startEdit = (student) => {
   // 保存原始成绩，用于取消操作
   student.originalScore = student.score;
+  student.originalUsualScore = student.usual_score;
+  student.originalMidtermScore = student.midterm_score;
+  student.originalFinalScore = student.final_score;
   student.isEditing = true;
 };
 
@@ -375,39 +433,111 @@ const saveScore = (student) => {
       return;
     }
     
-    const studentCourse = {
-      student_id: student.username,
-      course_id: currentCourse.value.id.toString(),
-      teaching_class_id: selectedClassId.value,
-      score: student.score
-    };
-    request.put('/studentCourse/updateScore', studentCourse).then(res => {
-      if (res.code === '200') {
-        // 更新成功
-        console.log('成绩更新成功');
-        // 更新本地映射
-        data.studentCourseMap[student.username] = student.score;
-        // 更新绩点
-        student.gpa = calculateGPA(student.score).toFixed(1);
-        student.isEditing = false;
-      } else {
-        // 更新失败，恢复原成绩
-        student.score = student.originalScore || data.studentCourseMap[student.username] || 0;
-        // 恢复原绩点
-        student.gpa = calculateGPA(student.score).toFixed(1);
-        console.error('成绩更新失败');
+    // 计算总评成绩
+    request.get('/scoreDetail/calculateTotalScore', {
+      params: {
+        usual_score: student.usual_score || 0,
+        midterm_score: student.midterm_score || 0,
+        final_score: student.final_score || 0,
+        usual_weight: 30,
+        midterm_weight: 20,
+        final_weight: 50
+      }
+    }).then(calculateRes => {
+      if (calculateRes.code === '200') {
+        const totalScore = calculateRes.data;
+        student.score = totalScore;
+        student.gpa = calculateGPA(totalScore).toFixed(1);
+        
+        // 保存成绩详情
+        const scoreDetail = {
+          student_id: student.username,
+          course_id: currentCourse.value.id,
+          teaching_class_id: selectedClassId.value,
+          usual_score: student.usual_score || 0,
+          midterm_score: student.midterm_score || 0,
+          final_score: student.final_score || 0,
+          total_score: totalScore
+        };
+        
+        // 检查是否已有成绩详情记录
+        request.get('/scoreDetail/selectByStudentAndTeachingClass', {
+          params: {
+            student_id: student.username,
+            teaching_class_id: selectedClassId.value
+          }
+        }).then(existingRes => {
+          if (existingRes.code === '200') {
+            if (existingRes.data) {
+              // 更新现有记录
+              scoreDetail.id = existingRes.data.id;
+              request.put('/scoreDetail/update', scoreDetail).then(updateRes => {
+                if (updateRes.code === '200') {
+                  // 更新 student_course 表中的总评成绩
+                  updateStudentCourse(student, totalScore);
+                } else {
+                  ElMessage.error('保存成绩详情失败');
+                }
+              });
+            } else {
+              // 创建新记录
+              request.post('/scoreDetail/add', scoreDetail).then(addRes => {
+                if (addRes.code === '200') {
+                  // 更新 student_course 表中的总评成绩
+                  updateStudentCourse(student, totalScore);
+                } else {
+                  ElMessage.error('保存成绩详情失败');
+                }
+              });
+            }
+          }
+        });
       }
     });
   }
 };
 
+// 更新 student_course 表中的总评成绩
+const updateStudentCourse = (student, totalScore) => {
+  const studentCourse = {
+    student_id: student.username,
+    course_id: currentCourse.value.id.toString(),
+    teaching_class_id: selectedClassId.value,
+    score: totalScore
+  };
+  request.put('/studentCourse/updateScore', studentCourse).then(res => {
+    if (res.code === '200') {
+      // 更新成功
+      console.log('成绩更新成功');
+      // 更新本地映射
+      data.studentCourseMap[student.username] = totalScore;
+      student.isEditing = false;
+    } else {
+      // 更新失败，恢复原成绩
+      student.score = student.originalScore || data.studentCourseMap[student.username] || 0;
+      student.usual_score = student.originalUsualScore || 0;
+      student.midterm_score = student.originalMidtermScore || 0;
+      student.final_score = student.originalFinalScore || 0;
+      // 恢复原绩点
+      student.gpa = calculateGPA(student.score).toFixed(1);
+      console.error('成绩更新失败');
+    }
+  });
+};
+
 // 取消编辑
 const cancelEdit = (student) => {
   student.score = student.originalScore || data.studentCourseMap[student.username] || 0;
+  student.usual_score = student.originalUsualScore || 0;
+  student.midterm_score = student.originalMidtermScore || 0;
+  student.final_score = student.originalFinalScore || 0;
   // 恢复原绩点
   student.gpa = calculateGPA(student.score).toFixed(1);
   student.isEditing = false;
   delete student.originalScore;
+  delete student.originalUsualScore;
+  delete student.originalMidtermScore;
+  delete student.originalFinalScore;
 };
 
 // 课程选择变化时加载教学班级
@@ -475,20 +605,47 @@ const processImportedData = (data) => {
   
   // 批量导入成绩
   const importPromises = data.map(item => {
-    const studentCourse = {
-      student_id: item.studentId || item.学号,
-      course_id: selectedCourseId.value,
-      teaching_class_id: selectedClassId.value,
-      score: item.score || item.成绩
-    };
+    const studentId = item.studentId || item.学号;
+    const usualScore = item.usualScore || item.平时成绩 || 0;
+    const midtermScore = item.midtermScore || item.期中成绩 || 0;
+    const finalScore = item.finalScore || item.期末成绩 || 0;
     
     // 验证必填字段
-    if (!studentCourse.student_id || !studentCourse.course_id || !studentCourse.teaching_class_id || studentCourse.score === undefined) {
+    if (!studentId || !selectedCourseId.value || !selectedClassId.value) {
       console.error('数据格式错误:', item);
       return Promise.resolve(null);
     }
     
-    return request.put('/studentCourse/updateScore', studentCourse);
+    // 创建成绩详情对象
+    const scoreDetail = {
+      student_id: studentId,
+      course_id: selectedCourseId.value,
+      teaching_class_id: selectedClassId.value,
+      usual_score: parseFloat(usualScore),
+      midterm_score: parseFloat(midtermScore),
+      final_score: parseFloat(finalScore)
+    };
+    
+    // 先检查是否已存在成绩详情
+    return request.get('/scoreDetail/selectByStudentAndCourse', {
+      params: {
+        student_id: studentId,
+        course_id: selectedCourseId.value
+      }
+    }).then(res => {
+      if (res.code === '200') {
+        if (res.data) {
+          // 已存在，更新
+          scoreDetail.id = res.data.id;
+          return request.put('/scoreDetail/updateById', scoreDetail);
+        } else {
+          // 不存在，新增
+          return request.post('/scoreDetail/add', scoreDetail);
+        }
+      } else {
+        return Promise.resolve(null);
+      }
+    });
   });
   
   // 处理导入结果
@@ -544,7 +701,7 @@ const downloadCourseTemplate = () => {
             
             // 创建模板数据
             const templateData = [
-              { studentId: '学号', studentName: '姓名', score: '成绩' }
+              { studentId: '学号', studentName: '姓名', usualScore: '平时成绩', midtermScore: '期中成绩', finalScore: '期末成绩' }
             ];
             
             // 添加学生数据
@@ -552,7 +709,9 @@ const downloadCourseTemplate = () => {
               templateData.push({
                 studentId: student.username,
                 studentName: student.name,
-                score: ''
+                usualScore: '',
+                midtermScore: '',
+                finalScore: ''
               });
             });
             

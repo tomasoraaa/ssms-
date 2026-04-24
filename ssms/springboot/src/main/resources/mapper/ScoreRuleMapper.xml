@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgs.mapper.ScoreRuleMapper">
+    <resultMap id="ScoreRuleResultMap" type="com.lgs.entity.ScoreRule">
+        <id property="id" column="id"/>
+        <result property="course_id" column="course_id"/>
+        <result property="usual_weight" column="usual_weight"/>
+        <result property="midterm_weight" column="midterm_weight"/>
+        <result property="final_weight" column="final_weight"/>
+        <result property="warning_threshold" column="warning_threshold"/>
+        <result property="created_at" column="created_at"/>
+        <result property="updated_at" column="updated_at"/>
+    </resultMap>
+
+    <select id="selectAll" resultMap="ScoreRuleResultMap">
+        SELECT * FROM score_rule
+        <where>
+            <if test="course_id != null">AND course_id = #{course_id}</if>
+        </where>
+    </select>
+
+    <select id="selectById" resultMap="ScoreRuleResultMap">
+        SELECT * FROM score_rule WHERE id = #{id}
+    </select>
+
+    <select id="selectByCourseId" resultMap="ScoreRuleResultMap">
+        SELECT * FROM score_rule WHERE course_id = #{course_id}
+    </select>
+
+    <insert id="insert" parameterType="com.lgs.entity.ScoreRule">
+        INSERT INTO score_rule (course_id, usual_weight, midterm_weight, final_weight, warning_threshold)
+        VALUES (#{course_id}, #{usual_weight}, #{midterm_weight}, #{final_weight}, #{warning_threshold})
+    </insert>
+
+    <update id="updateById" parameterType="com.lgs.entity.ScoreRule">
+        UPDATE score_rule
+        <set>
+            <if test="courseId != null">course_id = #{course_id},</if>
+            <if test="usualWeight != null">usual_weight = #{usual_weight},</if>
+            <if test="midtermWeight != null">midterm_weight = #{midterm_weight},</if>
+            <if test="finalWeight != null">final_weight = #{final_weight},</if>
+            <if test="warningThreshold != null">warning_threshold = #{warning_threshold},</if>
+            updated_at = CURRENT_TIMESTAMP
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        DELETE FROM score_rule WHERE id = #{id}
+    </delete>
+</mapper>

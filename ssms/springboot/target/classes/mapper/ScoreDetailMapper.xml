@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgs.mapper.ScoreDetailMapper">
+    <resultMap id="ScoreDetailResultMap" type="com.lgs.entity.ScoreDetail">
+        <id property="id" column="id"/>
+        <result property="student_id" column="student_id"/>
+        <result property="course_id" column="course_id"/>
+        <result property="teaching_class_id" column="teaching_class_id"/>
+        <result property="usual_score" column="usual_score"/>
+        <result property="midterm_score" column="midterm_score"/>
+        <result property="final_score" column="final_score"/>
+        <result property="total_score" column="total_score"/>
+        <result property="created_at" column="created_at"/>
+        <result property="updated_at" column="updated_at"/>
+    </resultMap>
+
+    <select id="selectAll" resultMap="ScoreDetailResultMap">
+        SELECT * FROM score_detail
+        <where>
+            <if test="student_id != null">AND student_id = #{student_id}</if>
+            <if test="course_id != null">AND course_id = #{course_id}</if>
+            <if test="teaching_class_id != null">AND teaching_class_id = #{teaching_class_id}</if>
+        </where>
+    </select>
+
+    <select id="selectById" resultMap="ScoreDetailResultMap">
+        SELECT * FROM score_detail WHERE id = #{id}
+    </select>
+
+    <select id="selectByStudentAndCourse" resultMap="ScoreDetailResultMap">
+        SELECT * FROM score_detail WHERE student_id = #{student_id} AND course_id = #{course_id}
+    </select>
+
+    <select id="selectByStudentAndTeachingClass" resultMap="ScoreDetailResultMap">
+        SELECT * FROM score_detail WHERE student_id = #{student_id} AND teaching_class_id = #{teaching_class_id}
+    </select>
+
+    <select id="selectByCourseId" resultMap="ScoreDetailResultMap">
+        SELECT * FROM score_detail WHERE course_id = #{course_id}
+    </select>
+
+    <select id="selectByTeachingClassId" resultMap="ScoreDetailResultMap">
+        SELECT * FROM score_detail WHERE teaching_class_id = #{teaching_class_id}
+    </select>
+
+    <select id="selectByStudentId" resultMap="ScoreDetailResultMap">
+        SELECT * FROM score_detail WHERE student_id = #{student_id}
+    </select>
+
+    <insert id="insert" parameterType="com.lgs.entity.ScoreDetail">
+        INSERT INTO score_detail (student_id, course_id, teaching_class_id, usual_score, midterm_score, final_score, total_score)
+        VALUES (#{student_id}, #{course_id}, #{teaching_class_id}, #{usual_score}, #{midterm_score}, #{final_score}, #{total_score})
+    </insert>
+
+    <update id="updateById" parameterType="com.lgs.entity.ScoreDetail">
+        UPDATE score_detail
+        <set>
+            <if test="studentId != null">student_id = #{student_id},</if>
+            <if test="courseId != null">course_id = #{course_id},</if>
+            <if test="teachingClassId != null">teaching_class_id = #{teaching_class_id},</if>
+            <if test="usualScore != null">usual_score = #{usual_score},</if>
+            <if test="midtermScore != null">midterm_score = #{midterm_score},</if>
+            <if test="finalScore != null">final_score = #{final_score},</if>
+            <if test="totalScore != null">total_score = #{total_score},</if>
+            updated_at = CURRENT_TIMESTAMP
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        DELETE FROM score_detail WHERE id = #{id}
+    </delete>
+</mapper>

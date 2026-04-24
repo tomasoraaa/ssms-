@@ -158,4 +158,9 @@ public class CourseServiceImpl implements CourseService {
     public int count() {
         return courseMapper.count();
     }
+
+    @Override
+    public List<Course> selectAll() {
+        return courseMapper.selectAll(new Course());
+    }
 }

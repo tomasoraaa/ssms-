@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/course")
@@ -90,5 +89,13 @@ public class CourseController {
     @GetMapping("/selectByTeacherId")
     public Result selectByTeacherId(@RequestParam String teacher_id) {
         return Result.success(courseService.selectByTeacherId(teacher_id));
+    }
+
+    /**
+     * 查询所有课程
+     */
+    @GetMapping("/selectAll")
+    public Result selectAll() {
+        return Result.success(courseService.selectAll());
     }
 }

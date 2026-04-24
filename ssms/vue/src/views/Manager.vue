@@ -98,6 +98,14 @@
             <el-icon><Message /></el-icon>
             <span>修改申请管理</span>
           </el-menu-item>
+          <el-menu-item index="/manager/scoreRule">
+            <el-icon><DataLine /></el-icon>
+            <span>成绩规则管理</span>
+          </el-menu-item>
+          <el-menu-item index="/manager/makeupExam">
+            <el-icon><Tickets /></el-icon>
+            <span>缓考/补考管理</span>
+          </el-menu-item>
         </el-menu>
       </div>
 
@@ -113,7 +121,7 @@
 import { reactive } from "vue";
 import router from "@/router";
 import {ElMessage} from "element-plus";
-import { HomeFilled, Memo, Avatar, UserFilled, Document, Message, User, Lock, SwitchButton, ArrowDown, Collection, Calendar, School, OfficeBuilding } from "@element-plus/icons-vue";
+import { HomeFilled, Memo, Avatar, UserFilled, Document, Message, User, Lock, SwitchButton, ArrowDown, Collection, Calendar, School, OfficeBuilding, DataLine, Tickets } from "@element-plus/icons-vue";
 
 const data = reactive({
   user: JSON.parse(sessionStorage.getItem('xm-user') || '{}')

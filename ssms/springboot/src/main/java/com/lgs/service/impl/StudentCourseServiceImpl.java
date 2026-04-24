@@ -61,4 +61,9 @@ public class StudentCourseServiceImpl implements StudentCourseService {
     public List<StudentCourse> selectByTeachingClassId(Integer teachingClassId) {
         return studentCourseMapper.selectByTeachingClassId(teachingClassId);
     }
+
+    @Override
+    public double calculateTotalScore(double usualScore, double midtermScore, double finalScore, Integer usualWeight, Integer midtermWeight, Integer finalWeight) {
+        return (usualScore * usualWeight / 100) + (midtermScore * midtermWeight / 100) + (finalScore * finalWeight / 100);
+    }
 }

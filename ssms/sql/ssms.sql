@@ -11,7 +11,7 @@
  Target Server Version : 80042 (8.0.42)
  File Encoding         : 65001
 
- Date: 22/04/2026 20:28:29
+ Date: 24/04/2026 16:15:00
 */
 
 SET NAMES utf8mb4;
@@ -53,7 +53,7 @@ CREATE TABLE `activity_log`  (
   `user_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_operate_time`(`operate_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 113 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 126 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of activity_log
@@ -170,6 +170,19 @@ INSERT INTO `activity_log` VALUES (109, '2026-04-22 19:21:27', '选课', '202401
 INSERT INTO `activity_log` VALUES (110, '2026-04-22 19:22:01', '成绩', 'admin', '修改学生课程成绩', 'ADMIN');
 INSERT INTO `activity_log` VALUES (111, '2026-04-22 19:22:01', '成绩', 'admin', '修改学生课程成绩', 'ADMIN');
 INSERT INTO `activity_log` VALUES (112, '2026-04-22 19:32:51', '成绩', 'admin', '修改学生课程成绩', 'ADMIN');
+INSERT INTO `activity_log` VALUES (113, '2026-04-22 20:33:23', '成绩', 'admin', '为学生添加课程成绩', 'ADMIN');
+INSERT INTO `activity_log` VALUES (114, '2026-04-22 20:53:46', '选课', '20240101001', '学生 20240101001 申请选课', 'STUDENT');
+INSERT INTO `activity_log` VALUES (115, '2026-04-22 21:45:53', '成绩', 'admin', '修改学生课程成绩', 'ADMIN');
+INSERT INTO `activity_log` VALUES (116, '2026-04-22 21:46:24', '成绩', 'admin', '修改学生课程成绩', 'ADMIN');
+INSERT INTO `activity_log` VALUES (117, '2026-04-22 22:19:53', '成绩', 'admin', '修改学生课程成绩', 'ADMIN');
+INSERT INTO `activity_log` VALUES (118, '2026-04-22 22:46:17', '登录', '20240101003', '学生 20240101003 登录系统', 'STUDENT');
+INSERT INTO `activity_log` VALUES (119, '2026-04-22 23:07:24', '登录', 'admin', '管理员 admin 登录系统', 'ADMIN');
+INSERT INTO `activity_log` VALUES (120, '2026-04-22 23:07:42', '登录', '20240101003', '学生 20240101003 登录系统', 'STUDENT');
+INSERT INTO `activity_log` VALUES (121, '2026-04-24 14:32:28', '登录', 'admin', '管理员 admin 登录系统', 'ADMIN');
+INSERT INTO `activity_log` VALUES (122, '2026-04-24 14:39:32', '登录', '20240101003', '学生 20240101003 登录系统', 'STUDENT');
+INSERT INTO `activity_log` VALUES (123, '2026-04-24 14:40:22', '登录', 'T2024004', '教师 T2024004 登录系统', 'TEACHER');
+INSERT INTO `activity_log` VALUES (124, '2026-04-24 14:40:25', '登录', 'T2024004', '教师 T2024004 登录系统', 'TEACHER');
+INSERT INTO `activity_log` VALUES (125, '2026-04-24 14:40:39', '登录', 'T2024004', '教师 T2024004 登录系统', 'TEACHER');
 
 -- ----------------------------
 -- Table structure for admin
@@ -304,14 +317,14 @@ CREATE TABLE `course_selection`  (
   `admin_class_id` int NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_user_course`(`user_id` ASC, `course_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 19 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 20 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of course_selection
 -- ----------------------------
 INSERT INTO `course_selection` VALUES (16, '20240101002', '李浩然', 'STUDENT', '17', '云计算与大数据', 1, '2026-04-22 15:31:19', 'T2024004', '刘芳', 'CS403-2024-2-02', 7, NULL, NULL);
-INSERT INTO `course_selection` VALUES (17, '20240101001', '张梓萱', 'STUDENT', '17', '云计算与大数据', 1, '2026-04-22 15:31:29', 'T2024004', '刘芳', 'CS403-2024-2-02', 7, NULL, NULL);
 INSERT INTO `course_selection` VALUES (18, '20240101003', '王思琪', 'STUDENT', '17', '云计算与大数据', 1, '2026-04-22 19:21:26', 'T2024004', '刘芳', 'CS403-2024-2-03', 12, NULL, NULL);
+INSERT INTO `course_selection` VALUES (19, '20240101001', '张梓萱', 'STUDENT', '17', '云计算与大数据', 1, '2026-04-22 20:53:45', 'T2024004', '刘芳', 'CS403-2024-2-02', 7, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for course_teacher
@@ -390,6 +403,35 @@ CREATE TABLE `course_withdrawal`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for makeup_exam
+-- ----------------------------
+DROP TABLE IF EXISTS `makeup_exam`;
+CREATE TABLE `makeup_exam`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `student_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `course_id` int NULL DEFAULT NULL,
+  `teaching_class_id` int NULL DEFAULT NULL,
+  `exam_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `makeup_score` decimal(5, 2) NULL DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '待审批',
+  `reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `student_id`(`student_id` ASC) USING BTREE,
+  INDEX `course_id`(`course_id` ASC) USING BTREE,
+  INDEX `teaching_class_id`(`teaching_class_id` ASC) USING BTREE,
+  CONSTRAINT `makeup_exam_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `student` (`username`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `makeup_exam_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `course` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `makeup_exam_ibfk_3` FOREIGN KEY (`teaching_class_id`) REFERENCES `teaching_class` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of makeup_exam
+-- ----------------------------
+INSERT INTO `makeup_exam` VALUES (1, '20240101003', 17, 12, '补考', NULL, '已通过', '挂科了，按照规定需要申请补考', '2026-04-22 22:47:15', '2026-04-24 14:39:04');
+
+-- ----------------------------
 -- Table structure for modify_request
 -- ----------------------------
 DROP TABLE IF EXISTS `modify_request`;
@@ -413,6 +455,61 @@ INSERT INTO `modify_request` VALUES (1, '20240101001', '张梓萱', 'STUDENT', '
 INSERT INTO `modify_request` VALUES (2, 'T2024001', '张明', 'TEACHER', 'avatar', '', 'http://localhost:9090/files/download/1776596101549-0d19b52d7e475569095d0400858eec.jpg', 1, '2026-04-19 18:55:02');
 INSERT INTO `modify_request` VALUES (6, 'T2024020', '宋丽', 'TEACHER', 'avatar', '', 'http://localhost:9090/files/download/1776844315693-0ff7e2e97b44d74ef25052bd7294fb.jpg', 1, '2026-04-22 15:51:56');
 INSERT INTO `modify_request` VALUES (7, '20240101002', '李浩然', 'STUDENT', 'avatar', '', 'http://localhost:9090/files/download/1776844339119-1c62775b7a6fdc7e6ef35af2aac3bf.jpg', 1, '2026-04-22 15:52:19');
+
+-- ----------------------------
+-- Table structure for score_detail
+-- ----------------------------
+DROP TABLE IF EXISTS `score_detail`;
+CREATE TABLE `score_detail`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `student_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `course_id` int NULL DEFAULT NULL,
+  `teaching_class_id` int NULL DEFAULT NULL,
+  `usual_score` decimal(5, 2) NULL DEFAULT NULL,
+  `midterm_score` decimal(5, 2) NULL DEFAULT NULL,
+  `final_score` decimal(5, 2) NULL DEFAULT NULL,
+  `total_score` decimal(5, 2) NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `student_id`(`student_id` ASC) USING BTREE,
+  INDEX `course_id`(`course_id` ASC) USING BTREE,
+  INDEX `teaching_class_id`(`teaching_class_id` ASC) USING BTREE,
+  CONSTRAINT `score_detail_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `student` (`username`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `score_detail_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `course` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `score_detail_ibfk_3` FOREIGN KEY (`teaching_class_id`) REFERENCES `teaching_class` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of score_detail
+-- ----------------------------
+INSERT INTO `score_detail` VALUES (1, '20240101001', 17, 7, 80.00, 90.00, 85.00, 84.50, '2026-04-22 21:45:52', '2026-04-22 21:45:52');
+INSERT INTO `score_detail` VALUES (2, '20240101002', 17, 7, 90.00, 85.00, 90.00, 89.00, '2026-04-22 21:46:24', '2026-04-22 21:46:24');
+INSERT INTO `score_detail` VALUES (3, '20240101003', 17, 12, 80.00, 60.00, 30.00, 49.00, '2026-04-22 22:19:53', '2026-04-22 22:19:53');
+
+-- ----------------------------
+-- Table structure for score_rule
+-- ----------------------------
+DROP TABLE IF EXISTS `score_rule`;
+CREATE TABLE `score_rule`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `course_id` int NULL DEFAULT NULL,
+  `usual_weight` int NULL DEFAULT 30,
+  `midterm_weight` int NULL DEFAULT 20,
+  `final_weight` int NULL DEFAULT 50,
+  `warning_threshold` int NULL DEFAULT 60,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `unique_course`(`course_id` ASC) USING BTREE,
+  CONSTRAINT `score_rule_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `course` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of score_rule
+-- ----------------------------
+INSERT INTO `score_rule` VALUES (1, 17, 20, 30, 50, 60, '2026-04-22 22:03:09', '2026-04-22 22:15:21');
+INSERT INTO `score_rule` VALUES (2, 15, 20, 30, 50, 60, '2026-04-22 22:18:56', '2026-04-22 22:18:56');
 
 -- ----------------------------
 -- Table structure for student
@@ -518,14 +615,14 @@ CREATE TABLE `student_course`  (
   `original_score` double NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_student_course`(`student_id` ASC, `course_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 14 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of student_course
 -- ----------------------------
-INSERT INTO `student_course` VALUES (11, '20240101002', '17', 7, 2, 84, 'T2024004', '刘芳', 1, NULL, NULL);
-INSERT INTO `student_course` VALUES (12, '20240101001', '17', 7, 2, 83, 'T2024004', '刘芳', 1, NULL, NULL);
-INSERT INTO `student_course` VALUES (13, '20240101003', '17', 12, 2, NULL, 'T2024004', '刘芳', 1, NULL, NULL);
+INSERT INTO `student_course` VALUES (11, '20240101002', '17', 7, 2, 89, 'T2024004', '刘芳', 1, NULL, NULL);
+INSERT INTO `student_course` VALUES (13, '20240101003', '17', 12, 2, 51, 'T2024004', '刘芳', 1, NULL, NULL);
+INSERT INTO `student_course` VALUES (14, '20240101001', '17', 7, 2, 84.5, 'T2024004', '刘芳', 1, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for system_config

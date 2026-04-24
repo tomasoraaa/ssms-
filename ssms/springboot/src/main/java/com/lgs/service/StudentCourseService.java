@@ -13,4 +13,5 @@ public interface StudentCourseService {
     List<StudentCourse> selectByCourseId(String courseId);
     List<StudentCourse> selectByStudentId(String studentId);
     List<StudentCourse> selectByTeachingClassId(Integer teachingClassId);
+    double calculateTotalScore(double usualScore, double midtermScore, double finalScore, Integer usualWeight, Integer midtermWeight, Integer finalWeight);
 }

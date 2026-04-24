@@ -4,52 +4,68 @@
       <h3>我的课程</h3>
     </div>
 
-    <div class="card" style="margin-bottom: 15px">
-      <el-form :inline="true" @submit.prevent="handleQuery">
-        <el-form-item label="查询">
-          <el-input v-model="queryParams.keyword" placeholder="请输入课程代码或名称"></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleQuery">查询</el-button>
-          <el-button @click="resetQuery">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </div>
-
-    <div class="card" style="margin-bottom: 15px">
-      <div style="padding: 10px 20px; background-color: #f5f7fa; border-radius: 4px; margin-bottom: 10px;">
-        <el-row>
-          <el-col :span="8">
-            <span style="font-weight: bold;">平均学分绩点：</span>
-            <span style="font-size: 18px; color: #409eff;">{{ averageGPA }}</span>
-          </el-col>
-          <el-col :span="8">
-            <span style="font-weight: bold;">已修课程数：</span>
-            <span>{{ completedCourses.length }}</span>
-          </el-col>
-          <el-col :span="8">
-            <span style="font-weight: bold;">总学分：</span>
-            <span>{{ totalCredit }}</span>
-          </el-col>
-        </el-row>
-      </div>
-    </div>
-
     <div class="card" style="margin-bottom: 5px">
-      <el-table :data="filteredCourses" stripe>
-        <el-table-column label="课程代码" prop="course_code"></el-table-column>
-        <el-table-column label="课程名称" prop="course_name"></el-table-column>
-        <el-table-column label="学分" prop="credit"></el-table-column>
-        <el-table-column label="任课教师" prop="teacher_name"></el-table-column>
-        <el-table-column label="成绩" prop="score"></el-table-column>
-        <el-table-column label="绩点" prop="gpa"></el-table-column>
-        <el-table-column label="课程描述" prop="description"></el-table-column>
-        <el-table-column label="操作" align="center">
-          <template #default="scope">
-            <el-button type="danger" @click="showWithdrawalDialog(scope.row)">退课</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+      <!-- 标签页切换 -->
+      <el-tabs v-model="data.activeTab" type="card" style="margin-bottom: 20px;">
+        <el-tab-pane label="课程列表" name="courses">
+          <div style="margin-bottom: 15px">
+            <el-form :inline="true" @submit.prevent="handleQuery">
+              <el-form-item label="查询">
+                <el-input v-model="queryParams.keyword" placeholder="请输入课程代码或名称"></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="handleQuery">查询</el-button>
+                <el-button @click="resetQuery">重置</el-button>
+              </el-form-item>
+            </el-form>
+          </div>
+
+          <div style="margin-bottom: 15px">
+            <div style="padding: 10px 20px; background-color: #f5f7fa; border-radius: 4px; margin-bottom: 10px;">
+              <el-row>
+                <el-col :span="8">
+                  <span style="font-weight: bold;">平均学分绩点：</span>
+                  <span style="font-size: 18px; color: #409eff;">{{ averageGPA }}</span>
+                </el-col>
+                <el-col :span="8">
+                  <span style="font-weight: bold;">已修课程数：</span>
+                  <span>{{ completedCourses.length }}</span>
+                </el-col>
+                <el-col :span="8">
+                  <span style="font-weight: bold;">总学分：</span>
+                  <span>{{ totalCredit }}</span>
+                </el-col>
+              </el-row>
+            </div>
+          </div>
+
+          <el-table :data="filteredCourses" stripe>
+            <el-table-column label="课程代码" prop="course_code"></el-table-column>
+            <el-table-column label="课程名称" prop="course_name"></el-table-column>
+            <el-table-column label="学分" prop="credit"></el-table-column>
+            <el-table-column label="任课教师" prop="teacher_name"></el-table-column>
+            <el-table-column label="成绩" prop="score"></el-table-column>
+            <el-table-column label="绩点" prop="gpa"></el-table-column>
+            <el-table-column label="课程描述" prop="description"></el-table-column>
+            <el-table-column label="操作" align="center">
+              <template #default="scope">
+                <el-button type="danger" @click="showWithdrawalDialog(scope.row)">退课</el-button>
+                <el-button type="primary" @click="gotoMakeupExam(scope.row)">缓考/补考</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+        <el-tab-pane label="退课申请" name="withdrawals">
+          <el-table :data="data.withdrawals" stripe style="margin-top: 10px">
+            <el-table-column label="课程ID" prop="course_id"></el-table-column>
+            <el-table-column label="课程名称" prop="course_name"></el-table-column>
+            <el-table-column label="任课教师" prop="teacher_name"></el-table-column>
+            <el-table-column label="申请时间" prop="create_time" :formatter="formatDate"></el-table-column>
+            <el-table-column label="状态" prop="status" :formatter="formatStatus"></el-table-column>
+            <el-table-column label="退课原因" prop="reason"></el-table-column>
+          </el-table>
+        </el-tab-pane>
+      </el-tabs>
     </div>
 
     <!-- 退课申请对话框 -->
@@ -89,6 +105,7 @@
 import request from "@/utils/request";
 import {reactive, computed, onMounted} from "vue";
 import {ElMessage} from "element-plus";
+import router from "@/router/index.js";
 
 const data = reactive({
   courses: [],
@@ -96,7 +113,9 @@ const data = reactive({
   withdrawalDialogVisible: false,
   selectedCourse: null,
   withdrawalReason: '',
-  courseSelectionEnabled: false
+  courseSelectionEnabled: false,
+  activeTab: 'courses',
+  withdrawals: []
 })
 
 const queryParams = reactive({
@@ -264,6 +283,8 @@ const submitWithdrawal = () => {
           data.withdrawalDialogVisible = false;
           data.selectedCourse = null;
           data.withdrawalReason = '';
+          // 重新加载退课申请列表
+          loadWithdrawals();
         } else {
           ElMessage.error(res.msg);
         }
@@ -283,9 +304,52 @@ const checkCourseSelectionStatus = () => {
   });
 }
 
+// 加载退课申请
+const loadWithdrawals = () => {
+  const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}');
+  if (user.username) {
+    request.get('/courseWithdrawal/selectAll', {
+      params: { student_id: user.username }
+    }).then(res => {
+      if (res.code === '200') {
+        data.withdrawals = res.data;
+      }
+    });
+  }
+};
+
+// 跳转到缓考/补考申请页面
+const gotoMakeupExam = (course) => {
+  // 跳转到缓考/补考申请页面
+  router.push('/front/student/makeupExam');
+};
+
+// 格式化日期
+const formatDate = (row, column, cellValue) => {
+  if (cellValue) {
+    return new Date(cellValue).toLocaleString();
+  }
+  return '';
+};
+
+// 格式化状态
+const formatStatus = (row, column, cellValue) => {
+  switch (cellValue) {
+    case 0:
+      return '待审核';
+    case 1:
+      return '已通过';
+    case 2:
+      return '已拒绝';
+    default:
+      return '';
+  }
+};
+
 onMounted(() => {
   loadCourses();
   checkCourseSelectionStatus();
+  loadWithdrawals();
 })
 
 </script>

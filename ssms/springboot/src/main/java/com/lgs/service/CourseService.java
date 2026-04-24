@@ -18,4 +18,9 @@ public interface CourseService {
      * 统计课程数量
      */
     int count();
+
+    /**
+     * 查询所有课程
+     */
+    java.util.List<Course> selectAll();
 }

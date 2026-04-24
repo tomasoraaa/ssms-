@@ -13,9 +13,9 @@
             <el-menu-item index="/front/student/home">首页</el-menu-item>
             <el-menu-item index="/front/student/courses">我的课程</el-menu-item>
             <el-menu-item index="/front/student/courseSelection">选课</el-menu-item>
-            <el-menu-item index="/front/student/withdrawalRequests">退课申请</el-menu-item>
             <el-menu-item index="/front/student/scoreAnalysis">成绩分析</el-menu-item>
             <el-menu-item index="/front/student/evaluation">课程评价</el-menu-item>
+            <el-menu-item index="/front/student/makeupExam">缓考/补考申请</el-menu-item>
           </template>
           <template v-else-if="data.user.role === 'TEACHER'">
             <el-menu-item index="/front/teacher/home">首页</el-menu-item>

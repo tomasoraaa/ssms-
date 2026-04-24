@@ -93,6 +93,30 @@
           </div>
         </el-card>
 
+        <el-card shadow="hover" class="feature-card">
+          <template #header>
+            <div class="card-header">
+              <span>缓考/补考申请</span>
+            </div>
+          </template>
+          <div class="feature-content">
+            <el-button type="primary" @click="router.push('/front/student/makeupExam')">申请缓考/补考</el-button>
+            <p class="feature-desc">申请缓考或补考</p>
+          </div>
+        </el-card>
+
+        <el-card shadow="hover" class="feature-card">
+          <template #header>
+            <div class="card-header">
+              <span>成绩详情</span>
+            </div>
+          </template>
+          <div class="feature-content">
+            <el-button type="primary" @click="router.push('/front/student/scoreDetail')">查看详情</el-button>
+            <p class="feature-desc">查看详细成绩构成</p>
+          </div>
+        </el-card>
+
 
 
         <el-card shadow="hover" class="feature-card">
