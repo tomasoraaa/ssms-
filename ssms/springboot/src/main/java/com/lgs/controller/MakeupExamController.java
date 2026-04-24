@@ -67,4 +67,10 @@ public class MakeupExamController {
         makeupExamService.reject(id);
         return Result.success();
     }
+
+    @PutMapping("/updateScore")
+    public Result updateScore(@RequestBody MakeupExam makeupExam) {
+        makeupExamService.updateScore(makeupExam);
+        return Result.success();
+    }
 }

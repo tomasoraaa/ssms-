@@ -74,6 +74,11 @@ public class ScoreDetailServiceImpl implements ScoreDetailService {
     }
 
     @Override
+    public List<ScoreDetail> selectByStudentIdWithParams(String studentId, Integer courseId, Integer academicYearId) {
+        return scoreDetailMapper.selectByStudentIdWithParams(studentId, courseId, academicYearId);
+    }
+
+    @Override
     public List<ScoreDetail> getWarningStudents(Integer teaching_class_id) {
         List<ScoreDetail> scoreDetails = scoreDetailMapper.selectByTeachingClassId(teaching_class_id);
         List<ScoreDetail> warningStudents = new ArrayList<>();

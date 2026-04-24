@@ -9,16 +9,13 @@
 
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="课程">
-          <el-select v-model="searchForm.courseId" placeholder="选择课程">
-            <el-option v-for="course in courses" :key="course.id" :label="course.courseName" :value="course.id"></el-option>
+          <el-select v-model="searchForm.courseId" placeholder="选择课程" style="width: 150px;">
+            <el-option v-for="course in courses" :key="course.id" :label="course.course_name" :value="course.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="学期">
-          <el-select v-model="searchForm.semester" placeholder="选择学期">
-            <el-option label="2023-2024 第一学期" value="2023-2024 第一学期"></el-option>
-            <el-option label="2023-2024 第二学期" value="2023-2024 第二学期"></el-option>
-            <el-option label="2024-2025 第一学期" value="2024-2025 第一学期"></el-option>
-            <el-option label="2024-2025 第二学期" value="2024-2025 第二学期"></el-option>
+          <el-select v-model="searchForm.academicYearId" placeholder="选择学期"style="width: 150px;">
+            <el-option v-for="academicYear in academicYears" :key="academicYear.id" :label="`${academicYear.year} 第${academicYear.semester}学期`" :value="academicYear.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -126,11 +123,12 @@ import request from '@/utils/request'
 const scoreDetails = ref([])
 const courses = ref([])
 const teachingClasses = ref([])
+const academicYears = ref([])
 const detailDialogVisible = ref(false)
 const detailForm = ref({})
 const searchForm = ref({
   courseId: null,
-  semester: null
+  academicYearId: null
 })
 const pagination = ref({
   currentPage: 1,
@@ -183,21 +181,61 @@ const getStatusText = (score) => {
   }
 }
 
-// 加载课程列表
+// 加载课程列表（学生已选择的课程）
 const loadCourses = () => {
-  request.get('/course/selectAll').then(res => {
-    if (res.code === '200') {
-      courses.value = res.data
+  return new Promise((resolve) => {
+    const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}')
+    if (user.username) {
+      // 先获取所有课程
+      request.get('/course/selectAll').then(courseRes => {
+        if (courseRes.code === '200') {
+          const allCourses = courseRes.data
+          // 再获取学生课程
+          request.get(`/studentCourse/selectByStudentId/${user.username}`).then(studentCourseRes => {
+            if (studentCourseRes.code === '200') {
+              // 提取学生已选择的课程
+              const studentCourses = studentCourseRes.data
+              // 去重，确保每个课程只出现一次
+              const courseIdSet = new Set()
+              studentCourses.forEach(sc => {
+                courseIdSet.add(String(sc.course_id))
+              })
+              // 过滤出学生已选择的课程
+            courses.value = allCourses.filter(course => courseIdSet.has(String(course.id)))
+            }
+            resolve()
+          })
+        } else {
+          resolve()
+        }
+      })
+    } else {
+      resolve()
     }
   })
 }
 
 // 加载教学班列表
 const loadTeachingClasses = () => {
-  request.get('/teachingClass/selectAll').then(res => {
-    if (res.code === '200') {
-      teachingClasses.value = res.data
-    }
+  return new Promise((resolve) => {
+    request.get('/teachingClass/selectAll').then(res => {
+      if (res.code === '200') {
+        teachingClasses.value = res.data
+      }
+      resolve()
+    })
+  })
+}
+
+// 加载学期列表
+const loadAcademicYears = () => {
+  return new Promise((resolve) => {
+    request.get('/academicYear/selectAll').then(res => {
+      if (res.code === '200') {
+        academicYears.value = res.data
+      }
+      resolve()
+    })
   })
 }
 
@@ -205,21 +243,34 @@ const loadTeachingClasses = () => {
 const loadScoreDetails = () => {
   const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}')
   if (user.username) {
-    request.get('/scoreDetail/selectByStudentId', {
+    request.get('/scoreDetail/selectByStudentIdWithParams', {
       params: {
         studentId: user.username,
-        courseId: searchForm.value.courseId
+        courseId: searchForm.value.courseId,
+        academicYearId: searchForm.value.academicYearId
       }
     }).then(res => {
       if (res.code === '200') {
         // 处理数据，添加课程和教学班信息
         const details = res.data
+        console.log('成绩详情数据:', details)
+        console.log('课程数据:', courses.value)
         details.forEach(detail => {
-          const course = courses.value.find(c => c.id === detail.courseId)
-          detail.courseName = course ? course.courseName : '未知课程'
-          const teachingClass = teachingClasses.value.find(tc => tc.id === detail.teachingClassId)
-          detail.classCode = teachingClass ? teachingClass.classCode : '未知教学班'
-          detail.gpa = calculateGPA(detail.totalScore || 0).toFixed(1)
+          console.log('当前成绩详情的course_id:', detail.course_id, '类型:', typeof detail.course_id)
+          // 尝试转换类型后查找课程
+          const course = courses.value.find(c => {
+            console.log('课程ID:', c.id, '类型:', typeof c.id)
+            return String(c.id) === String(detail.course_id)
+          })
+          detail.courseName = course ? course.course_name : '未知课程'
+          const teachingClass = teachingClasses.value.find(tc => tc.id === detail.teaching_class_id)
+          detail.classCode = teachingClass ? teachingClass.class_code : '未知教学班'
+          // 转换成绩字段为驼峰命名法
+          detail.usualScore = detail.usual_score || 0
+          detail.midtermScore = detail.midterm_score || 0
+          detail.finalScore = detail.final_score || 0
+          detail.totalScore = detail.total_score || 0
+          detail.gpa = calculateGPA(detail.total_score || 0).toFixed(1)
         })
         scoreDetails.value = details
         pagination.value.total = details.length
@@ -233,12 +284,12 @@ const viewScoreDetail = (row) => {
   detailForm.value = {
     courseName: row.courseName,
     classCode: row.classCode,
-    usualScore: row.usualScore || 0,
-    midtermScore: row.midtermScore || 0,
-    finalScore: row.finalScore || 0,
-    totalScore: row.totalScore || 0,
+    usualScore: row.usual_score || 0,
+    midtermScore: row.midterm_score || 0,
+    finalScore: row.final_score || 0,
+    totalScore: row.total_score || 0,
     gpa: row.gpa || 0,
-    status: getStatusText(row.totalScore)
+    status: getStatusText(row.total_score)
   }
   detailDialogVisible.value = true
 }
@@ -247,7 +298,7 @@ const viewScoreDetail = (row) => {
 const resetSearch = () => {
   searchForm.value = {
     courseId: null,
-    semester: null
+    academicYearId: null
   }
   loadScoreDetails()
 }
@@ -264,9 +315,12 @@ const handleCurrentChange = (current) => {
 }
 
 // 初始化
-onMounted(() => {
-  loadCourses()
-  loadTeachingClasses()
+onMounted(async () => {
+  await Promise.all([
+    loadCourses(),
+    loadTeachingClasses(),
+    loadAcademicYears()
+  ])
   loadScoreDetails()
 })
 </script>

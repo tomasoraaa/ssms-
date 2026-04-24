@@ -15,4 +15,5 @@ public interface ScoreDetailMapper {
     List<ScoreDetail> selectByCourseId(Integer course_id);
     List<ScoreDetail> selectByTeachingClassId(Integer teaching_class_id);
     List<ScoreDetail> selectByStudentId(String student_id);
+    List<ScoreDetail> selectByStudentIdWithParams(String studentId, Integer courseId, Integer academicYearId);
 }

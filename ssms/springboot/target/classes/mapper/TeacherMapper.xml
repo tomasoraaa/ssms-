@@ -30,6 +30,7 @@
             <if test="email != null">email = #{email},</if>
             <if test="role != null">role = #{role},</if>
             <if test="status != null">status = #{status},</if>
+            <if test="makeup_exam_permission != null">makeup_exam_permission = #{makeup_exam_permission},</if>
         </set>
         where id = #{id}
     </update>

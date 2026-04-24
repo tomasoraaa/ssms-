@@ -87,6 +87,18 @@
         <el-card shadow="hover" class="feature-card">
           <template #header>
             <div class="card-header">
+              <span>缓考/补考管理</span>
+            </div>
+          </template>
+          <div class="feature-content">
+            <el-button type="primary" @click="router.push('/front/teacher/makeupExam')">管理申请</el-button>
+            <p class="feature-desc">审批申请和录入成绩</p>
+          </div>
+        </el-card>
+
+        <el-card shadow="hover" class="feature-card">
+          <template #header>
+            <div class="card-header">
               <span>个人资料</span>
             </div>
           </template>

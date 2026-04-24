@@ -47,6 +47,19 @@
         SELECT * FROM score_detail WHERE student_id = #{student_id}
     </select>
 
+    <select id="selectByStudentIdWithParams" resultMap="ScoreDetailResultMap">
+        SELECT sd.* FROM score_detail sd
+        LEFT JOIN teaching_class tc ON sd.teaching_class_id = tc.id
+        LEFT JOIN academic_year ay ON tc.academic_year_id = ay.id
+        WHERE sd.student_id = #{studentId}
+        <if test="courseId != null">
+            AND sd.course_id = #{courseId}
+        </if>
+        <if test="academicYearId != null">
+            AND ay.id = #{academicYearId}
+        </if>
+    </select>
+
     <insert id="insert" parameterType="com.lgs.entity.ScoreDetail">
         INSERT INTO score_detail (student_id, course_id, teaching_class_id, usual_score, midterm_score, final_score, total_score)
         VALUES (#{student_id}, #{course_id}, #{teaching_class_id}, #{usual_score}, #{midterm_score}, #{final_score}, #{total_score})

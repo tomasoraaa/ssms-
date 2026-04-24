@@ -53,7 +53,7 @@
             <if test="course_id != null">course_id = #{course_id},</if>
             <if test="teaching_class_id != null">teaching_class_id = #{teaching_class_id},</if>
             <if test="exam_type != null">exam_type = #{exam_type},</if>
-            <if test="makeup_score != null">makeup_score = #{makeup_score},</if>
+            <if test="makeup_score != null or makeup_score == 0">makeup_score = #{makeup_score},</if>
             <if test="status != null">status = #{status},</if>
             <if test="reason != null">reason = #{reason},</if>
             updated_at = CURRENT_TIMESTAMP

@@ -28,5 +28,7 @@ public class Teacher extends Account {
     private String role;
     /** 审核状态：0-待审核，1-已通过，2-已拒绝 */
     private Integer status;
+    /** 缓考/补考管理权限：true-有，false-无 */
+    private Boolean makeup_exam_permission;
 
 }

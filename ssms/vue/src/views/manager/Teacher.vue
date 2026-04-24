@@ -75,6 +75,11 @@
             <el-tag v-else-if="scope.row.status === 2" type="danger">已拒绝</el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="缓考/补考权限" prop="makeup_exam_permission">
+          <template #default="scope">
+            <el-switch v-model="scope.row.makeup_exam_permission" @change="handlePermissionChange(scope.row)"></el-switch>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" align="center" width="300">
           <template #default="scope">
             <el-button type="primary" @click="handleEdit(scope.row)">编辑</el-button>
@@ -326,6 +331,22 @@ const handleSizeChange = (size) => {
 const handleCurrentChange = (current) => {
   data.pageNum = current
   load()
+}
+
+// 处理权限变更
+const handlePermissionChange = (row) => {
+  request.put('/teacher/update', {
+    id: row.id,
+    makeup_exam_permission: row.makeup_exam_permission
+  }).then(res => {
+    if (res.code === '200') {
+      ElMessage.success('权限更新成功')
+    } else {
+      ElMessage.error(res.msg)
+      // 恢复原状态
+      row.makeup_exam_permission = !row.makeup_exam_permission
+    }
+  })
 }
 
 </script>

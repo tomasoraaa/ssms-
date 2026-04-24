@@ -65,6 +65,22 @@ public class ScoreDetailController {
     public Result selectByStudentId(@PathVariable String student_id) {
         return Result.success(scoreDetailService.selectByStudentId(student_id));
     }
+    
+    @GetMapping("/selectByStudentId")
+    public Result selectByStudentId(
+            @RequestParam String studentId,
+            @RequestParam(required = false) Integer courseId,
+            @RequestParam(required = false) Integer academicYearId) {
+        return Result.success(scoreDetailService.selectByStudentIdWithParams(studentId, courseId, academicYearId));
+    }
+    
+    @GetMapping("/selectByStudentIdWithParams")
+    public Result selectByStudentIdWithParams(
+            @RequestParam String studentId,
+            @RequestParam(required = false) Integer courseId,
+            @RequestParam(required = false) Integer academicYearId) {
+        return Result.success(scoreDetailService.selectByStudentIdWithParams(studentId, courseId, academicYearId));
+    }
 
     @GetMapping("/getWarningStudents/{teaching_class_id}")
     public Result getWarningStudents(@PathVariable Integer teaching_class_id) {

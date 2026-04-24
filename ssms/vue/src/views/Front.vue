@@ -13,6 +13,7 @@
             <el-menu-item index="/front/student/home">首页</el-menu-item>
             <el-menu-item index="/front/student/courses">我的课程</el-menu-item>
             <el-menu-item index="/front/student/courseSelection">选课</el-menu-item>
+            <el-menu-item index="/front/student/scoreDetail">成绩详情</el-menu-item>
             <el-menu-item index="/front/student/scoreAnalysis">成绩分析</el-menu-item>
             <el-menu-item index="/front/student/evaluation">课程评价</el-menu-item>
             <el-menu-item index="/front/student/makeupExam">缓考/补考申请</el-menu-item>
@@ -23,6 +24,7 @@
             <el-menu-item index="/front/teacher/score">管理成绩</el-menu-item>
             <el-menu-item index="/front/teacher/scoreAnalysis">成绩分析</el-menu-item>
             <el-menu-item index="/front/teacher/evaluation">课程评价</el-menu-item>
+            <el-menu-item index="/front/teacher/makeupExam">缓考/补考管理</el-menu-item>
           </template>
         </el-menu>
       </div>

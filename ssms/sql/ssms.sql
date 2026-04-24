@@ -11,7 +11,7 @@
  Target Server Version : 80042 (8.0.42)
  File Encoding         : 65001
 
- Date: 24/04/2026 16:15:00
+ Date: 24/04/2026 19:04:23
 */
 
 SET NAMES utf8mb4;
@@ -53,7 +53,7 @@ CREATE TABLE `activity_log`  (
   `user_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_operate_time`(`operate_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 126 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 128 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of activity_log
@@ -183,6 +183,8 @@ INSERT INTO `activity_log` VALUES (122, '2026-04-24 14:39:32', '登录', '202401
 INSERT INTO `activity_log` VALUES (123, '2026-04-24 14:40:22', '登录', 'T2024004', '教师 T2024004 登录系统', 'TEACHER');
 INSERT INTO `activity_log` VALUES (124, '2026-04-24 14:40:25', '登录', 'T2024004', '教师 T2024004 登录系统', 'TEACHER');
 INSERT INTO `activity_log` VALUES (125, '2026-04-24 14:40:39', '登录', 'T2024004', '教师 T2024004 登录系统', 'TEACHER');
+INSERT INTO `activity_log` VALUES (126, '2026-04-24 17:59:29', '用户', 'admin', '修改教师 null 的信息', 'ADMIN');
+INSERT INTO `activity_log` VALUES (127, '2026-04-24 18:00:09', '登录', 'T2024004', '教师 T2024004 登录系统', 'TEACHER');
 
 -- ----------------------------
 -- Table structure for admin
@@ -429,7 +431,7 @@ CREATE TABLE `makeup_exam`  (
 -- ----------------------------
 -- Records of makeup_exam
 -- ----------------------------
-INSERT INTO `makeup_exam` VALUES (1, '20240101003', 17, 12, '补考', NULL, '已通过', '挂科了，按照规定需要申请补考', '2026-04-22 22:47:15', '2026-04-24 14:39:04');
+INSERT INTO `makeup_exam` VALUES (1, '20240101003', 17, 12, '补考', 60.00, '已通过', '挂科了，按照规定需要申请补考', '2026-04-22 22:47:15', '2026-04-24 18:02:27');
 
 -- ----------------------------
 -- Table structure for modify_request
@@ -658,6 +660,7 @@ CREATE TABLE `teacher`  (
   `role` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '角色',
   `status` int NULL DEFAULT 0 COMMENT '审核状态：0-待审核，1-已通过，2-已拒绝',
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `makeup_exam_permission` tinyint(1) NULL DEFAULT 0 COMMENT '缓考/补考管理权限：true-有，false-无',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `username`(`username` ASC) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 22 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '教师信息' ROW_FORMAT = DYNAMIC;
@@ -665,26 +668,26 @@ CREATE TABLE `teacher`  (
 -- ----------------------------
 -- Records of teacher
 -- ----------------------------
-INSERT INTO `teacher` VALUES (1, 'T2024001', '123456789ok', '张明', 'http://localhost:9090/files/download/1776596101549-0d19b52d7e475569095d0400858eec.jpg', '男', '13912341001', 'TEACHER', 1, 'zhangming@cs.edu.cn');
-INSERT INTO `teacher` VALUES (2, 'T2024002', '123456', '李华', NULL, '女', '13912341002', 'TEACHER', 1, 'lihua@cs.edu.cn');
-INSERT INTO `teacher` VALUES (3, 'T2024003', '123456', '王强', NULL, '男', '13912341003', 'TEACHER', 1, 'wangqiang@cs.edu.cn');
-INSERT INTO `teacher` VALUES (4, 'T2024004', '123456', '刘芳', NULL, '女', '13912341004', 'TEACHER', 1, 'liufang@cs.edu.cn');
-INSERT INTO `teacher` VALUES (5, 'T2024005', '123456', '陈明亮', NULL, '男', '13912341005', 'TEACHER', 1, 'chenmingliang@cs.edu.cn');
-INSERT INTO `teacher` VALUES (6, 'T2024006', '123456', '赵小红', NULL, '女', '13912341006', 'TEACHER', 1, 'zhaoxiaohong@cs.edu.cn');
-INSERT INTO `teacher` VALUES (7, 'T2024007', '123456', '钱建国', NULL, '男', '13912341007', 'TEACHER', 1, 'qianjianguo@cs.edu.cn');
-INSERT INTO `teacher` VALUES (8, 'T2024008', '123456', '孙丽', NULL, '女', '13912341008', 'TEACHER', 1, 'sunli@cs.edu.cn');
-INSERT INTO `teacher` VALUES (9, 'T2024009', '123456', '周建国', NULL, '男', '13912341009', 'TEACHER', 1, 'zhoujianguo@cs.edu.cn');
-INSERT INTO `teacher` VALUES (10, 'T2024010', '123456', '吴敏', NULL, '女', '13912341010', 'TEACHER', 1, 'wumin@cs.edu.cn');
-INSERT INTO `teacher` VALUES (11, 'T2024011', '123456', '郑华', NULL, '男', '13912341011', 'TEACHER', 1, 'zhenghua@cs.edu.cn');
-INSERT INTO `teacher` VALUES (12, 'T2024012', '123456', '黄丽', NULL, '女', '13912341012', 'TEACHER', 1, 'huangli@cs.edu.cn');
-INSERT INTO `teacher` VALUES (13, 'T2024013', '123456', '马建国', NULL, '男', '13912341013', 'TEACHER', 1, 'majiguo@cs.edu.cn');
-INSERT INTO `teacher` VALUES (14, 'T2024014', '123456', '朱敏', NULL, '女', '13912341014', 'TEACHER', 1, 'zhumin@cs.edu.cn');
-INSERT INTO `teacher` VALUES (15, 'T2024015', '123456', '胡华', NULL, '男', '13912341015', 'TEACHER', 1, 'huhua@cs.edu.cn');
-INSERT INTO `teacher` VALUES (16, 'T2024016', '123456', '林丽', NULL, '女', '13912341016', 'TEACHER', 1, 'linli@cs.edu.cn');
-INSERT INTO `teacher` VALUES (17, 'T2024017', '123456', '郭建国', NULL, '男', '13912341017', 'TEACHER', 1, 'guojianguo@cs.edu.cn');
-INSERT INTO `teacher` VALUES (18, 'T2024018', '123456', '梁敏', NULL, '女', '13912341018', 'TEACHER', 1, 'liangmin@cs.edu.cn');
-INSERT INTO `teacher` VALUES (19, 'T2024019', '123456', '谢华', NULL, '男', '13912341019', 'TEACHER', 1, 'xiehua@cs.edu.cn');
-INSERT INTO `teacher` VALUES (20, 'T2024020', '123456', '宋丽', 'http://localhost:9090/files/download/1776844315693-0ff7e2e97b44d74ef25052bd7294fb.jpg', '女', '13912341020', 'TEACHER', 1, 'songli@cs.edu.cn');
+INSERT INTO `teacher` VALUES (1, 'T2024001', '123456789ok', '张明', 'http://localhost:9090/files/download/1776596101549-0d19b52d7e475569095d0400858eec.jpg', '男', '13912341001', 'TEACHER', 1, 'zhangming@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (2, 'T2024002', '123456', '李华', NULL, '女', '13912341002', 'TEACHER', 1, 'lihua@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (3, 'T2024003', '123456', '王强', NULL, '男', '13912341003', 'TEACHER', 1, 'wangqiang@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (4, 'T2024004', '123456', '刘芳', NULL, '女', '13912341004', 'TEACHER', 1, 'liufang@cs.edu.cn', 1);
+INSERT INTO `teacher` VALUES (5, 'T2024005', '123456', '陈明亮', NULL, '男', '13912341005', 'TEACHER', 1, 'chenmingliang@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (6, 'T2024006', '123456', '赵小红', NULL, '女', '13912341006', 'TEACHER', 1, 'zhaoxiaohong@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (7, 'T2024007', '123456', '钱建国', NULL, '男', '13912341007', 'TEACHER', 1, 'qianjianguo@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (8, 'T2024008', '123456', '孙丽', NULL, '女', '13912341008', 'TEACHER', 1, 'sunli@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (9, 'T2024009', '123456', '周建国', NULL, '男', '13912341009', 'TEACHER', 1, 'zhoujianguo@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (10, 'T2024010', '123456', '吴敏', NULL, '女', '13912341010', 'TEACHER', 1, 'wumin@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (11, 'T2024011', '123456', '郑华', NULL, '男', '13912341011', 'TEACHER', 1, 'zhenghua@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (12, 'T2024012', '123456', '黄丽', NULL, '女', '13912341012', 'TEACHER', 1, 'huangli@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (13, 'T2024013', '123456', '马建国', NULL, '男', '13912341013', 'TEACHER', 1, 'majiguo@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (14, 'T2024014', '123456', '朱敏', NULL, '女', '13912341014', 'TEACHER', 1, 'zhumin@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (15, 'T2024015', '123456', '胡华', NULL, '男', '13912341015', 'TEACHER', 1, 'huhua@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (16, 'T2024016', '123456', '林丽', NULL, '女', '13912341016', 'TEACHER', 1, 'linli@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (17, 'T2024017', '123456', '郭建国', NULL, '男', '13912341017', 'TEACHER', 1, 'guojianguo@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (18, 'T2024018', '123456', '梁敏', NULL, '女', '13912341018', 'TEACHER', 1, 'liangmin@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (19, 'T2024019', '123456', '谢华', NULL, '男', '13912341019', 'TEACHER', 1, 'xiehua@cs.edu.cn', 0);
+INSERT INTO `teacher` VALUES (20, 'T2024020', '123456', '宋丽', 'http://localhost:9090/files/download/1776844315693-0ff7e2e97b44d74ef25052bd7294fb.jpg', '女', '13912341020', 'TEACHER', 1, 'songli@cs.edu.cn', 0);
 
 -- ----------------------------
 -- Table structure for teaching_class

@@ -39,7 +39,7 @@
     </select>
 
     <select id="selectByTeachingClassId" resultType="com.lgs.entity.StudentCourse">
-        select * from student_course where teaching_class_id = #{teachingClassId}
+        select * from student_course where teaching_class_id = #{teaching_class_id}
     </select>
 
 </mapper>

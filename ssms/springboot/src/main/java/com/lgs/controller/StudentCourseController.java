@@ -49,7 +49,7 @@ public class StudentCourseController {
     }
 
     @GetMapping("/selectByCourseId/{courseId}")
-    public Result selectByCourseId(@PathVariable String courseId) {
+    public Result selectByCourseId(@PathVariable Integer courseId) {
         return Result.success(studentCourseService.selectByCourseId(courseId));
     }
 

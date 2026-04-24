@@ -73,4 +73,10 @@ public class MakeupExamServiceImpl implements MakeupExamService {
         makeupExam.setStatus("已拒绝");
         makeupExamMapper.updateById(makeupExam);
     }
+
+    @Override
+    @Transactional
+    public void updateScore(MakeupExam makeupExam) {
+        makeupExamMapper.updateById(makeupExam);
+    }
 }

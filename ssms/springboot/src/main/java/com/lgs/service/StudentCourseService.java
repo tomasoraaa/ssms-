@@ -10,8 +10,8 @@ public interface StudentCourseService {
     void updateScore(StudentCourse studentCourse);
     void deleteById(Integer id);
     void deleteByStudentIdAndCourseId(StudentCourse studentCourse);
-    List<StudentCourse> selectByCourseId(String courseId);
-    List<StudentCourse> selectByStudentId(String studentId);
-    List<StudentCourse> selectByTeachingClassId(Integer teachingClassId);
+    List<StudentCourse> selectByCourseId(Integer course_id);
+    List<StudentCourse> selectByStudentId(String student_id);
+    List<StudentCourse> selectByTeachingClassId(Integer teaching_class_id);
     double calculateTotalScore(double usualScore, double midtermScore, double finalScore, Integer usualWeight, Integer midtermWeight, Integer finalWeight);
 }

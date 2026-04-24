@@ -15,4 +15,5 @@ public interface MakeupExamService {
     List<MakeupExam> selectByTeachingClassId(Integer teaching_class_id);
     void approve(Integer id);
     void reject(Integer id);
+    void updateScore(MakeupExam makeupExam);
 }

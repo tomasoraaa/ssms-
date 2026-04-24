@@ -15,6 +15,7 @@ public interface ScoreDetailService {
     List<ScoreDetail> selectByCourseId(Integer course_id);
     List<ScoreDetail> selectByTeachingClassId(Integer teaching_class_id);
     List<ScoreDetail> selectByStudentId(String student_id);
+    List<ScoreDetail> selectByStudentIdWithParams(String student_id, Integer course_id, Integer academic_year_Id);
     List<ScoreDetail> getWarningStudents(Integer teaching_class_id);
     double calculateTotalScore(double usual_score, double midterm_score, double final_score, Integer usual_weight, Integer midterm_weight, Integer final_weight);
 }
