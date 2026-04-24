@@ -220,16 +220,18 @@ const selectSpecificClass = (course, selectedClass) => {
     };
     console.log('提交选课申请:', selection);
     request.post('/courseSelection/add', selection).then(res => {
-      console.log('选课申请提交响应:', res);
-      if (res.code === '200') {
-        ElMessage.success('选课申请已提交，请等待管理员审核');
-        loadSelections();
-      } else {
-        ElMessage.error(res.msg);
-      }
-    }).catch(err => {
-      console.error('提交选课申请失败:', err);
-    })
+    console.log('选课申请提交响应:', res);
+    if (res.code === '200') {
+      ElMessage.success('选课申请已提交，请等待管理员审核');
+      loadSelections();
+    } else {
+      ElMessage.error(res.msg);
+    }
+  }).catch(err => {
+    console.error('提交选课申请失败:', err);
+    // 显示错误信息，当时间冲突时会显示具体的冲突信息
+    ElMessage.error(err.response?.data?.msg || err.message || '请求失败');
+  })
   }
 }
 
@@ -286,12 +288,12 @@ const formatStatus = (row, column, cellValue) => {
 
 // 格式化上课时间
 const formatSchedule = (cls) => {
-  if (!cls.dayOfWeek || !cls.periodStart || !cls.periodEnd) {
+  if (!cls.day_of_week || !cls.period_start || !cls.period_end) {
     return '未设置';
   }
   const days = ['', '周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-  const day = days[cls.dayOfWeek] || `第${cls.dayOfWeek}天`;
-  return `${day} 第${cls.periodStart}-${cls.periodEnd}节`;
+  const day = days[cls.day_of_week] || `第${cls.day_of_week}天`;
+  return `${day} 第${cls.period_start}-${cls.period_end}节`;
 }
 
 onMounted(() => {

@@ -8,6 +8,8 @@
         <result property="teaching_class_id" column="teaching_class_id"/>
         <result property="exam_type" column="exam_type"/>
         <result property="makeup_score" column="makeup_score"/>
+        <result property="original_score" column="original_score"/>
+        <result property="is_final" column="is_final"/>
         <result property="status" column="status"/>
         <result property="reason" column="reason"/>
         <result property="created_at" column="created_at"/>
@@ -42,8 +44,8 @@
     </select>
 
     <insert id="insert" parameterType="com.lgs.entity.MakeupExam">
-        INSERT INTO makeup_exam (student_id, course_id, teaching_class_id, exam_type, makeup_score, status, reason)
-        VALUES (#{student_id}, #{course_id}, #{teaching_class_id}, #{exam_type}, #{makeup_score}, #{status}, #{reason})
+        INSERT INTO makeup_exam (student_id, course_id, teaching_class_id, exam_type, makeup_score, original_score, is_final, status, reason)
+        VALUES (#{student_id}, #{course_id}, #{teaching_class_id}, #{exam_type}, #{makeup_score}, #{original_score}, #{is_final}, #{status}, #{reason})
     </insert>
 
     <update id="updateById" parameterType="com.lgs.entity.MakeupExam">
@@ -53,7 +55,9 @@
             <if test="course_id != null">course_id = #{course_id},</if>
             <if test="teaching_class_id != null">teaching_class_id = #{teaching_class_id},</if>
             <if test="exam_type != null">exam_type = #{exam_type},</if>
-            <if test="makeup_score != null or makeup_score == 0">makeup_score = #{makeup_score},</if>
+            <if test="makeup_score != null || makeup_score == 0">makeup_score = #{makeup_score},</if>
+            <if test="original_score != null || original_score == 0">original_score = #{original_score},</if>
+            <if test="is_final != null">is_final = #{is_final},</if>
             <if test="status != null">status = #{status},</if>
             <if test="reason != null">reason = #{reason},</if>
             updated_at = CURRENT_TIMESTAMP

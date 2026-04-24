@@ -20,6 +20,10 @@ public class GlobalExceptionHandler {
     @ResponseBody//返回json串
     public Result error(HttpServletRequest request, Exception e) {
         log.error("异常信息：", e);
+        // 对于RuntimeException，返回具体的错误信息
+        if (e instanceof RuntimeException) {
+            return Result.error(e.getMessage());
+        }
         return Result.error();
     }
 

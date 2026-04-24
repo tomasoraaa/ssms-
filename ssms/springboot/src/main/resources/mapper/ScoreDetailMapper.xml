@@ -68,13 +68,13 @@
     <update id="updateById" parameterType="com.lgs.entity.ScoreDetail">
         UPDATE score_detail
         <set>
-            <if test="studentId != null">student_id = #{student_id},</if>
-            <if test="courseId != null">course_id = #{course_id},</if>
-            <if test="teachingClassId != null">teaching_class_id = #{teaching_class_id},</if>
-            <if test="usualScore != null">usual_score = #{usual_score},</if>
-            <if test="midtermScore != null">midterm_score = #{midterm_score},</if>
-            <if test="finalScore != null">final_score = #{final_score},</if>
-            <if test="totalScore != null">total_score = #{total_score},</if>
+            <if test="student_id != null">student_id = #{student_id},</if>
+            <if test="course_id != null">course_id = #{course_id},</if>
+            <if test="teaching_class_id != null">teaching_class_id = #{teaching_class_id},</if>
+            <if test="usual_score != null">usual_score = #{usual_score},</if>
+            <if test="midterm_score != null">midterm_score = #{midterm_score},</if>
+            <if test="final_score != null">final_score = #{final_score},</if>
+            <if test="total_score != null">total_score = #{total_score},</if>
             updated_at = CURRENT_TIMESTAMP
         </set>
         WHERE id = #{id}

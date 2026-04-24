@@ -6,5 +6,6 @@ public interface SystemConfigService {
     SystemConfig getByKey(String configKey);
     boolean isCourseSelectionEnabled();
     boolean isTeacherScoreEntryEnabled();
+    boolean isMakeupExamScoreEntryEnabled();
     boolean updateConfig(String configKey, String configValue);
 }

@@ -44,8 +44,7 @@
         <el-table-column prop="exam_type" label="考试类型" width="100"></el-table-column>
         <el-table-column prop="makeup_score" label="缓考/补考成绩" width="100">
           <template #default="scope">
-            <el-input v-if="scope.row.status === '已通过' && editingId === scope.row.id" v-model.number="editScore" size="small" @blur="saveScore(scope.row.id)"></el-input>
-            <span v-else>{{ scope.row.makeup_score || '-' }}</span>
+            <span>{{ scope.row.makeup_score || '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="100">
@@ -63,8 +62,8 @@
           <template #default="scope">
             <el-button v-if="scope.row.status === '待审批'" type="primary" size="small" @click="approveMakeupExam(scope.row.id)">批准</el-button>
             <el-button v-if="scope.row.status === '待审批'" type="danger" size="small" @click="rejectMakeupExam(scope.row.id)">拒绝</el-button>
-            <el-button v-if="scope.row.status === '已通过' && !scope.row.makeup_score" type="success" size="small" @click="startEdit(scope.row.id, scope.row.makeup_score)">录入成绩</el-button>
-            <el-button v-if="scope.row.status === '已通过' && scope.row.makeup_score" type="warning" size="small" @click="startEdit(scope.row.id, scope.row.makeup_score)">修改成绩</el-button>
+            <el-button v-if="scope.row.status === '已通过' && !scope.row.makeup_score && makeupExamScoreEntryEnabled" type="success" size="small" @click="startEdit(scope.row.id, scope.row.makeup_score, scope.row.exam_type)">录入成绩</el-button>
+            <el-button v-if="scope.row.status === '已通过' && scope.row.makeup_score && makeupExamScoreEntryEnabled" type="warning" size="small" @click="startEdit(scope.row.id, scope.row.makeup_score, scope.row.exam_type)">修改成绩</el-button>
             <el-button type="info" size="small" @click="viewMakeupExam(scope.row)">查看</el-button>
           </template>
         </el-table-column>
@@ -122,6 +121,41 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- 编辑成绩对话框 -->
+    <el-dialog
+      v-model="editDialogVisible"
+      :title="isEditMode ? '修改成绩' : '录入成绩'"
+      width="500px"
+    >
+      <el-form :model="editForm" label-width="120px">
+        <el-form-item label="学生姓名">
+          <el-input v-model="editForm.studentName" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="课程名称">
+          <el-input v-model="editForm.courseName" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="考试类型">
+          <el-input v-model="editForm.exam_type" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="成绩" :required="true">
+          <el-input 
+            v-model.number="editForm.makeup_score" 
+            type="number" 
+            placeholder="请输入成绩" 
+            min="0" 
+            max="100"
+            step="0.5"
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="editDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="confirmSaveScore">保存</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -149,7 +183,8 @@ onMounted(() => {
   Promise.all([
     loadCourses(),
     loadStudents(),
-    loadTeachingClasses()
+    loadTeachingClasses(),
+    loadMakeupExamScoreEntryStatus()
   ]).then(() => {
     loadMakeupExams()
   })
@@ -172,8 +207,13 @@ const pagination = ref({
   pageSize: 10,
   total: 0
 })
-const editingId = ref(null)
-const editScore = ref(null)
+// const editingId = ref(null)
+// const editScore = ref(null)
+const editDialogVisible = ref(false)
+const editForm = ref({})
+const isEditMode = ref(false)
+const currentEditId = ref(null)
+const makeupExamScoreEntryEnabled = ref(true) // 默认为开启状态
 
 // 获取状态类型
 const getStatusType = (status) => {
@@ -216,6 +256,21 @@ const loadTeachingClasses = () => {
       if (res.code === '200') {
         teachingClasses.value = res.data
       }
+      resolve()
+    })
+  })
+}
+
+// 加载补考/缓考成绩录入状态
+const loadMakeupExamScoreEntryStatus = () => {
+  return new Promise((resolve) => {
+    request.get('/systemConfig/isMakeupExamScoreEntryEnabled').then(res => {
+      if (res.code === '200') {
+        makeupExamScoreEntryEnabled.value = res.data
+      }
+    }).catch(err => {
+      console.error('获取补考/缓考成绩录入状态失败:', err)
+    }).finally(() => {
       resolve()
     })
   })
@@ -285,26 +340,74 @@ const rejectMakeupExam = (id) => {
 }
 
 // 开始编辑成绩
-const startEdit = (id, score) => {
-  editingId.value = id
-  editScore.value = score !== undefined && score !== null ? score : ''
+const startEdit = (id, score, examType) => {
+  if (!makeupExamScoreEntryEnabled.value) {
+    ElMessage.warning('补考/缓考成绩录入功能已关闭，无法编辑成绩')
+    return
+  }
+  
+  // 查找当前编辑的记录
+  const exam = makeupExams.value.find(e => e.id === id)
+  if (!exam) {
+    ElMessage.error('未找到对应记录')
+    return
+  }
+  
+  // 设置编辑模式和当前编辑ID
+  isEditMode.value = score !== undefined && score !== null && score !== ''
+  currentEditId.value = id
+  
+  // 填充编辑表单
+  editForm.value = {
+    studentName: exam.studentName,
+    courseName: exam.courseName,
+    exam_type: exam.exam_type || exam.examType,
+    makeup_score: score !== undefined && score !== null ? score : ''
+  }
+  
+  // 打开编辑对话框
+  editDialogVisible.value = true
+  
+  const examTypeText = examType === '缓考' ? '期末' : '最终'
+  ElMessage.info(`请输入${examTypeText}成绩，录入后将自动计算总评成绩`)
 }
 
 // 保存成绩
 const saveScore = (id) => {
-  if (editScore.value === null || (typeof editScore.value === 'string' && editScore.value === '')) {
+  if (!makeupExamScoreEntryEnabled.value) {
+    ElMessage.warning('补考/缓考成绩录入功能已关闭，无法保存成绩')
+    editingId.value = null
+    return
+  }
+  // 检查是否为空或未定义
+  if (editScore.value === null || editScore.value === undefined || editScore.value === '') {
     ElMessage.warning('请输入成绩')
     return
   }
-  
-  if (isNaN(editScore.value)) {
+
+  // 确保成绩是数字类型
+  const scoreNum = Number(editScore.value)
+
+  // 检查是否是有效的数字
+  if (isNaN(scoreNum)) {
     ElMessage.warning('请输入有效的成绩')
     return
   }
-  
+
+  // 检查成绩范围 [0, 100]
+  if (scoreNum < 0 || scoreNum > 100) {
+    ElMessage.warning('成绩必须在0到100之间')
+    return
+  }
+
+  // 获取当前编辑的缓考/补考记录的考试类型
+  const exam = makeupExams.value.find(e => e.id === id)
+  const examType = exam ? exam.exam_type || exam.examType : '补考'
+
   request.put('/makeupExam/updateScore', {
     id: id,
-    makeup_score: editScore.value
+    makeup_score: scoreNum,
+    exam_type: examType
   }).then(res => {
     if (res.code === '200') {
       ElMessage.success('成绩保存成功')
@@ -313,6 +416,55 @@ const saveScore = (id) => {
     } else {
       ElMessage.error(res.msg)
     }
+  })
+}
+
+// 确认保存成绩
+const confirmSaveScore = () => {
+  if (!makeupExamScoreEntryEnabled.value) {
+    ElMessage.warning('补考/缓考成绩录入功能已关闭，无法保存成绩')
+    editDialogVisible.value = false
+    return
+  }
+  
+  // 检查是否为空或未定义
+  if (editForm.value.makeup_score === null || editForm.value.makeup_score === undefined || editForm.value.makeup_score === '') {
+    ElMessage.warning('请输入成绩')
+    return
+  }
+
+  // 确保成绩是数字类型
+  const scoreNum = Number(editForm.value.makeup_score)
+
+  // 检查是否是有效的数字
+  if (isNaN(scoreNum)) {
+    ElMessage.warning('请输入有效的成绩')
+    return
+  }
+
+  // 检查成绩范围 [0, 100]
+  if (scoreNum < 0 || scoreNum > 100) {
+    ElMessage.warning('成绩必须在0到100之间')
+    return
+  }
+
+  // 获取当前编辑的缓考/补考记录的考试类型
+  const examType = editForm.value.exam_type || '补考'
+
+  request.put('/makeupExam/updateScore', {
+    id: currentEditId.value,
+    makeup_score: scoreNum,
+    exam_type: examType
+  }).then(res => {
+    if (res.code === '200') {
+      ElMessage.success('成绩保存成功')
+      editDialogVisible.value = false
+      loadMakeupExams() // 重新加载数据
+    } else {
+      ElMessage.error('成绩保存失败')
+    }
+  }).catch(() => {
+    ElMessage.error('网络错误，请稍后重试')
   })
 }
 

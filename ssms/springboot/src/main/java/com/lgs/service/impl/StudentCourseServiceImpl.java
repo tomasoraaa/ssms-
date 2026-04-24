@@ -63,6 +63,11 @@ public class StudentCourseServiceImpl implements StudentCourseService {
     }
 
     @Override
+    public StudentCourse selectByStudentIdAndCourseId(String student_id, Integer course_id) {
+        return studentCourseMapper.selectByStudentIdAndCourseId(student_id, course_id);
+    }
+
+    @Override
     public double calculateTotalScore(double usualScore, double midtermScore, double finalScore, Integer usualWeight, Integer midtermWeight, Integer finalWeight) {
         return (usualScore * usualWeight / 100) + (midtermScore * midtermWeight / 100) + (finalScore * finalWeight / 100);
     }

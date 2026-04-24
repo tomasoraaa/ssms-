@@ -112,6 +112,20 @@
             </span>
           </div>
         </div>
+        <div class="switch-item">
+          <div class="switch-label">补考/缓考成绩录入功能</div>
+          <div class="switch-value">
+            <el-switch
+              v-model="data.makeupExamScoreEntryEnabled"
+              active-text="开启"
+              inactive-text="关闭"
+              @change="handleMakeupExamScoreEntryChange"
+            />
+            <span :class="['status-indicator', data.makeupExamScoreEntryEnabled ? 'status-online' : 'status-offline']">
+              {{ data.makeupExamScoreEntryEnabled ? '已开启' : '已关闭' }}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -140,7 +154,8 @@ const data = reactive({
   systemVersion: "1.0.0",
   lastUpdate: "2026-04-12",
   courseSelectionEnabled: false,
-  teacherScoreEntryEnabled: false
+  teacherScoreEntryEnabled: false,
+  makeupExamScoreEntryEnabled: false
 });
 
 // 加载系统统计数据
@@ -261,6 +276,7 @@ onMounted(() => {
   loadSystemStatus();
   loadCourseSelectionStatus();
   loadTeacherScoreEntryStatus();
+  loadMakeupExamScoreEntryStatus();
 });
 
 // 加载选课状态
@@ -282,6 +298,17 @@ const loadTeacherScoreEntryStatus = () => {
     }
   }).catch(err => {
     console.error('获取教师录入成绩状态失败:', err);
+  });
+};
+
+// 加载补考/缓考成绩录入状态
+const loadMakeupExamScoreEntryStatus = () => {
+  request.get('/systemConfig/isMakeupExamScoreEntryEnabled').then(res => {
+    if (res.code === '200') {
+      data.makeupExamScoreEntryEnabled = res.data;
+    }
+  }).catch(err => {
+    console.error('获取补考/缓考成绩录入状态失败:', err);
   });
 };
 
@@ -314,6 +341,22 @@ const handleTeacherScoreEntryChange = (value) => {
     console.error('切换教师录入成绩状态失败:', err);
     ElMessage.error('操作失败');
     data.teacherScoreEntryEnabled = !value;
+  });
+};
+
+// 切换补考/缓考成绩录入状态
+const handleMakeupExamScoreEntryChange = (value) => {
+  request.post(`/systemConfig/setMakeupExamScoreEntryEnabled/${value}`).then(res => {
+    if (res.code === '200') {
+      ElMessage.success(value ? '补考/缓考成绩录入已开启' : '补考/缓考成绩录入已关闭');
+    } else {
+      ElMessage.error('操作失败');
+      data.makeupExamScoreEntryEnabled = !value;
+    }
+  }).catch(err => {
+    console.error('切换补考/缓考成绩录入状态失败:', err);
+    ElMessage.error('操作失败');
+    data.makeupExamScoreEntryEnabled = !value;
   });
 };
 </script>

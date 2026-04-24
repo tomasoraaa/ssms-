@@ -30,6 +30,12 @@ public class SystemConfigServiceImpl implements SystemConfigService {
     }
 
     @Override
+    public boolean isMakeupExamScoreEntryEnabled() {
+        SystemConfig config = systemConfigMapper.selectByKey("makeup_exam_score_entry_enabled");
+        return config != null && "true".equals(config.getConfig_value());
+    }
+
+    @Override
     public boolean updateConfig(String config_key, String config_value) {
         SystemConfig config = systemConfigMapper.selectByKey(config_key);
         if (config == null) {

@@ -42,4 +42,8 @@
         select * from student_course where teaching_class_id = #{teaching_class_id}
     </select>
 
+    <select id="selectByStudentIdAndCourseId" resultType="com.lgs.entity.StudentCourse">
+        select * from student_course where student_id = #{student_id} and course_id = #{course_id}
+    </select>
+
 </mapper>

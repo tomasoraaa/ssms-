@@ -75,36 +75,36 @@
         <el-table-column label="平时成绩" width="120">
           <template #default="scope">
             <template v-if="!scope.row.isEditing">
-              <span>{{ scope.row.usual_score || 0 }}</span>
+              <span>{{ formatScore(scope.row.usual_score) }}</span>
             </template>
             <template v-else>
-              <el-input-number v-model="scope.row.usual_score" :min="0" :max="100" :step="1" size="small" style="width: 100px;"></el-input-number>
+              <el-input-number v-model="scope.row.usual_score" :min="0" :max="100" :step="0.1" size="small" style="width: 100px;"></el-input-number>
             </template>
           </template>
         </el-table-column>
         <el-table-column label="期中成绩" width="120">
           <template #default="scope">
             <template v-if="!scope.row.isEditing">
-              <span>{{ scope.row.midterm_score || 0 }}</span>
+              <span>{{ formatScore(scope.row.midterm_score) }}</span>
             </template>
             <template v-else>
-              <el-input-number v-model="scope.row.midterm_score" :min="0" :max="100" :step="1" size="small" style="width: 100px;"></el-input-number>
+              <el-input-number v-model="scope.row.midterm_score" :min="0" :max="100" :step="0.1" size="small" style="width: 100px;"></el-input-number>
             </template>
           </template>
         </el-table-column>
         <el-table-column label="期末成绩" width="120">
           <template #default="scope">
             <template v-if="!scope.row.isEditing">
-              <span>{{ scope.row.final_score || 0 }}</span>
+              <span>{{ formatScore(scope.row.final_score) }}</span>
             </template>
             <template v-else>
-              <el-input-number v-model="scope.row.final_score" :min="0" :max="100" :step="1" size="small" style="width: 100px;"></el-input-number>
+              <el-input-number v-model="scope.row.final_score" :min="0" :max="100" :step="0.1" size="small" style="width: 100px;"></el-input-number>
             </template>
           </template>
         </el-table-column>
         <el-table-column label="总评成绩" width="120">
           <template #default="scope">
-            <span>{{ scope.row.score || 0 }}</span>
+            <span>{{ formatScore(scope.row.score) }}</span>
           </template>
         </el-table-column>
         <el-table-column label="绩点" prop="gpa" width="80"></el-table-column>
@@ -229,6 +229,11 @@ const calculateGPA = (score) => {
   } else {
     return 0;
   }
+};
+
+// 格式化成绩显示，保留一位小数
+const formatScore = (score) => {
+  return Number(score || 0).toFixed(1);
 };
 
 const data = reactive({
