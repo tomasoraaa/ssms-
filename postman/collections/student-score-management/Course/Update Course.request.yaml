@@ -1,0 +1,18 @@
+$kind: http-request
+name: Update Course
+method: PUT
+url: '{{baseUrl}}/course/update'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id": 1,
+      "course_name": "Advanced Mathematics",
+      "course_code": "MATH101",
+      "credit": 4,
+      "hours": 64
+    }

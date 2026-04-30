@@ -1,0 +1,5 @@
+$kind: http-request
+name: Get All Teachers
+method: GET
+url: '{{baseUrl}}/teacher/selectAll'
+order: 5000

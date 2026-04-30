@@ -1,0 +1,19 @@
+$kind: http-request
+name: Add Teacher
+method: POST
+url: '{{baseUrl}}/teacher/add'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "t2024001",
+      "password": "123456",
+      "name": "Li Si",
+      "gender": "male",
+      "phone": "13900000001",
+      "email": "lisi@example.com"
+    }

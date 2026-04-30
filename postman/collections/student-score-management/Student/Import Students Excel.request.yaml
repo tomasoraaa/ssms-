@@ -1,0 +1,12 @@
+$kind: http-request
+name: Import Students Excel
+method: POST
+url: '{{baseUrl}}/student/import'
+order: 7000
+body:
+  type: formdata
+  content:
+    - key: file
+      type: file
+      src: ''
+      description: Excel file (.xlsx) containing student records

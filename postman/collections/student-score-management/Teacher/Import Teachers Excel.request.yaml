@@ -1,0 +1,12 @@
+$kind: http-request
+name: Import Teachers Excel
+method: POST
+url: '{{baseUrl}}/teacher/import'
+order: 7000
+body:
+  type: formdata
+  content:
+    - key: file
+      type: file
+      src: ''
+      description: Excel file (.xlsx) containing teacher records

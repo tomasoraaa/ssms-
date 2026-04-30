@@ -184,4 +184,64 @@ public class TeacherService {
         dbTeacher.setPassword(account.getNewPassword());
         teacherMapper.updateById(dbTeacher);
     }
+
+    /**
+     * 重置单个教师密码（重置为默认密码123456）
+     */
+    public void resetPassword(String username) {
+        Teacher teacher = teacherMapper.selectByUsername(username);
+        if (teacher == null) {
+            throw new CustomException("教师不存在");
+        }
+        teacher.setPassword("123456");
+        teacherMapper.updateById(teacher);
+    }
+
+    /**
+     * 批量重置教师密码
+     */
+    public int batchResetPassword(List<String> usernames) {
+        if (usernames == null || usernames.isEmpty()) {
+            return 0;
+        }
+        int count = 0;
+        for (String username : usernames) {
+            try {
+                resetPassword(username);
+                count++;
+            } catch (Exception e) {
+                // 跳过失败的记录，继续处理其他教师
+                continue;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * 重置所有教师密码
+     */
+    public int resetAllPassword() {
+        List<Teacher> teachers = teacherMapper.selectAll(new Teacher());
+        if (teachers == null || teachers.isEmpty()) {
+            return 0;
+        }
+        int count = 0;
+        for (Teacher teacher : teachers) {
+            try {
+                teacher.setPassword("123456");
+                teacherMapper.updateById(teacher);
+                count++;
+            } catch (Exception e) {
+                continue;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * 根据用户名查询教师（不验证密码）
+     */
+    public Account loginByUsername(String username) {
+        return teacherMapper.selectByUsername(username);
+    }
 }

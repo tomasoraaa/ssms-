@@ -28,5 +28,7 @@ public class Account {
     private String phone;
     /** 专业 */
     private String profession;
+    /** 密码校验值（用于检测密码是否被重置） */
+    private String passwordChecksum;
 
 }

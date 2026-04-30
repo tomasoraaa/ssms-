@@ -1,0 +1,12 @@
+$kind: http-request
+name: Get Students By Usernames
+method: POST
+url: '{{baseUrl}}/student/selectByUsernames'
+order: 11000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    ["s2024001", "s2024002"]

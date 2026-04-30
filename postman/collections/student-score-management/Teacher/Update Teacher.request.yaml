@@ -1,0 +1,19 @@
+$kind: http-request
+name: Update Teacher
+method: PUT
+url: '{{baseUrl}}/teacher/update'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id": 1,
+      "username": "t2024001",
+      "name": "Li Si Updated",
+      "gender": "male",
+      "phone": "13900000001",
+      "email": "lisi@example.com"
+    }

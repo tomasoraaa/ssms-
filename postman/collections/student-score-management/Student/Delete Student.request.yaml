@@ -1,0 +1,8 @@
+$kind: http-request
+name: Delete Student
+method: DELETE
+url: '{{baseUrl}}/student/delete/{{studentId}}'
+order: 3000
+pathVariables:
+  - key: studentId
+    value: '1'

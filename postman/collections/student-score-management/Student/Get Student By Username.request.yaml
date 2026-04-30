@@ -1,0 +1,8 @@
+$kind: http-request
+name: Get Student By Username
+method: GET
+url: '{{baseUrl}}/student/selectByUsername'
+order: 6000
+queryParams:
+  - key: username
+    value: 's2024001'

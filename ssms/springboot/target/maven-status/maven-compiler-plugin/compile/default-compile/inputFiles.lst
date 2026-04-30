@@ -1,6 +1,7 @@
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\common\CorsConfig.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\common\Result.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\config\SystemMonitorSchedule.java
+D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\config\WebMvcConfig.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\controller\AcademicYearController.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\controller\AdminClassController.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\controller\AdminController.java
@@ -44,6 +45,7 @@ D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\ja
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\entity\TeachingClass.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\exception\CustomException.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\exception\GlobalExceptionHandler.java
+D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\interceptor\PasswordCheckInterceptor.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\mapper\AcademicYearMapper.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\mapper\ActivityLogMapper.java
 D:\genzuobishe\毕业设计-学生成绩管理系统\ssms\springboot\src\main\java\com\lgs\mapper\AdminClassMapper.java

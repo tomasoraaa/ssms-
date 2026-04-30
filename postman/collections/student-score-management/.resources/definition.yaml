@@ -1,0 +1,10 @@
+$kind: collection
+name: Student Score Management System API
+description: |-
+  REST API collection for the Student Score Management System (学生成绩管理系统).
+  Backend: Spring Boot on port 9090.
+  All responses follow the shape: { "code": "200", "data": ..., "msg": "..." }
+variables:
+  - key: baseUrl
+    value: 'http://localhost:9090'
+    description: Base URL of the backend API server

@@ -1,0 +1,5 @@
+$kind: http-request
+name: Get All Courses
+method: GET
+url: '{{baseUrl}}/course/selectAll'
+order: 6000

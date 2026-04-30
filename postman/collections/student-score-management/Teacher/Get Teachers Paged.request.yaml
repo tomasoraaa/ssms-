@@ -1,0 +1,10 @@
+$kind: http-request
+name: Get Teachers Paged
+method: GET
+url: '{{baseUrl}}/teacher/selectPage'
+order: 4000
+queryParams:
+  - key: pageNum
+    value: '1'
+  - key: pageSize
+    value: '10'

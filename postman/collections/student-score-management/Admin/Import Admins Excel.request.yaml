@@ -1,0 +1,12 @@
+$kind: http-request
+name: Import Admins Excel
+method: POST
+url: '{{baseUrl}}/admin/import'
+order: 7000
+body:
+  type: formdata
+  content:
+    - key: file
+      type: file
+      src: ''
+      description: Excel file (.xlsx) containing admin records

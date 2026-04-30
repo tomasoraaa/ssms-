@@ -42,6 +42,7 @@ com\lgs\service\impl\AdminClassServiceImpl.class
 com\lgs\controller\AdminClassController.class
 com\lgs\controller\SystemConfigController.class
 com\lgs\mapper\CourseWithdrawalMapper.class
+com\lgs\interceptor\PasswordCheckInterceptor.class
 com\lgs\mapper\MakeupExamMapper.class
 com\lgs\service\impl\MakeupExamServiceImpl.class
 com\lgs\service\CourseTeacherService.class
@@ -102,5 +103,6 @@ com\lgs\controller\ScoreRuleController.class
 com\lgs\mapper\CourseTeacherMapper.class
 com\lgs\controller\StudentAdminClassController.class
 com\lgs\service\impl\ScoreRuleServiceImpl.class
+com\lgs\config\WebMvcConfig.class
 com\lgs\mapper\CourseEvaluationMapper.class
 com\lgs\service\MakeupExamService.class

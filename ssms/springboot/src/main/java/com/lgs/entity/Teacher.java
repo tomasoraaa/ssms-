@@ -3,7 +3,7 @@ package com.lgs.entity;
 import lombok.Data;
 
 /**
- * 管理员
+ * 教师
 */
 @Data
 public class Teacher extends Account {
@@ -30,5 +30,7 @@ public class Teacher extends Account {
     private Integer status;
     /** 缓考/补考管理权限：true-有，false-无 */
     private Boolean makeup_exam_permission;
+    /** 密码版本号（用于检测密码是否被重置） */
+    private Long passwordVersion;
 
 }

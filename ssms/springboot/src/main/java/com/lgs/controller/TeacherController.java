@@ -102,4 +102,46 @@ public class TeacherController {
         teacher.setUsername(username);
         return Result.success(teacherService.selectAll(teacher).get(0));
     }
+
+    /**
+     * 重置单个教师密码
+     */
+    @PutMapping("/resetPassword/{username}")
+    public Result resetPassword(@PathVariable String username) {
+        try {
+            teacherService.resetPassword(username);
+            activityLogService.recordLog("用户", "admin", "重置教师 " + username + " 的密码", "ADMIN");
+            return Result.success("密码已重置为默认密码：123456");
+        } catch (RuntimeException e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 批量重置教师密码
+     */
+    @PutMapping("/resetPassword/batch")
+    public Result batchResetPassword(@RequestBody java.util.List<String> usernames) {
+        try {
+            int count = teacherService.batchResetPassword(usernames);
+            activityLogService.recordLog("用户", "admin", "批量重置 " + count + " 个教师的密码", "ADMIN");
+            return Result.success("成功重置 " + count + " 个教师的密码，默认密码：123456");
+        } catch (RuntimeException e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 重置所有教师密码
+     */
+    @PutMapping("/resetPassword/all")
+    public Result resetAllPassword() {
+        try {
+            int count = teacherService.resetAllPassword();
+            activityLogService.recordLog("用户", "admin", "重置所有教师密码", "ADMIN");
+            return Result.success("成功重置所有 " + count + " 个教师的密码，默认密码：123456");
+        } catch (RuntimeException e) {
+            return Result.error(e.getMessage());
+        }
+    }
 }

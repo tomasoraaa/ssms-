@@ -1,0 +1,5 @@
+$kind: http-request
+name: Get Recent Activities
+method: GET
+url: '{{baseUrl}}/admin/getRecentActivities'
+order: 9000

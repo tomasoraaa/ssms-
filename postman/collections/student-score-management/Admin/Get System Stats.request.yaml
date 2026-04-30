@@ -1,0 +1,5 @@
+$kind: http-request
+name: Get System Stats
+method: GET
+url: '{{baseUrl}}/admin/getSystemStats'
+order: 8000

@@ -1,0 +1,8 @@
+$kind: http-request
+name: Get Courses By Student ID
+method: GET
+url: '{{baseUrl}}/course/selectByStudentId'
+order: 7000
+queryParams:
+  - key: student_id
+    value: 's2024001'

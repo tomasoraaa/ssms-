@@ -1,5 +1,7 @@
 <template>
   <div class="login-container">
+    <!-- 背景大字 -->
+    <div class="background-title">学生成绩管理系统</div>
     <div class="login-box">
       <div style="font-weight: bold; font-size: 30px; text-align: center; margin-bottom: 30px; color: #1967e3">欢 迎 登 录</div>
       <el-form :model="data.form"  ref="formRef" :rules="data.rules">
@@ -20,9 +22,9 @@
           <el-button size="large" type="primary" style="width: 100%" @click="login">登 录</el-button>
         </el-form-item>
       </el-form>
-      <div style="text-align: right;">
+      <!-- <div style="text-align: right;">
         还没有账号？请 <a href="/register">注册</a>
-      </div>
+      </div> -->
     </div>
 
   </div>
@@ -100,14 +102,43 @@
   justify-content: center;
   align-items: center;
   background: #242d8f;
+  position: relative;
+}
+
+/* 背景图片层 */
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-image:url("@/assets/imgs/login-background-img.png") ;
   background-size: cover;
+  z-index: 0;
 }
+
+/* 背景大字样式 */
+.background-title {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 80px;
+  font-weight: bold;
+  color: rgba(47, 91, 179, 0.5);
+  letter-spacing: 20px;
+  pointer-events: none;
+  z-index: 1;
+}
+
 .login-box {
   width: 400px;
   padding: 50px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   background-color: #fff;
+  position: relative;
+  z-index: 2;
 }
 </style>

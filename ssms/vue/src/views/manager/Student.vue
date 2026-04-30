@@ -12,6 +12,7 @@
       <div style="margin-bottom: 10px">
         <el-button type="primary" @click="handleAdd">新增</el-button>
         <el-button type="success" @click="showImportDialog">批量导入</el-button>
+        <el-button type="warning" @click="showBatchResetPasswordDialog">批量重置密码</el-button>
       </div>
 
       <!-- 批量导入弹窗 -->
@@ -79,10 +80,11 @@
             <el-tag v-else-if="scope.row.status === 2" type="danger">已拒绝</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" width="300">
+        <el-table-column label="操作" align="center" width="350">
           <template #default="scope">
             <el-button type="primary" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button type="info" @click="viewDetails(scope.row)">详情</el-button>
+            <el-button type="warning" @click="handleResetPassword(scope.row)">重置密码</el-button>
             <el-button type="danger" @click="handleDelete(scope.row.id)">删除</el-button>
             <el-button v-if="scope.row.status === 0" type="success" @click="handleApprove(scope.row.id, 1)">通过</el-button>
             <el-button v-if="scope.row.status === 0" type="warning" @click="handleApprove(scope.row.id, 2)">拒绝</el-button>
@@ -225,6 +227,19 @@
           </span>
         </template>
       </el-dialog>
+
+      <!-- 批量重置密码弹窗 -->
+      <el-dialog title="批量重置学生密码" width="400px" v-model="data.batchResetPasswordVisible" :close-on-click-modal="false">
+        <div style="background-color: #fff3cd; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+          <strong>警告：</strong>此操作将重置所有学生的密码为默认密码 <strong>123456</strong>，请谨慎操作！
+        </div>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="data.batchResetPasswordVisible = false">取消</el-button>
+            <el-button type="danger" @click="handleBatchResetPassword">确定重置</el-button>
+          </span>
+        </template>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -270,6 +285,8 @@ const data = reactive({
   studentCourses: [],
   studentEvaluations: [],
   importVisible: false,
+  batchResetPasswordVisible: false,
+  batchResetPasswordUsernames: '',
   pageNum: 1,
   pageSize: 10,
   total: 0,
@@ -453,6 +470,65 @@ const viewDetails = (student) => {
         }
       })
     }
+  })
+}
+
+// 重置单个学生密码
+const handleResetPassword = (row) => {
+  ElMessageBox.confirm(
+    `确定要重置学生 ${row.name}(${row.username}) 的密码吗？重置后密码将变为默认密码 123456`,
+    '重置密码确认',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).then(() => {
+    request.put(`/student/resetPassword/${row.username}`).then(res => {
+      if (res.code === '200') {
+        ElMessage.success(res.msg || '密码重置成功')
+      } else {
+        ElMessage.error(res.msg || '密码重置失败')
+      }
+    }).catch(err => {
+      ElMessage.error('密码重置失败')
+      console.error(err)
+    })
+  }).catch(() => {
+    // 用户取消操作
+  })
+}
+
+// 显示批量重置密码弹窗
+const showBatchResetPasswordDialog = () => {
+  data.batchResetPasswordUsernames = ''
+  data.batchResetPasswordVisible = true
+}
+
+// 批量重置学生密码
+const handleBatchResetPassword = () => {
+  ElMessageBox.confirm(
+    '确定要重置所有学生的密码吗？此操作不可撤销！重置后密码将变为默认密码 123456',
+    '批量重置密码确认',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).then(() => {
+    request.put('/student/resetPassword/all').then(res => {
+      if (res.code === '200') {
+        ElMessage.success(res.msg || '批量密码重置成功')
+        data.batchResetPasswordVisible = false
+      } else {
+        ElMessage.error(res.msg || '批量密码重置失败')
+      }
+    }).catch(err => {
+      ElMessage.error('批量密码重置失败')
+      console.error(err)
+    })
+  }).catch(() => {
+    // 用户取消操作
   })
 }
 

@@ -1,0 +1,10 @@
+$kind: http-request
+name: Get Admins Paged
+method: GET
+url: '{{baseUrl}}/admin/selectPage'
+order: 6000
+queryParams:
+  - key: pageNum
+    value: '1'
+  - key: pageSize
+    value: '10'

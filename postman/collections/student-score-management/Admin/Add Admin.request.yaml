@@ -1,0 +1,18 @@
+$kind: http-request
+name: Add Admin
+method: POST
+url: '{{baseUrl}}/admin/add'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "admin2",
+      "password": "123456",
+      "name": "Admin Two",
+      "phone": "13800000002",
+      "email": "admin2@example.com"
+    }

@@ -107,6 +107,48 @@ public class StudentController {
     }
 
     /**
+     * 重置单个学生密码
+     */
+    @PutMapping("/resetPassword/{username}")
+    public Result resetPassword(@PathVariable String username) {
+        try {
+            studentService.resetPassword(username);
+            activityLogService.recordLog("用户", "admin", "重置学生 " + username + " 的密码", "ADMIN");
+            return Result.success("密码已重置为默认密码：123456");
+        } catch (RuntimeException e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 批量重置学生密码
+     */
+    @PutMapping("/resetPassword/batch")
+    public Result batchResetPassword(@RequestBody List<String> usernames) {
+        try {
+            int count = studentService.batchResetPassword(usernames);
+            activityLogService.recordLog("用户", "admin", "批量重置 " + count + " 个学生的密码", "ADMIN");
+            return Result.success("成功重置 " + count + " 个学生的密码，默认密码：123456");
+        } catch (RuntimeException e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 重置所有学生密码
+     */
+    @PutMapping("/resetPassword/all")
+    public Result resetAllPassword() {
+        try {
+            int count = studentService.resetAllPassword();
+            activityLogService.recordLog("用户", "admin", "重置所有学生密码", "ADMIN");
+            return Result.success("成功重置所有 " + count + " 个学生的密码，默认密码：123456");
+        } catch (RuntimeException e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
      * 根据学生用户名列表查询
      */
     @PostMapping("/selectByUsernames")

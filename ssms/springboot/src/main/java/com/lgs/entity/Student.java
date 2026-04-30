@@ -3,7 +3,7 @@ package com.lgs.entity;
 import lombok.Data;
 
 /**
- * 管理员
+ * 学生
 */
 @Data
 public class Student extends Account {
@@ -32,5 +32,7 @@ public class Student extends Account {
     private String role;
     /** 审核状态：0-待审核，1-已通过，2-已拒绝 */
     private Integer status;
+    /** 密码版本号（用于检测密码是否被重置） */
+    private Long passwordVersion;
 
 }
