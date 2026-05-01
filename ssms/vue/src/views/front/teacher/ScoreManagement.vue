@@ -12,54 +12,56 @@
       <el-button type="primary" @click="loadScoreEntryStatus">刷新状态</el-button>
     </div>
 
-    <template v-else>
-      <div class="card" style="margin-bottom: 15px">
+    <div class="card" style="margin-bottom: 15px">
+      <div v-if="data.scoreEntryEnabled">
         <el-button type="primary" @click="dialogImportVisible = true">批量导入</el-button>
       </div>
+    </div>
 
-      <div class="card" style="margin-bottom: 15px">
-        <el-table :data="data.courses" stripe>
-          <el-table-column label="课程代码" prop="course_code"></el-table-column>
-          <el-table-column label="课程名称" prop="course_name"></el-table-column>
-          <el-table-column label="学分" prop="credit"></el-table-column>
-          <el-table-column label="课程描述" prop="description"></el-table-column>
-          <el-table-column label="操作">
-            <template #default="scope">
+    <div class="card" style="margin-bottom: 15px">
+      <el-table :data="data.courses" stripe>
+        <el-table-column label="课程代码" prop="course_code"></el-table-column>
+        <el-table-column label="课程名称" prop="course_name"></el-table-column>
+        <el-table-column label="学分" prop="credit"></el-table-column>
+        <el-table-column label="课程描述" prop="description"></el-table-column>
+        <el-table-column label="操作">
+          <template #default="scope">
+            <template v-if="data.scoreEntryEnabled">
               <el-button type="primary" @click="showClassSelection(scope.row)">录入成绩</el-button>
             </template>
-          </el-table-column>
-        </el-table>
-      </div>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
 
-      <!-- 教学班选择对话框 -->
-      <el-dialog
-        v-model="classSelectionVisible"
-        :title="`选择教学班：${currentCourse?.course_name || ''}`"
-        width="50%"
-      >
-        <div v-if="currentCourse?.teachingClasses && currentCourse.teachingClasses.length > 0">
-          <el-radio-group v-model="selectedClassId">
-            <el-radio 
-              v-for="cls in currentCourse.teachingClasses" 
-              :key="cls.id"
-              :label="cls.id"
-              style="margin-bottom: 10px; display: block;"
-            >
-              {{ cls.class_code }}
-            </el-radio>
-          </el-radio-group>
-        </div>
-        <div v-else style="color: #999; text-align: center; padding: 20px;">
-          该课程暂无教学班
-        </div>
-        <template #footer>
-          <span class="dialog-footer">
-            <el-button @click="classSelectionVisible = false">取消</el-button>
-            <el-button type="primary" @click="confirmClassSelection" :disabled="!selectedClassId">确定</el-button>
-          </span>
-        </template>
-      </el-dialog>
-    </template>
+    <!-- 教学班选择对话框（录入成绩用） -->
+    <el-dialog
+      v-model="classSelectionVisible"
+      :title="`选择教学班：${currentCourse?.course_name || ''}`"
+      width="50%"
+    >
+      <div v-if="currentCourse?.teachingClasses && currentCourse.teachingClasses.length > 0">
+        <el-radio-group v-model="selectedClassId">
+          <el-radio 
+            v-for="cls in currentCourse.teachingClasses" 
+            :key="cls.id"
+            :label="cls.id"
+            style="margin-bottom: 10px; display: block;"
+          >
+            {{ cls.class_code }}
+          </el-radio>
+        </el-radio-group>
+      </div>
+      <div v-else style="color: #999; text-align: center; padding: 20px;">
+        该课程暂无教学班
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="classSelectionVisible = false">取消</el-button>
+          <el-button type="primary" @click="confirmClassSelection" :disabled="!selectedClassId">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
 
     <!-- 学生列表对话框 -->
     <el-dialog
@@ -102,9 +104,18 @@
             </template>
           </template>
         </el-table-column>
-        <el-table-column label="总评成绩" width="120">
+        <el-table-column label="总评成绩" width="140">
           <template #default="scope">
             <span>{{ formatScore(scope.row.score) }}</span>
+            <span v-if="scope.row.is_makeup === 1 && scope.row.original_score" style="margin-left: 5px; text-decoration: line-through; color: #999; font-size: 12px;">
+              (原: {{ formatScore(scope.row.original_score) }})
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="成绩来源" width="100">
+          <template #default="scope">
+            <el-tag v-if="scope.row.is_makeup === 1" type="warning">{{ scope.row.makeup_exam_type === '补考' ? '补考' : '缓考' }}</el-tag>
+            <el-tag v-else type="success">正常</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="绩点" prop="gpa" width="80"></el-table-column>
@@ -355,6 +366,10 @@ const viewStudentsByClass = (course, classId) => {
                     student.final_score = detail.final_score || 0;
                     student.score = detail.total_score || 0;
                     student.gpa = calculateGPA(detail.total_score || 0).toFixed(1);
+                    // 添加补考相关字段
+                    student.is_makeup = detail.is_makeup || 0;
+                    student.original_score = detail.original_score || null;
+                    student.makeup_exam_type = detail.makeup_exam_type || null;
                   }
                 });
               }

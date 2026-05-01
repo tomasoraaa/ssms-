@@ -42,7 +42,20 @@
         <el-table-column label="课程代码" prop="course_code"></el-table-column>
         <el-table-column label="课程名称" prop="course_name"></el-table-column>
         <el-table-column label="学分" prop="credit"></el-table-column>
-        <el-table-column label="成绩" prop="score"></el-table-column>
+        <el-table-column label="成绩" width="140">
+          <template #default="scope">
+            <span>{{ formatScore(scope.row.score) }}</span>
+            <span v-if="scope.row.is_makeup === 1 && scope.row.original_score" style="margin-left: 5px; text-decoration: line-through; color: #999; font-size: 12px;">
+              (原: {{ formatScore(scope.row.original_score) }})
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="成绩来源" width="100">
+          <template #default="scope">
+            <el-tag v-if="scope.row.is_makeup === 1" type="warning">{{ scope.row.makeup_exam_type === '补考' ? '补考' : '缓考' }}</el-tag>
+            <el-tag v-else type="success">正常</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="绩点" prop="gpa"></el-table-column>
         <el-table-column label="等级">
           <template #default="scope">
@@ -59,6 +72,11 @@
 import request from "@/utils/request";
 import {reactive, ref, onMounted} from "vue";
 import * as echarts from 'echarts';
+
+// 格式化成绩显示，保留一位小数
+const formatScore = (score) => {
+  return Number(score || 0).toFixed(1);
+};
 
 const calculateGPA = (score) => {
   if (score >= 96) {
@@ -116,18 +134,39 @@ const loadStudentScores = () => {
             scores.forEach(score => {
               scoreMap[score.course_id] = score.score || 0;
             });
-            data.coursesWithScore = courses.map(course => {
-              const score = scoreMap[course.id.toString()] || 0;
-              const gpa = calculateGPA(score);
-              return {
-                ...course,
-                score: score,
-                gpa: gpa.toFixed(1)
-              };
+            
+            // 获取成绩详情以获取补考信息
+            request.get('/scoreDetail/selectAll', {
+              params: { student_id: user.username }
+            }).then(scoreDetailRes => {
+              const scoreDetailMap = {};
+              if (scoreDetailRes.code === '200') {
+                scoreDetailRes.data.forEach(detail => {
+                  scoreDetailMap[detail.course_id] = {
+                    is_makeup: detail.is_makeup,
+                    original_score: detail.original_score,
+                    makeup_exam_type: detail.makeup_exam_type
+                  };
+                });
+              }
+              
+              data.coursesWithScore = courses.map(course => {
+                const score = scoreMap[course.id.toString()] || 0;
+                const gpa = calculateGPA(score);
+                const scoreDetail = scoreDetailMap[course.id] || {};
+                return {
+                  ...course,
+                  score: score,
+                  gpa: gpa.toFixed(1),
+                  is_makeup: scoreDetail.is_makeup || 0,
+                  original_score: scoreDetail.original_score || null,
+                  makeup_exam_type: scoreDetail.makeup_exam_type || null
+                };
+              });
+              data.scores = data.coursesWithScore.map(course => course.score);
+              calculateScoreStats();
+              drawScoreDistributionChart();
             });
-            data.scores = data.coursesWithScore.map(course => course.score);
-            calculateScoreStats();
-            drawScoreDistributionChart();
           }
         });
       }

@@ -194,7 +194,20 @@
         <el-table :data="data.scoreStatistics.students" stripe>
           <el-table-column label="学生学号" prop="studentId"></el-table-column>
           <el-table-column label="学生姓名" prop="studentName"></el-table-column>
-          <el-table-column label="成绩" prop="score"></el-table-column>
+          <el-table-column label="成绩" width="140">
+            <template #default="scope">
+              <span>{{ formatScore(scope.row.score) }}</span>
+              <span v-if="scope.row.is_makeup === 1 && scope.row.original_score" style="margin-left: 5px; text-decoration: line-through; color: #999; font-size: 12px;">
+                (原: {{ formatScore(scope.row.original_score) }})
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column label="成绩来源" width="100">
+            <template #default="scope">
+              <el-tag v-if="scope.row.is_makeup === 1" type="warning">{{ scope.row.makeup_exam_type === '补考' ? '补考' : '缓考' }}</el-tag>
+              <el-tag v-else type="success">正常</el-tag>
+            </template>
+          </el-table-column>
           <el-table-column label="状态">
             <template #default="scope">
               <el-tag :type="scope.row.score >= 60 ? 'success' : 'danger'">
@@ -206,6 +219,7 @@
 
         <template #footer>
           <span class="dialog-footer">
+            <el-button @click="exportAdminScores" :disabled="!data.currentTeachingClass">导出成绩</el-button>
             <el-button @click="data.scoreDialogVisible = false">关闭</el-button>
           </span>
         </template>
@@ -620,9 +634,16 @@ const handleCurrentChange = (val) => {
   load()
 }
 
+// 格式化成绩显示，保留一位小数
+const formatScore = (score) => {
+  return Number(score || 0).toFixed(1)
+}
+
 // 查看成绩统计
 const viewScoreStatistics = (teachingClass) => {
   data.scoreStatistics.class_name = teachingClass.class_code + ' ' + teachingClass.course_name;
+  // 保存当前教学班信息用于导出
+  data.currentTeachingClass = teachingClass;
   // 获取该教学班的所有学生成绩
   request.get('/studentCourse/selectByTeachingClassId/' + teachingClass.id).then(res => {
     if (res.code === '200') {
@@ -637,38 +658,61 @@ const viewScoreStatistics = (teachingClass) => {
             allStudents.forEach(student => {
               studentMap[student.username] = student.name;
             });
-            // 计算统计数据
-            let totalScore = 0;
-            let highestScore = 0;
-            let lowestScore = 100;
-            let passCount = 0;
-            const students = studentCourses.map(sc => {
-              const score = sc.score || 0;
-              totalScore += score;
-              highestScore = Math.max(highestScore, score);
-              lowestScore = Math.min(lowestScore, score);
-              if (score >= 60) {
-                passCount++;
+            
+            // 获取成绩详情以获取补考信息
+            request.get('/scoreDetail/selectAll', {
+              params: { teaching_class_id: teachingClass.id }
+            }).then(scoreDetailRes => {
+              const scoreDetailMap = {};
+              if (scoreDetailRes.code === '200') {
+                scoreDetailRes.data.forEach(detail => {
+                  scoreDetailMap[detail.student_id] = {
+                    is_makeup: detail.is_makeup,
+                    original_score: detail.original_score,
+                    makeup_exam_type: detail.makeup_exam_type
+                  };
+                });
               }
-              return {
-                studentId: sc.student_id,
-                studentName: studentMap[sc.student_id] || sc.student_id,
-                score: score
-              };
+              
+              // 计算统计数据
+              let totalScore = 0;
+              let highestScore = 0;
+              let lowestScore = 100;
+              let passCount = 0;
+              const students = studentCourses.map(sc => {
+                const score = sc.score || 0;
+                const scoreDetail = scoreDetailMap[sc.student_id] || {};
+                totalScore += score;
+                highestScore = Math.max(highestScore, score);
+                lowestScore = Math.min(lowestScore, score);
+                if (score >= 60) {
+                  passCount++;
+                }
+                return {
+                  studentId: sc.student_id,
+                  studentName: studentMap[sc.student_id] || sc.student_id,
+                  score: score,
+                  is_makeup: scoreDetail.is_makeup || 0,
+                  original_score: scoreDetail.original_score || null,
+                  makeup_exam_type: scoreDetail.makeup_exam_type || null
+                };
+              });
+              // 计算平均分和及格率
+              const averageScore = totalScore / students.length;
+              const passRate = passCount / students.length;
+              // 更新统计数据
+              data.scoreStatistics.averageScore = averageScore;
+              data.scoreStatistics.highestScore = highestScore;
+              data.scoreStatistics.lowestScore = lowestScore;
+              data.scoreStatistics.passRate = passRate;
+              data.scoreStatistics.students = students;
+              
+              data.scoreDialogVisible = true;
             });
-            // 计算平均分和及格率
-            const averageScore = totalScore / students.length;
-            const passRate = passCount / students.length;
-            // 更新统计数据
-            data.scoreStatistics.averageScore = averageScore;
-            data.scoreStatistics.highestScore = highestScore;
-            data.scoreStatistics.lowestScore = lowestScore;
-            data.scoreStatistics.passRate = passRate;
-            data.scoreStatistics.students = students;
           } else {
             data.scoreStatistics.students = [];
+            data.scoreDialogVisible = true;
           }
-          data.scoreDialogVisible = true;
         });
       } else {
         // 没有学生选该课程
@@ -681,6 +725,35 @@ const viewScoreStatistics = (teachingClass) => {
       }
     }
   });
+};
+
+// 导出教学班成绩（管理端）
+const exportAdminScores = () => {
+  if (!data.currentTeachingClass) {
+    ElMessage.error('请先选择教学班')
+    return
+  }
+  
+  // 使用axios下载文件
+  request({
+    url: `/scoreExport/admin?teaching_class_id=${data.currentTeachingClass.id}`,
+    method: 'GET',
+    responseType: 'blob'
+  }).then(response => {
+    // 创建下载链接
+    const url = window.URL.createObjectURL(new Blob([response]))
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${data.currentTeachingClass.class_code}_成绩.xlsx`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    ElMessage.success('导出成功')
+  }).catch(error => {
+    console.error('导出失败:', error)
+    ElMessage.error('导出失败，请稍后重试')
+  })
 }
 
 // 管理学生

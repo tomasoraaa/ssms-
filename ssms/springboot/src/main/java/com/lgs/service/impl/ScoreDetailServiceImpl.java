@@ -119,6 +119,11 @@ public class ScoreDetailServiceImpl implements ScoreDetailService {
         Integer course_id = scoreDetail.getCourse_id();
         String student_id = scoreDetail.getStudent_id();
 
+        // 默认不是补考
+        scoreDetail.setIs_makeup(0);
+        scoreDetail.setOriginal_score(null);
+        scoreDetail.setMakeup_exam_type(null);
+
         if (student_id != null && course_id != null) {
             // 优化：按学生和课程查询补考记录，而不是查询所有记录
             MakeupExam makeupExamQuery = new MakeupExam();
@@ -129,9 +134,23 @@ public class ScoreDetailServiceImpl implements ScoreDetailService {
                 if (exam.getMakeup_score() != null) {
 
                     if ("补考".equals(exam.getExam_type())) {
+                        // 保存原始成绩
+                        Double existingTotalScore = scoreDetail.getTotal_score();
+                        if (existingTotalScore == null || existingTotalScore == 0) {
+                            // 如果没有现有的总评成绩，尝试从数据库查询
+                            ScoreDetail existingDetail = scoreDetailMapper.selectByStudentAndCourse(student_id, course_id);
+                            if (existingDetail != null && existingDetail.getTotal_score() != null) {
+                                existingTotalScore = existingDetail.getTotal_score();
+                            }
+                        }
+                        scoreDetail.setOriginal_score(existingTotalScore);
+                        scoreDetail.setIs_makeup(1);
+                        scoreDetail.setMakeup_exam_type("补考");
                         scoreDetail.setTotal_score(exam.getMakeup_score());
                         return;
                     } else if ("缓考".equals(exam.getExam_type())) {
+                        scoreDetail.setIs_makeup(1);
+                        scoreDetail.setMakeup_exam_type("缓考");
                         var scoreRule = scoreRuleService.selectByCourseId(course_id);
                         int usual_weight = 30, midterm_weight = 20, final_weight = 50;
                         if (scoreRule != null) {

@@ -38,6 +38,9 @@
             <span class="course-value">{{ selectedTeachingClass.class_code }} ({{ selectedTeachingClass.academic_year_name }})</span>
           </div>
         </el-form-item>
+        <el-form-item>
+          <el-button type="success" @click="exportScores" :disabled="!selectedTeachingClassId">导出成绩</el-button>
+        </el-form-item>
       </el-form>
     </div>
 
@@ -73,7 +76,20 @@
       <el-table :data="data.studentsWithScore" stripe>
         <el-table-column label="学生学号" prop="username"></el-table-column>
         <el-table-column label="学生姓名" prop="name"></el-table-column>
-        <el-table-column label="成绩" prop="score"></el-table-column>
+        <el-table-column label="成绩" width="140">
+          <template #default="scope">
+            <span>{{ formatScore(scope.row.score) }}</span>
+            <span v-if="scope.row.is_makeup === 1 && scope.row.original_score" style="margin-left: 5px; text-decoration: line-through; color: #999; font-size: 12px;">
+              (原: {{ formatScore(scope.row.original_score) }})
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="成绩来源" width="100">
+          <template #default="scope">
+            <el-tag v-if="scope.row.is_makeup === 1" type="warning">{{ scope.row.makeup_exam_type === '补考' ? '补考' : '缓考' }}</el-tag>
+            <el-tag v-else type="success">正常</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="等级">
           <template #default="scope">
             <span>{{ getScoreLevel(scope.row.score) }}</span>
@@ -89,6 +105,12 @@
 import request from "@/utils/request";
 import {reactive, ref, onMounted, watch, computed} from "vue";
 import * as echarts from 'echarts';
+import { ElMessage } from 'element-plus';
+
+// 格式化成绩显示，保留一位小数
+const formatScore = (score) => {
+  return Number(score || 0).toFixed(1);
+};
 
 const data = reactive({
   courses: [],
@@ -194,16 +216,37 @@ const loadScoreData = () => {
           if (studentRes.code === '200') {
             const allStudents = studentRes.data;
             const studentIds = studentCourses.map(sc => sc.student_id);
-            data.studentsWithScore = allStudents.filter(student => studentIds.includes(student.username)).map(student => {
-              const sc = studentCourses.find(s => s.student_id === student.username);
-              return {
-                ...student,
-                score: sc ? sc.score || 0 : 0
-              };
-            });
+            
+            // 获取成绩详情以获取补考信息
+            request.get('/scoreDetail/selectAll', {
+              params: params
+            }).then(scoreDetailRes => {
+              const scoreDetailMap = {};
+              if (scoreDetailRes.code === '200') {
+                scoreDetailRes.data.forEach(detail => {
+                  scoreDetailMap[detail.student_id] = {
+                    is_makeup: detail.is_makeup,
+                    original_score: detail.original_score,
+                    makeup_exam_type: detail.makeup_exam_type
+                  };
+                });
+              }
 
-            calculateScoreStats();
-            drawScoreDistributionChart();
+              data.studentsWithScore = allStudents.filter(student => studentIds.includes(student.username)).map(student => {
+                const sc = studentCourses.find(s => s.student_id === student.username);
+                const scoreDetail = scoreDetailMap[student.username] || {};
+                return {
+                  ...student,
+                  score: sc ? sc.score || 0 : 0,
+                  is_makeup: scoreDetail.is_makeup || 0,
+                  original_score: scoreDetail.original_score || null,
+                  makeup_exam_type: scoreDetail.makeup_exam_type || null
+                };
+              });
+
+              calculateScoreStats();
+              drawScoreDistributionChart();
+            });
           }
         });
       } else {
@@ -311,6 +354,30 @@ const getScoreLevel = (score) => {
   if (score >= 70) return '中等';
   if (score >= 60) return '及格';
   return '不及格';
+};
+
+// 导出成绩
+const exportScores = () => {
+  if (!selectedTeachingClassId.value) return;
+  
+  request({
+    url: `/scoreExport/teacher?teaching_class_id=${selectedTeachingClassId.value}`,
+    method: 'GET',
+    responseType: 'blob'
+  }).then(response => {
+    const url = window.URL.createObjectURL(new Blob([response]))
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${selectedCourse.value.course_code}_${selectedTeachingClass.value.class_code}_成绩.xlsx`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    ElMessage.success('导出成功')
+  }).catch(err => {
+    console.error('导出失败', err)
+    ElMessage.error('导出失败，请稍后重试')
+  });
 };
 
 window.addEventListener('resize', () => {

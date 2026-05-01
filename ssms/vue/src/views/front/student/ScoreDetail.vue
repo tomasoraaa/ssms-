@@ -21,6 +21,7 @@
         <el-form-item>
           <el-button type="primary" @click="loadScoreDetails">查询</el-button>
           <el-button @click="resetSearch">重置</el-button>
+          <el-button type="success" @click="exportMyScores">导出成绩</el-button>
         </el-form-item>
       </el-form>
 
@@ -42,9 +43,18 @@
             <span>{{ formatScore(scope.row.finalScore) }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="totalScore" label="总评成绩" width="100">
+        <el-table-column prop="totalScore" label="总评成绩" width="120">
           <template #default="scope">
             <span>{{ formatScore(scope.row.totalScore) }}</span>
+            <span v-if="scope.row.isMakeup === 1 && scope.row.originalScore" style="margin-left: 5px; text-decoration: line-through; color: #999; font-size: 12px;">
+              (原: {{ formatScore(scope.row.originalScore) }})
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="scoreSource" label="成绩来源" width="100">
+          <template #default="scope">
+            <el-tag v-if="scope.row.isMakeup === 1" type="warning">{{ scope.row.makeupExamType === '补考' ? '补考' : '缓考' }}</el-tag>
+            <el-tag v-else type="success">正常</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="gpa" label="绩点" width="80">
@@ -122,6 +132,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import request from '@/utils/request'
+import { ElMessage } from 'element-plus'
 
 const scoreDetails = ref([])
 const courses = ref([])
@@ -279,6 +290,11 @@ const loadScoreDetails = () => {
           detail.finalScore = detail.final_score || 0
           detail.totalScore = detail.total_score || 0
           detail.gpa = calculateGPA(detail.total_score || 0).toFixed(1)
+          // 转换补考相关字段
+          detail.isMakeup = detail.is_makeup || 0
+          detail.originalScore = detail.original_score || null
+          detail.makeupExamType = detail.makeup_exam_type || null
+          detail.scoreSource = detail.is_makeup === 1 ? (detail.makeup_exam_type === '补考' ? '补考' : '缓考') : '正常'
         })
         scoreDetails.value = details
         pagination.value.total = details.length
@@ -368,6 +384,36 @@ const handleSizeChange = (size) => {
 const handleCurrentChange = (current) => {
   pagination.value.currentPage = current
   loadScoreDetails()
+}
+
+// 导出我的成绩
+const exportMyScores = () => {
+  const user = JSON.parse(sessionStorage.getItem('xm-user') || '{}')
+  if (!user.username) {
+    ElMessage.error('用户未登录')
+    return
+  }
+  
+  // 使用axios下载文件
+  request({
+    url: `/scoreExport/student?student_id=${user.username}`,
+    method: 'GET',
+    responseType: 'blob'
+  }).then(response => {
+    // 创建下载链接
+    const url = window.URL.createObjectURL(new Blob([response]))
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `个人成绩.xlsx`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    ElMessage.success('导出成功')
+  }).catch(error => {
+    console.error('导出失败:', error)
+    ElMessage.error('导出失败，请稍后重试')
+  })
 }
 
 // 初始化
