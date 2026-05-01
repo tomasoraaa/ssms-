@@ -3,6 +3,7 @@ package com.lgs.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
+import com.lgs.common.PasswordUtil;
 import com.lgs.entity.Account;
 import com.lgs.entity.Admin;
 import com.lgs.exception.CustomException;
@@ -35,7 +36,9 @@ public class AdminServiceImpl implements AdminService {
             throw new CustomException("用户不存在");
         }
         if (ObjectUtil.isEmpty(admin.getPassword())) {
-            admin.setPassword("admin");
+            admin.setPassword(PasswordUtil.encode("admin"));
+        } else {
+            admin.setPassword(PasswordUtil.encode(admin.getPassword()));
         }
         if (ObjectUtil.isEmpty(admin.getName())) {
             admin.setName(admin.getUsername());
@@ -95,7 +98,7 @@ public class AdminServiceImpl implements AdminService {
         if (ObjectUtil.isNull(dbAdmin)) {
             throw new CustomException("用户不存在");
         }
-        if (!account.getPassword().equals(dbAdmin.getPassword())) {
+        if (!PasswordUtil.matches(account.getPassword(), dbAdmin.getPassword())) {
             throw new CustomException("账号或密码错误");
         }
         return dbAdmin;
@@ -110,10 +113,10 @@ public class AdminServiceImpl implements AdminService {
         if (ObjectUtil.isNull(dbAdmin)) {
             throw new CustomException("用户不存在");
         }
-        if (!account.getPassword().equals(dbAdmin.getPassword())) {
+        if (!PasswordUtil.matches(account.getPassword(), dbAdmin.getPassword())) {
             throw new CustomException("原密码错误");
         }
-        dbAdmin.setPassword(account.getNewPassword());
+        dbAdmin.setPassword(PasswordUtil.encode(account.getNewPassword()));
         adminMapper.updateById(dbAdmin);
     }
 
@@ -136,9 +139,9 @@ public class AdminServiceImpl implements AdminService {
                         admin.setName(row.get(1).toString());
                     }
                     if (row.size() > 2 && row.get(2) != null) {
-                        admin.setPassword(row.get(2).toString());
+                        admin.setPassword(PasswordUtil.encode(row.get(2).toString()));
                     } else {
-                        admin.setPassword("admin");
+                        admin.setPassword(PasswordUtil.encode("admin"));
                     }
                     if (row.size() > 3 && row.get(3) != null) {
                         admin.setAvatar(row.get(3).toString());

@@ -98,4 +98,20 @@ public class ScoreDetailController {
         double total_score = scoreDetailService.calculateTotalScore(usual_score, midterm_score, final_score, usual_weight, midterm_weight, final_weight);
         return Result.success(total_score);
     }
+
+    /**
+     * 获取班级成绩统计（平均分、最高分、最低分）
+     */
+    @GetMapping("/getClassStatistics/{teaching_class_id}")
+    public Result getClassScoreStatistics(@PathVariable Integer teaching_class_id) {
+        return Result.success(scoreDetailService.getClassScoreStatistics(teaching_class_id));
+    }
+
+    /**
+     * 获取成绩分布统计（各分数段人数）
+     */
+    @GetMapping("/getScoreDistribution/{teaching_class_id}")
+    public Result getScoreDistribution(@PathVariable Integer teaching_class_id) {
+        return Result.success(scoreDetailService.getScoreDistribution(teaching_class_id));
+    }
 }

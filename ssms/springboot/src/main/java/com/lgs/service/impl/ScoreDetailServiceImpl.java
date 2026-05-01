@@ -10,7 +10,9 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ScoreDetailServiceImpl implements ScoreDetailService {
@@ -186,5 +188,91 @@ public class ScoreDetailServiceImpl implements ScoreDetailService {
             usual_weight, midterm_weight, final_weight
         );
         scoreDetail.setTotal_score(total_score);
+    }
+
+    @Override
+    public Map<String, Object> getClassScoreStatistics(Integer teaching_class_id) {
+        Map<String, Object> statistics = new HashMap<>();
+        List<ScoreDetail> scoreDetails = scoreDetailMapper.selectByTeachingClassId(teaching_class_id);
+        
+        if (scoreDetails == null || scoreDetails.isEmpty()) {
+            statistics.put("averageScore", 0.0);
+            statistics.put("maxScore", 0.0);
+            statistics.put("minScore", 0.0);
+            statistics.put("count", 0);
+            return statistics;
+        }
+        
+        double sum = 0.0;
+        double max = Double.NEGATIVE_INFINITY;
+        double min = Double.POSITIVE_INFINITY;
+        int validCount = 0;
+        
+        for (ScoreDetail detail : scoreDetails) {
+            Double score = detail.getTotal_score();
+            if (score != null && score >= 0 && score <= 100) {
+                sum += score;
+                max = Math.max(max, score);
+                min = Math.min(min, score);
+                validCount++;
+            }
+        }
+        
+        statistics.put("averageScore", validCount > 0 ? Math.round(sum / validCount * 100.0) / 100.0 : 0.0);
+        statistics.put("maxScore", validCount > 0 ? max : 0.0);
+        statistics.put("minScore", validCount > 0 ? min : 0.0);
+        statistics.put("count", validCount);
+        
+        return statistics;
+    }
+
+    @Override
+    public Map<String, Object> getScoreDistribution(Integer teaching_class_id) {
+        Map<String, Object> distribution = new HashMap<>();
+        List<ScoreDetail> scoreDetails = scoreDetailMapper.selectByTeachingClassId(teaching_class_id);
+        
+        // 分数段定义
+        int[] ranges = {0, 60, 70, 80, 90, 100};
+        String[] rangeLabels = {"0-59", "60-69", "70-79", "80-89", "90-100"};
+        int[] counts = new int[5];
+        
+        int totalCount = 0;
+        for (ScoreDetail detail : scoreDetails) {
+            Double score = detail.getTotal_score();
+            if (score != null && score >= 0 && score <= 100) {
+                totalCount++;
+                for (int i = 0; i < ranges.length - 1; i++) {
+                    if (i == ranges.length - 2) {
+                        // 最后一个区间：90-100，包含100分
+                        if (score >= ranges[i] && score <= ranges[i + 1]) {
+                            counts[i]++;
+                            break;
+                        }
+                    } else {
+                        // 其他区间：左闭右开
+                        if (score >= ranges[i] && score < ranges[i + 1]) {
+                            counts[i]++;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // 统计各分数段人数
+        for (int i = 0; i < rangeLabels.length; i++) {
+            distribution.put(rangeLabels[i], counts[i]);
+        }
+        
+        // 计算各分数段占比
+        Map<String, Double> percentages = new HashMap<>();
+        for (int i = 0; i < rangeLabels.length; i++) {
+            double percentage = totalCount > 0 ? Math.round(counts[i] * 10000.0 / totalCount) / 100.0 : 0.0;
+            percentages.put(rangeLabels[i] + "_percent", percentage);
+        }
+        distribution.put("percentages", percentages);
+        distribution.put("totalCount", totalCount);
+        
+        return distribution;
     }
 }

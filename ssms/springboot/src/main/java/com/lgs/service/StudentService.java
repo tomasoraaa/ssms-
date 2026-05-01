@@ -5,6 +5,7 @@ import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.lgs.common.PasswordUtil;
 import com.lgs.entity.Account;
 import com.lgs.entity.Student;
 import com.lgs.exception.CustomException;
@@ -28,7 +29,9 @@ public class StudentService {
             throw new CustomException("该学号对应学生已存在");
         }
         if (ObjectUtil.isEmpty(student.getPassword())) {
-            student.setPassword("123456");
+            student.setPassword(PasswordUtil.encode("123456"));
+        } else {
+            student.setPassword(PasswordUtil.encode(student.getPassword()));
         }
         if (ObjectUtil.isEmpty(student.getName())) {
             student.setName(student.getUsername());
@@ -96,7 +99,7 @@ public class StudentService {
         if (student == null) {
             throw new CustomException("用户不存在");
         }
-        if (!student.getPassword().equals(account.getPassword())) {
+        if (!PasswordUtil.matches(account.getPassword(), student.getPassword())) {
             throw new CustomException("密码错误");
         }
         if (student.getStatus() != 1) {
@@ -129,9 +132,9 @@ public class StudentService {
                     }
                     // 第三列：密码（可选）
                     if (row.size() > 2 && row.get(2) != null) {
-                        student.setPassword(row.get(2).toString());
+                        student.setPassword(PasswordUtil.encode(row.get(2).toString()));
                     } else {
-                        student.setPassword("123456"); // 默认密码
+                        student.setPassword(PasswordUtil.encode("123456")); // 默认密码
                     }
                     // 第四列：年龄（可选）
                     if (row.size() > 3 && row.get(3) != null) {
@@ -189,10 +192,10 @@ public class StudentService {
         if (ObjectUtil.isNull(dbStudent)) {
             throw new CustomException("用户不存在");
         }
-        if (!account.getPassword().equals(dbStudent.getPassword())) {
+        if (!PasswordUtil.matches(account.getPassword(), dbStudent.getPassword())) {
             throw new CustomException("原密码错误");
         }
-        dbStudent.setPassword(account.getNewPassword());
+        dbStudent.setPassword(PasswordUtil.encode(account.getNewPassword()));
         studentMapper.updateById(dbStudent);
     }
 
@@ -215,7 +218,7 @@ public class StudentService {
         if (student == null) {
             throw new CustomException("学生不存在");
         }
-        student.setPassword("123456");
+        student.setPassword(PasswordUtil.encode("123456"));
         studentMapper.updateById(student);
     }
 
@@ -250,7 +253,7 @@ public class StudentService {
         int count = 0;
         for (Student student : students) {
             try {
-                student.setPassword("123456");
+                student.setPassword(PasswordUtil.encode("123456"));
                 studentMapper.updateById(student);
                 count++;
             } catch (Exception e) {
