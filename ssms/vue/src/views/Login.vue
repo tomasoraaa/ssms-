@@ -85,6 +85,19 @@
           } else {
             ElMessage.error(res.msg)
           }
+        }).catch(error => {
+          // 处理网络异常情况
+          console.error('登录请求失败:', error)
+          if (error.response) {
+            // 请求已发出但服务器响应状态码不在 2xx 范围内
+            ElMessage.error('登录失败，服务器错误')
+          } else if (error.request) {
+            // 请求已发出但没有收到响应（断网情况）
+            ElMessage.error('网络连接异常，请检查网络设置')
+          } else {
+            // 其他错误
+            ElMessage.error('登录失败，请稍后重试')
+          }
         })
       }
     })).catch(error => {

@@ -22,6 +22,7 @@ com\lgs\service\impl\TeachingClassServiceImpl.class
 com\lgs\service\ModifyRequestService.class
 com\lgs\service\StudentCourseService.class
 com\lgs\exception\CustomException.class
+com\lgs\controller\ScoreExportController.class
 com\lgs\service\impl\ModifyRequestServiceImpl.class
 com\lgs\service\impl\CourseTeacherServiceImpl.class
 com\lgs\mapper\TeacherMapper.class
@@ -32,6 +33,7 @@ com\lgs\mapper\AdminClassMapper.class
 com\lgs\entity\Course.class
 com\lgs\controller\CourseSelectionController.class
 com\lgs\entity\CourseSelection.class
+com\lgs\common\PasswordUtil.class
 com\lgs\controller\AcademicYearController.class
 com\lgs\service\ActivityLogService.class
 com\lgs\service\impl\CourseWithdrawalServiceImpl.class

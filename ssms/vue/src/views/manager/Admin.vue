@@ -67,7 +67,7 @@ import request from "@/utils/request";
 import {reactive} from "vue";
 import {ElMessageBox, ElMessage} from "element-plus";
 
-const uploadUrl = import.meta.env.VITE_BASE_URL + '/files/upload'
+const uploadUrl = '/api/files/upload'
 
 const data = reactive({
   pageNum: 1,

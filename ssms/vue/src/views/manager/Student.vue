@@ -181,7 +181,7 @@
             </div>
             <div class="info-item">
               <span class="label">行政班级：</span>
-              <span v-if="data.adminClass">{{ data.adminClass.className }} ({{ data.adminClass.classCode }})</span>
+              <span v-if="data.adminClass">{{ data.adminClass.class_name }} ({{ data.adminClass.class_code }})</span>
               <span v-else style="color: #999">未分配班级</span>
             </div>
           </div>
@@ -189,17 +189,17 @@
 
         <div style="margin-bottom: 20px;">
           <h4>已修课程</h4>
-          <el-table :data="data.studentCourses" stripe height="400" border :row-key="row => row.courseCode">
-            <el-table-column label="课程代码" prop="courseCode"></el-table-column>
-            <el-table-column label="课程名称" prop="courseName"></el-table-column>
-            <el-table-column label="修读学期" prop="academicYearName">
+          <el-table :data="data.studentCourses" stripe height="400" border :row-key="row => row.course_code">
+            <el-table-column label="课程代码" prop="course_code"></el-table-column>
+            <el-table-column label="课程名称" prop="course_name"></el-table-column>
+            <el-table-column label="修读学期" prop="academic_year_name">
               <template #default="scope">
-                <span v-if="scope.row.academicYearName">{{ scope.row.academicYearName }}</span>
+                <span v-if="scope.row.academic_year_name">{{ scope.row.academic_year_name }}</span>
                 <span v-else style="color: #999">未记录</span>
               </template>
             </el-table-column>
             <el-table-column label="学分" prop="credit"></el-table-column>
-            <el-table-column label="任课教师" prop="teacherName"></el-table-column>
+            <el-table-column label="任课教师" prop="teacher_name"></el-table-column>
             <el-table-column label="成绩" prop="score">
               <template #default="scope">
                 <span v-if="scope.row.score === null || scope.row.score === undefined || scope.row.score === ''">未录入</span>
@@ -273,8 +273,8 @@ const professionOptions = ref([
   { value: '信息安全', label: '信息安全' }
 ])
 
-const uploadUrl = import.meta.env.VITE_BASE_URL + '/files/upload'
-const importUrl = import.meta.env.VITE_BASE_URL + '/student/import'
+const uploadUrl = '/api/files/upload'
+const importUrl = '/api/student/import'
 
 const data = reactive({
   name:null,
@@ -452,7 +452,7 @@ const viewDetails = (student) => {
   
   // 加载学生课程
   request.get('/course/selectByStudentId', {
-    params: { studentId: student.username }
+    params: { student_id: student.username }
   }).then(res => {
     if (res.code === '200') {
       data.studentCourses = res.data || []
@@ -462,7 +462,7 @@ const viewDetails = (student) => {
   // 加载学生行政班级信息
   request.get('/studentAdminClass/selectByStudentId/' + student.username).then(res => {
     if (res.code === '200' && res.data && res.data.length > 0) {
-      const adminClassId = res.data[0].adminClassId
+      const adminClassId = res.data[0].admin_class_id
       // 根据行政班级ID获取班级详情
       request.get('/adminClass/selectById/' + adminClassId).then(adminClassRes => {
         if (adminClassRes.code === '200') {

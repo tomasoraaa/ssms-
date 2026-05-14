@@ -1,17 +1,33 @@
 server:
   port: 9090
+  servlet:
+    context-path: /api
+# # 数据库配置
+# spring:
+#   datasource:
+#     driver-class-name: com.mysql.cj.jdbc.Driver
+#     username: root
+#     password: 2865369ok
+#     url: jdbc:mysql://localhost:3306/sms?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=GMT%2b8&allowPublicKeyRetrieval=true
+#   servlet:
+#     multipart:
+#       max-file-size: 100MB
+#       max-request-size: 100MB
 
 # 数据库配置
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: 2865369ok
-    url: jdbc:mysql://localhost:3306/sms?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=GMT%2b8&allowPublicKeyRetrieval=true
+    password: "@2865369Ok"
+    url: jdbc:mysql://172.20.166.107:3306/sms?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=GMT%2b8&allowPublicKeyRetrieval=true
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
 
 # 配置mybatis实体和xml映射
 mybatis:
@@ -21,4 +37,6 @@ mybatis:
     map-underscore-to-camel-case: false
 
 # 文件上传的前缀url
-fileBaseUrl: http://localhost:9090
+fileBaseUrl: http://116.62.162.156/api
+
+  

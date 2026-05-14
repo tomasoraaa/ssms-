@@ -49,7 +49,7 @@ import { reactive, onMounted, onUnmounted } from "vue";
 import request from "@/utils/request.js";
 import {ElMessage} from "element-plus";
 
-const baseUrl = import.meta.env.VITE_BASE_URL
+const baseUrl = '/api'
 
 const data = reactive({
   user: JSON.parse(sessionStorage.getItem('xm-user') || '{}')

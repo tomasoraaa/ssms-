@@ -1,7 +1,9 @@
 package com.lgs.controller;
 
+import com.lgs.entity.Course;
 import com.lgs.entity.ScoreDetail;
 import com.lgs.entity.Student;
+import com.lgs.service.CourseService;
 import com.lgs.service.ScoreDetailService;
 import com.lgs.service.StudentService;
 import jakarta.annotation.Resource;
@@ -28,11 +30,22 @@ import java.util.stream.Collectors;
 @RequestMapping("/scoreExport")
 public class ScoreExportController {
 
+    /**
+     * 静态块：在类加载时设置系统属性，避免每次导出重复设置
+     * 禁用字体自动检测，避免Fontconfig问题
+     */
+    static {
+        System.setProperty("java.awt.headless", "true");
+    }
+
     @Resource
     private ScoreDetailService scoreDetailService;
 
     @Resource
     private StudentService studentService;
+
+    @Resource
+    private CourseService courseService;
 
     /**
      * 教师导出教学班成绩
@@ -60,8 +73,11 @@ public class ScoreExportController {
         // 按需查询学生信息（仅查询有成绩记录的学生）
         Map<String, Student> studentMap = getStudentMap(scoreDetails);
         
+        // 按需查询课程信息
+        Map<Integer, Course> courseMap = getCourseMap(scoreDetails);
+        
         // 生成Excel
-        try (Workbook workbook = generateScoreExcel(scoreDetails, studentMap);
+        try (Workbook workbook = generateScoreExcel(scoreDetails, studentMap, courseMap);
              OutputStream outputStream = response.getOutputStream()) {
             
             // 设置响应头
@@ -103,8 +119,11 @@ public class ScoreExportController {
         // 按需查询学生信息（仅查询当前学生）
         Map<String, Student> studentMap = getStudentMap(scoreDetails);
         
+        // 按需查询课程信息
+        Map<Integer, Course> courseMap = getCourseMap(scoreDetails);
+        
         // 生成Excel
-        try (Workbook workbook = generateScoreExcel(scoreDetails, studentMap);
+        try (Workbook workbook = generateScoreExcel(scoreDetails, studentMap, courseMap);
              OutputStream outputStream = response.getOutputStream()) {
             
             // 设置响应头
@@ -146,8 +165,11 @@ public class ScoreExportController {
         // 按需查询学生信息（仅查询有成绩记录的学生）
         Map<String, Student> studentMap = getStudentMap(scoreDetails);
         
+        // 按需查询课程信息
+        Map<Integer, Course> courseMap = getCourseMap(scoreDetails);
+        
         // 生成Excel
-        try (Workbook workbook = generateScoreExcel(scoreDetails, studentMap);
+        try (Workbook workbook = generateScoreExcel(scoreDetails, studentMap, courseMap);
              OutputStream outputStream = response.getOutputStream()) {
             
             // 设置响应头
@@ -201,9 +223,9 @@ public class ScoreExportController {
     }
 
     /**
-     * 生成成绩Excel文件
+     * 生成成绩Excel文件（包含课程信息）
      */
-    private Workbook generateScoreExcel(List<ScoreDetail> scoreDetails, Map<String, Student> studentMap) {
+    private Workbook generateScoreExcel(List<ScoreDetail> scoreDetails, Map<String, Student> studentMap, Map<Integer, Course> courseMap) {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("成绩表");
         
@@ -217,10 +239,6 @@ public class ScoreExportController {
         headerStyle.setBorderRight(BorderStyle.THIN);
         headerStyle.setAlignment(HorizontalAlignment.CENTER);
         
-        Font headerFont = workbook.createFont();
-        headerFont.setBold(true);
-        headerStyle.setFont(headerFont);
-        
         // 创建数据行样式
         CellStyle dataStyle = workbook.createCellStyle();
         dataStyle.setBorderBottom(BorderStyle.THIN);
@@ -229,9 +247,9 @@ public class ScoreExportController {
         dataStyle.setBorderRight(BorderStyle.THIN);
         dataStyle.setAlignment(HorizontalAlignment.CENTER);
         
-        // 创建标题行
+        // 创建标题行（添加课程名称和课程代码）
         Row headerRow = sheet.createRow(0);
-        String[] headers = {"学号", "姓名", "平时成绩", "期中成绩", "期末成绩", "总评成绩", "成绩来源", "原始成绩", "绩点", "等级", "状态"};
+        String[] headers = {"学号", "姓名", "课程名称", "课程代码", "平时成绩", "期中成绩", "期末成绩", "总评成绩", "成绩来源", "原始成绩", "绩点", "等级", "状态"};
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(headers[i]);
@@ -246,31 +264,38 @@ public class ScoreExportController {
             // 查找学生信息（O(1)复杂度）
             Student student = studentMap.get(detail.getStudent_id());
             
+            // 查找课程信息（O(1)复杂度）
+            Course course = courseMap.get(detail.getCourse_id());
+            
             // 学号
             createCell(row, 0, detail.getStudent_id(), dataStyle);
             // 姓名
             createCell(row, 1, student != null ? student.getName() : "-", dataStyle);
+            // 课程名称
+            createCell(row, 2, course != null ? course.getCourse_name() : "-", dataStyle);
+            // 课程代码
+            createCell(row, 3, course != null ? course.getCourse_code() : "-", dataStyle);
             // 平时成绩
-            createCell(row, 2, formatScore(detail.getUsual_score()), dataStyle);
+            createCell(row, 4, formatScore(detail.getUsual_score()), dataStyle);
             // 期中成绩
-            createCell(row, 3, formatScore(detail.getMidterm_score()), dataStyle);
+            createCell(row, 5, formatScore(detail.getMidterm_score()), dataStyle);
             // 期末成绩
-            createCell(row, 4, formatScore(detail.getFinal_score()), dataStyle);
+            createCell(row, 6, formatScore(detail.getFinal_score()), dataStyle);
             // 总评成绩
-            createCell(row, 5, formatScore(detail.getTotal_score()), dataStyle);
+            createCell(row, 7, formatScore(detail.getTotal_score()), dataStyle);
             // 成绩来源
             String source = detail.getIs_makeup() != null && detail.getIs_makeup() == 1 
                     ? ("补考".equals(detail.getMakeup_exam_type()) ? "补考" : "缓考")
                     : "正常";
-            createCell(row, 6, source, dataStyle);
+            createCell(row, 8, source, dataStyle);
             // 原始成绩
-            createCell(row, 7, detail.getOriginal_score() != null ? detail.getOriginal_score().toString() : "-", dataStyle);
+            createCell(row, 9, detail.getOriginal_score() != null ? detail.getOriginal_score().toString() : "-", dataStyle);
             // 绩点
-            createCell(row, 8, calculateGPA(detail.getTotal_score()), dataStyle);
+            createCell(row, 10, calculateGPA(detail.getTotal_score()), dataStyle);
             // 等级
-            createCell(row, 9, getScoreLevel(detail.getTotal_score()), dataStyle);
+            createCell(row, 11, getScoreLevel(detail.getTotal_score()), dataStyle);
             // 状态
-            createCell(row, 10, (detail.getTotal_score() != null && detail.getTotal_score() >= 60) ? "及格" : "不及格", dataStyle);
+            createCell(row, 12, (detail.getTotal_score() != null && detail.getTotal_score() >= 60) ? "及格" : "不及格", dataStyle);
         }
         
         // 自动调整列宽
@@ -282,6 +307,38 @@ public class ScoreExportController {
         }
         
         return workbook;
+    }
+
+    /**
+     * 按需获取课程信息Map
+     */
+    private Map<Integer, Course> getCourseMap(List<ScoreDetail> scoreDetails) {
+        Map<Integer, Course> courseMap = new HashMap<>();
+        
+        if (scoreDetails == null || scoreDetails.isEmpty()) {
+            return courseMap;
+        }
+        
+        // 提取需要查询的课程ID列表
+        List<Integer> courseIds = scoreDetails.stream()
+                .map(ScoreDetail::getCourse_id)
+                .filter(id -> id != null)
+                .distinct()
+                .collect(Collectors.toList());
+        
+        if (courseIds.isEmpty()) {
+            return courseMap;
+        }
+        
+        // 按需查询课程信息
+        for (Integer courseId : courseIds) {
+            Course course = courseService.selectById(courseId);
+            if (course != null) {
+                courseMap.put(courseId, course);
+            }
+        }
+        
+        return courseMap;
     }
 
     private void createCell(Row row, int column, String value, CellStyle style) {

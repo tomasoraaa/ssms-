@@ -173,8 +173,8 @@ const options = [
   }
 ]
 
-const uploadUrl = import.meta.env.VITE_BASE_URL + '/files/upload'
-const importUrl = import.meta.env.VITE_BASE_URL + '/teacher/import'
+const uploadUrl = '/api/files/upload'
+const importUrl = '/api/teacher/import'
 
 const data = reactive({
   name:null,

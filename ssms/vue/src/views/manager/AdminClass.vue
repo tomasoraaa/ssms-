@@ -177,7 +177,7 @@ import {ElMessage, ElMessageBox} from "element-plus";
 import {ArrowDown, Edit, User, Delete} from "@element-plus/icons-vue";
 
 const uploadRef = ref(null)
-const importUrl = import.meta.env.VITE_BASE_URL + '/adminClass/import'
+const importUrl = '/api/adminClass/import'
 const teachers = ref([])
 const majors = ref([]) // 专业列表
 

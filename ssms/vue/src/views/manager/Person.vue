@@ -44,7 +44,7 @@ import request from "@/utils/request";
 import {ElMessage} from "element-plus";
 
 // 文件上传的接口地址
-const uploadUrl = import.meta.env.VITE_BASE_URL + '/files/upload'
+const uploadUrl = '/api/files/upload'
 
 const data = reactive({
   user: JSON.parse(sessionStorage.getItem('xm-user') || '{}'),

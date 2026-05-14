@@ -10,13 +10,23 @@
     </insert>
 
     <select id="selectAll" resultType="com.lgs.entity.CourseWithdrawal">
-        select * from course_withdrawal
+        select 
+            cw.*,
+            s.name as student_name,
+            c.course_name,
+            c.course_code,
+            tc.class_code
+        from course_withdrawal cw
+        left join student s on cw.student_id = s.username
+        left join course c on cw.course_id = c.id
+        left join student_course sc on cw.student_id = sc.student_id and cw.course_id = sc.course_id
+        left join teaching_class tc on sc.teaching_class_id = tc.id
         <where>
-            <if test="student_id != null and student_id != ''"> and student_id = #{student_id}</if>
-            <if test="course_id != null and course_id != ''"> and course_id = #{course_id}</if>
-            <if test="status != null"> and status = #{status}</if>
+            <if test="student_id != null and student_id != ''"> and cw.student_id = #{student_id}</if>
+            <if test="course_id != null and course_id != ''"> and cw.course_id = #{course_id}</if>
+            <if test="status != null"> and cw.status = #{status}</if>
         </where>
-        order by withdrawal_time desc
+        order by cw.withdrawal_time desc
     </select>
 
     <select id="selectByStudentId" parameterType="java.lang.String" resultType="com.lgs.entity.CourseWithdrawal">

@@ -27,7 +27,10 @@
     <div class="card" style="margin-bottom: 5px">
       <el-table :data="data.withdrawals" stripe>
         <el-table-column label="学生ID" prop="student_id"></el-table-column>
-        <el-table-column label="课程ID" prop="course_id"></el-table-column>
+        <el-table-column label="学生姓名" prop="student_name"></el-table-column>
+        <el-table-column label="课程代码" prop="course_code"></el-table-column>
+        <el-table-column label="课程名称" prop="course_name"></el-table-column>
+        <el-table-column label="教学班代码" prop="class_code"></el-table-column>
         <el-table-column label="教师姓名" prop="teacher_name"></el-table-column>
         <el-table-column label="退课原因" prop="reason"></el-table-column>
         <el-table-column label="申请时间" prop="withdrawal_time" :formatter="formatDate"></el-table-column>
