@@ -15,37 +15,102 @@ let isRefreshing = false;
 let refreshSubscribers = [];
 // Token 自动刷新定时器
 let refreshTimer = null;
+// 是否已添加可见性监听
+let visibilityListenerAdded = false;
+
+/**
+ * 验证 expiresAt 是否有效
+ */
+function isExpiresAtValid() {
+    const expiresAt = sessionStorage.getItem('expiresAt');
+    if (!expiresAt) return false;
+    const expiresTime = parseInt(expiresAt);
+    if (isNaN(expiresTime) || expiresTime <= 0) return false;
+    return true;
+}
 
 /**
  * 启动 Token 自动刷新定时器
  * 在 Token 过期前 1 分钟自动刷新
  */
 function startRefreshTimer() {
+    // 清理旧的定时器
     stopRefreshTimer();
 
-    const expiresAt = sessionStorage.getItem('expiresAt');
-    if (!expiresAt) return;
+    // 检查 expiresAt 是否有效
+    if (!isExpiresAtValid()) {
+        console.log('定时器启动失败：expiresAt 无效');
+        return;
+    }
 
+    const expiresAt = sessionStorage.getItem('expiresAt');
     const expiresTime = parseInt(expiresAt);
     const now = Date.now();
     const timeUntilExpire = expiresTime - now;
 
+    // 如果已经过期，不启动定时器（让后续请求处理）
+    if (timeUntilExpire <= 0) {
+        console.log('Token 已过期，不启动定时器，等待后续请求处理');
+        return;
+    }
+
     // 在过期前 1 分钟刷新
-    const refreshDelay = Math.max(timeUntilExpire - 60 * 1000, 0);
+    const refreshDelay = timeUntilExpire - 60 * 1000;
+
+    // 如果距离过期时间不足 1 分钟，立即刷新
+    if (refreshDelay <= 0) {
+        console.log('Token 即将过期，立即刷新...');
+        refreshToken().then(() => {
+            console.log('Token 刷新成功');
+            startRefreshTimer();
+        }).catch((error) => {
+            console.error('Token 刷新失败，不强制登出:', error.message || error);
+            // 刷新失败不强制登出，等待后续请求再尝试
+        });
+        return;
+    }
+
+    console.log(`定时器已启动，${Math.round(refreshDelay / 1000 / 60)} 分钟后自动刷新 Token`);
 
     refreshTimer = setTimeout(async () => {
         try {
             await refreshToken();
-            // 刷新成功后，重新设置定时器
+            console.log('Token 刷新成功，重新设置定时器');
             startRefreshTimer();
         } catch (error) {
-            console.error('自动刷新 Token 失败:', error);
-            // 刷新失败，可能是在其他设备登录了，强制登出
-            if (!isLoggedOut) {
-                handleUnauthorized('登录已失效');
-            }
+            console.error('自动刷新 Token 失败:', error.message || error);
+            // 刷新失败不强制登出，等待后续请求再尝试
         }
     }, refreshDelay);
+}
+
+/**
+ * 检查 Token 是否需要刷新
+ * 当页面重新可见时调用
+ */
+function checkAndRefreshToken() {
+    if (!isExpiresAtValid()) {
+        return;
+    }
+
+    const expiresAt = sessionStorage.getItem('expiresAt');
+    const expiresTime = parseInt(expiresAt);
+    const now = Date.now();
+    const timeUntilExpire = expiresTime - now;
+
+    // 如果 Token 已过期或即将在 1 分钟内过期，则刷新
+    if (timeUntilExpire <= 60 * 1000) {
+        console.log('页面重新可见，检测到 Token 即将过期，执行刷新...');
+        refreshToken().then(() => {
+            console.log('Token 刷新成功');
+            startRefreshTimer();
+        }).catch((error) => {
+            console.error('Token 刷新失败:', error.message || error);
+            // 刷新失败不强制登出
+        });
+    } else {
+        console.log(`页面重新可见，Token 还有 ${Math.round(timeUntilExpire / 1000 / 60)} 分钟有效`);
+    }
 }
 
 /**
@@ -57,6 +122,23 @@ function stopRefreshTimer() {
         refreshTimer = null;
     }
 }
+
+// 添加可见性变化监听（只添加一次）
+function addVisibilityListener() {
+    if (visibilityListenerAdded) return;
+    visibilityListenerAdded = true;
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            console.log('页面重新可见，检查 Token...');
+            checkAndRefreshToken();
+        }
+    });
+    console.log('已添加页面可见性监听');
+}
+
+// 立即添加可见性监听
+addVisibilityListener();
 
 // request 拦截器
 request.interceptors.request.use(config => {
@@ -133,9 +215,12 @@ request.interceptors.response.use(
                     refreshSubscribers = [];
                     // 重新发送当前请求
                     return request(originalRequest);
-                }).catch(() => {
+                }).catch((error) => {
                     isRefreshing = false;
-                    handleUnauthorized('登录已失效');
+                    console.error('Token 刷新失败，不强制登出:', error.message || error);
+                    // 刷新失败不强制登出，让用户继续操作
+                    // 清除刷新队列，不重发请求
+                    refreshSubscribers = [];
                     return Promise.reject(error);
                 });
             }
