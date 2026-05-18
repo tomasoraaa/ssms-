@@ -161,4 +161,12 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
+    /**
+     * 根据用户名查询管理员（不验证密码）
+     */
+    @Override
+    public Account loginByUsername(String username) {
+        return adminMapper.selectByUsername(username);
+    }
+
 }

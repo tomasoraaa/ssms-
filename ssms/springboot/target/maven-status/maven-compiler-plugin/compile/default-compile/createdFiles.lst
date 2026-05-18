@@ -47,6 +47,7 @@ com\lgs\mapper\CourseWithdrawalMapper.class
 com\lgs\interceptor\PasswordCheckInterceptor.class
 com\lgs\mapper\MakeupExamMapper.class
 com\lgs\service\impl\MakeupExamServiceImpl.class
+com\lgs\config\JwtConfig.class
 com\lgs\service\CourseTeacherService.class
 com\lgs\service\impl\CourseSelectionServiceImpl.class
 com\lgs\controller\CourseEvaluationController.class
@@ -60,6 +61,7 @@ com\lgs\service\CourseSelectionService.class
 com\lgs\mapper\SystemConfigMapper.class
 com\lgs\service\impl\SystemMonitorServiceImpl.class
 com\lgs\service\impl\CourseServiceImpl.class
+com\lgs\common\JwtUtil.class
 com\lgs\service\TeacherService.class
 com\lgs\entity\Admin.class
 com\lgs\service\StudentAdminClassService.class
@@ -76,6 +78,7 @@ com\lgs\common\Result.class
 com\lgs\entity\Account.class
 com\lgs\service\CourseEvaluationService.class
 com\lgs\controller\TeacherController.class
+com\lgs\interceptor\JwtInterceptor.class
 com\lgs\service\StudentService.class
 com\lgs\mapper\StudentMapper.class
 com\lgs\mapper\StudentCourseMapper.class
@@ -100,6 +103,7 @@ com\lgs\SpringbootApplication.class
 com\lgs\common\CorsConfig.class
 com\lgs\service\AdminClassService.class
 com\lgs\service\CourseWithdrawalService.class
+com\lgs\service\TokenService.class
 com\lgs\entity\StudentAdminClass.class
 com\lgs\controller\ScoreRuleController.class
 com\lgs\mapper\CourseTeacherMapper.class

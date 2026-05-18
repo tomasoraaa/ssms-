@@ -1,0 +1,1149 @@
+{
+  "info": {
+    "name": "学生成绩管理系统 API",
+    "description": "学生成绩管理系统的 Postman 接口测试集合\n\n**测试账号：**\n- 管理员: admin / 123456\n- 学生: 20240101001 / 123456\n- 教师: T2024001 / 123456",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://116.62.162.156/api",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "studentToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "teacherToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "认证模块",
+      "item": [
+        {
+          "name": "登录 - 管理员",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"admin\", \"password\": \"123456\", \"role\": \"ADMIN\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "登录 - 学生",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"20240101001\", \"password\": \"123456\", \"role\": \"STUDENT\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "登录 - 教师",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"T2024001\", \"password\": \"123456\", \"role\": \"TEACHER\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "登录 - 密码错误",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"admin\", \"password\": \"wrong\", \"role\": \"ADMIN\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "登录 - 未选择身份",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"admin\", \"password\": \"123456\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "刷新 Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"refreshToken\": \"{{refreshToken}}\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/refreshToken",
+              "host": ["{{baseUrl}}"],
+              "path": ["refreshToken"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "登出",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"admin\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "修改密码",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"20240101001\", \"password\": \"123456\", \"newPassword\": \"654321\", \"role\": \"STUDENT\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/updatePassword",
+              "host": ["{{baseUrl}}"],
+              "path": ["updatePassword"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "课程管理",
+      "item": [
+        {
+          "name": "添加课程",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"course_name\": \"物联网技术\", \"course_code\": \"CS404\", \"credit\": 3, \"description\": \"物联网技术基础课程\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/course/add",
+              "host": ["{{baseUrl}}"],
+              "path": ["course", "add"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "分页查询课程",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/course/selectPage?pageNum=1&pageSize=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["course", "selectPage"],
+              "query": [
+                {
+                  "key": "pageNum",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "查询课程详情",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/course/selectById/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["course", "selectById", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "根据学生ID查询课程",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/course/selectByStudentId?student_id=20240101001",
+              "host": ["{{baseUrl}}"],
+              "path": ["course", "selectByStudentId"],
+              "query": [
+                {
+                  "key": "student_id",
+                  "value": "20240101001"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "修改课程",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\": 1, \"course_name\": \"C语言程序设计(修订版)\", \"course_code\": \"CS101\", \"credit\": 4, \"description\": \"修订后的课程描述\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/course/update",
+              "host": ["{{baseUrl}}"],
+              "path": ["course", "update"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "删除课程",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/course/delete/20",
+              "host": ["{{baseUrl}}"],
+              "path": ["course", "delete", "20"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "成绩管理",
+      "item": [
+        {
+          "name": "添加成绩",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"student_id\": \"20240101001\", \"course_id\": 1, \"teaching_class_id\": 5, \"usual_score\": 90, \"midterm_score\": 85, \"final_score\": 88}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/scoreDetail/add",
+              "host": ["{{baseUrl}}"],
+              "path": ["scoreDetail", "add"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "根据学生ID查询成绩",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/scoreDetail/selectByStudentId/20240101001",
+              "host": ["{{baseUrl}}"],
+              "path": ["scoreDetail", "selectByStudentId", "20240101001"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "获取班级成绩统计",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/scoreDetail/getClassStatistics/7",
+              "host": ["{{baseUrl}}"],
+              "path": ["scoreDetail", "getClassStatistics", "7"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "获取成绩分布统计",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/scoreDetail/getScoreDistribution/7",
+              "host": ["{{baseUrl}}"],
+              "path": ["scoreDetail", "getScoreDistribution", "7"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "修改成绩",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\": 1, \"usual_score\": 95, \"midterm_score\": 90, \"final_score\": 92}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/scoreDetail/update",
+              "host": ["{{baseUrl}}"],
+              "path": ["scoreDetail", "update"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "教师导出成绩",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/scoreExport/teacher?teaching_class_id=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["scoreExport", "teacher"],
+              "query": [
+                {
+                  "key": "teaching_class_id",
+                  "value": "7"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "学生导出成绩",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/scoreExport/student?student_id=20240101001",
+              "host": ["{{baseUrl}}"],
+              "path": ["scoreExport", "student"],
+              "query": [
+                {
+                  "key": "student_id",
+                  "value": "20240101001"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "选课管理",
+      "item": [
+        {
+          "name": "选课申请",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user_id\": \"20240101001\", \"course_id\": 17, \"teaching_class_id\": 6}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courseSelection/add",
+              "host": ["{{baseUrl}}"],
+              "path": ["courseSelection", "add"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "查询选课申请",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courseSelection/selectAll",
+              "host": ["{{baseUrl}}"],
+              "path": ["courseSelection", "selectAll"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "批准选课",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courseSelection/approve/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["courseSelection", "approve", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "拒绝选课",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courseSelection/reject/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["courseSelection", "reject", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "退课申请",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"student_id\": \"20240101001\", \"course_id\": \"17\", \"reason\": \"时间冲突\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courseWithdrawal/add",
+              "host": ["{{baseUrl}}"],
+              "path": ["courseWithdrawal", "add"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "查询退课申请",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courseWithdrawal/selectAll",
+              "host": ["{{baseUrl}}"],
+              "path": ["courseWithdrawal", "selectAll"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "批准退课",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courseWithdrawal/approve/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["courseWithdrawal", "approve", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "拒绝退课",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courseWithdrawal/reject/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["courseWithdrawal", "reject", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "用户管理",
+      "item": [
+        {
+          "name": "添加学生",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"20250101003\", \"name\": \"赵小明\", \"password\": \"123456\", \"role\": \"student\", \"gender\": \"男\", \"profession\": \"计算机科学与技术\", \"email\": \"zhaoxm@sms.edu.cn\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/student/add",
+              "host": ["{{baseUrl}}"],
+              "path": ["student", "add"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "分页查询学生",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/student/selectPage?pageNum=1&pageSize=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["student", "selectPage"],
+              "query": [
+                {
+                  "key": "pageNum",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "查询学生详情",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/student/selectById/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["student", "selectById", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "修改学生信息",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\": 1, \"username\": \"20240101001\", \"name\": \"张梓萱\", \"gender\": \"女\", \"phone\": \"13812340001\", \"profession\": \"计算机科学与技术\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/student/update",
+              "host": ["{{baseUrl}}"],
+              "path": ["student", "update"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "删除学生",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/student/delete/24",
+              "host": ["{{baseUrl}}"],
+              "path": ["student", "delete", "24"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "添加教师",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"T2026002\", \"name\": \"王教授\", \"password\": \"123456\", \"role\": \"teacher\", \"gender\": \"男\", \"email\": \"wangjs@cs.edu.cn\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teacher/add",
+              "host": ["{{baseUrl}}"],
+              "path": ["teacher", "add"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "分页查询教师",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teacher/selectPage?pageNum=1&pageSize=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["teacher", "selectPage"],
+              "query": [
+                {
+                  "key": "pageNum",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "教学班管理",
+      "item": [
+        {
+          "name": "添加教学班",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"class_code\": \"CS101-2025-1-01\", \"course_id\": 1, \"course_name\": \"C语言程序设计\", \"course_code\": \"CS101\", \"capacity\": 50, \"location\": \"教学楼A101\", \"day_of_week\": 1, \"period_start\": 1, \"period_end\": 2, \"teacher_name\": \"张明\", \"teacher_id\": \"T2024001\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teachingClass/add",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachingClass", "add"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "分页查询教学班",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teachingClass/selectPage?pageNum=1&pageSize=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachingClass", "selectPage"],
+              "query": [
+                {
+                  "key": "pageNum",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "修改教学班",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\": 5, \"class_code\": \"CS104-2024-1-01\", \"course_id\": 11, \"capacity\": 50, \"location\": \"D402\", \"day_of_week\": 3, \"period_start\": 5, \"period_end\": 6}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teachingClass/update",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachingClass", "update"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "删除教学班",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teachingClass/delete/17",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachingClass", "delete", "17"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "补考管理",
+      "item": [
+        {
+          "name": "添加补考申请",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"student_id\": \"20240101001\", \"course_id\": 17, \"teaching_class_id\": 7, \"exam_type\": \"makeup\", \"original_score\": 55, \"reason\": \"因病缺考\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/makeupExam/add",
+              "host": ["{{baseUrl}}"],
+              "path": ["makeupExam", "add"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "查询补考申请",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/makeupExam/selectAll",
+              "host": ["{{baseUrl}}"],
+              "path": ["makeupExam", "selectAll"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "批准补考申请",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/makeupExam/approve/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["makeupExam", "approve", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "录入补考成绩",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\": 1, \"makeup_score\": 65}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/makeupExam/updateScore",
+              "host": ["{{baseUrl}}"],
+              "path": ["makeupExam", "updateScore"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "课程评价",
+      "item": [
+        {
+          "name": "保存课程评价",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"student_id\": \"20240101001\", \"course_id\": 17, \"teaching_class_id\": 7, \"score\": 5, \"content\": \"课程内容丰富，老师讲解清晰\", \"teacher_score\": 5}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courseEvaluation/saveOrUpdate",
+              "host": ["{{baseUrl}}"],
+              "path": ["courseEvaluation", "saveOrUpdate"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "查询课程评价",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courseEvaluation/selectByCourse/17",
+              "host": ["{{baseUrl}}"],
+              "path": ["courseEvaluation", "selectByCourse", "17"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "系统管理",
+      "item": [
+        {
+          "name": "添加学年学期",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"year\": \"2026-2027\", \"semester\": 1, \"start_date\": \"2026-09-01\", \"end_date\": \"2027-01-15\", \"selection_start\": \"2026-08-15 12:00:00\", \"selection_end\": \"2026-08-31 12:00:00\", \"status\": 0}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/academicYear/add",
+              "host": ["{{baseUrl}}"],
+              "path": ["academicYear", "add"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "查询学年学期",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/academicYear/selectAll",
+              "host": ["{{baseUrl}}"],
+              "path": ["academicYear", "selectAll"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "添加行政班",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"grade\": \"2025\", \"major\": \"软件工程\", \"class_name\": \"2025级软件工程1班\", \"class_code\": \"SE2025-1\", \"counselor_id\": \"T2024003\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/adminClass/add",
+              "host": ["{{baseUrl}}"],
+              "path": ["adminClass", "add"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "查询活动日志",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/activityLog/selectPage?pageNum=1&pageSize=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["activityLog", "selectPage"],
+              "query": [
+                {
+                  "key": "pageNum",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{adminToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 package com.lgs.config;
 
-import com.lgs.interceptor.PasswordCheckInterceptor;
+import com.lgs.interceptor.JwtInterceptor;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -13,12 +13,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     @Resource
-    private PasswordCheckInterceptor passwordCheckInterceptor;
+    private JwtInterceptor jwtInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // 注册密码变更检测拦截器
-        registry.addInterceptor(passwordCheckInterceptor)
+        // 注册 JWT 拦截器
+        registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/login", "/register", "/", "/files/**");
     }

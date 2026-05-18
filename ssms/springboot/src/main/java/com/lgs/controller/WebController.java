@@ -1,17 +1,22 @@
 package com.lgs.controller;
 
+import com.lgs.common.JwtUtil;
 import com.lgs.common.Result;
+import com.lgs.config.JwtConfig;
 import com.lgs.entity.Account;
 import com.lgs.service.AdminService;
 import com.lgs.service.StudentService;
 import com.lgs.service.TeacherService;
 import com.lgs.service.ActivityLogService;
+import com.lgs.service.TokenService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @RestController
@@ -25,9 +30,18 @@ public class WebController {
 
     @Resource
     private TeacherService teacherService;
-    
+
     @Resource
     private ActivityLogService activityLogService;
+
+    @Resource
+    private JwtUtil jwtUtil;
+
+    @Resource
+    private JwtConfig jwtConfig;
+
+    @Resource
+    private TokenService tokenService;
 
 
     /**
@@ -44,27 +58,54 @@ public class WebController {
     @PostMapping("/login")
     public Result login(@RequestBody Account account) {
         Account ac = null;
-        if ("ADMIN".equals(account.getRole())) {
+        String role = account.getRole();
+
+        if (role == null || role.isEmpty()) {
+            return Result.error("请选择登录身份");
+        }
+
+        if ("ADMIN".equals(role)) {
             ac = adminService.login(account);
             if (ac != null) {
                 activityLogService.recordLog("登录", ac.getUsername(), "管理员 " + ac.getUsername() + " 登录系统", "ADMIN");
             }
-        } else if ("STUDENT".equals(account.getRole())) {
+        } else if ("STUDENT".equals(role)) {
             ac = studentService.login(account);
             if (ac != null) {
                 activityLogService.recordLog("登录", ac.getUsername(), "学生 " + ac.getUsername() + " 登录系统", "STUDENT");
             }
-        } else if ("TEACHER".equals(account.getRole())) {
+        } else if ("TEACHER".equals(role)) {
             ac = teacherService.login(account);
             if (ac != null) {
                 activityLogService.recordLog("登录", ac.getUsername(), "教师 " + ac.getUsername() + " 登录系统", "TEACHER");
             }
+        } else {
+            return Result.error("无效的身份类型");
         }
+
         if (ac != null) {
-            // 设置密码校验值
-            ac.setPasswordChecksum(generatePasswordChecksum(ac.getUsername(), ac.getPassword()));
+            // 先记录登录（递增版本号），再生成包含版本号的 Token
+            String refreshToken = jwtUtil.generateRefreshToken(ac.getUsername());
+            tokenService.loginSuccess(ac.getUsername(), refreshToken);
+
+            // 获取当前登录版本号
+            long loginVersion = tokenService.getLoginVersion(ac.getUsername());
+
+            // 生成包含版本号的 Access Token
+            String accessToken = jwtUtil.generateAccessToken(ac.getUsername(), ac.getRole(), loginVersion);
+
+            // 返回用户信息和 Token
+            Map<String, Object> resultData = new HashMap<>();
+            resultData.put("user", ac);
+            resultData.put("accessToken", accessToken);
+            resultData.put("refreshToken", refreshToken);
+            resultData.put("tokenType", "Bearer");
+            resultData.put("expiresIn", jwtConfig.getAccessExpire() * 60);
+            resultData.put("loginVersion", loginVersion);
+
+            return Result.success(resultData);
         }
-        return Result.success(ac);
+        return Result.error("用户名或密码错误");
     }
 
     /**
@@ -84,11 +125,11 @@ public class WebController {
                 storedChecksum = generatePasswordChecksum(teacher.getUsername(), teacher.getPassword());
             }
         }
-        
+
         if (storedChecksum == null) {
             return Result.error("用户不存在");
         }
-        
+
         if (storedChecksum.equals(account.getPasswordChecksum())) {
             return Result.success("密码未变更");
         } else {
@@ -143,7 +184,85 @@ public class WebController {
         } else if ("TEACHER".equals(account.getRole())) {
             teacherService.updatePassword(account);
         }
+
+        // 修改密码后，清除该用户的 Token，强制重新登录（实现单点登录）
+        if (account.getUsername() != null) {
+            tokenService.logout(account.getUsername());
+            activityLogService.recordLog("修改密码", account.getUsername(),
+                "用户 " + account.getUsername() + " 修改密码，已清除登录状态", account.getRole());
+        }
+
         return Result.success();
+    }
+
+    /**
+     * 刷新 Token
+     */
+    @PostMapping("/refreshToken")
+    public Result refreshToken(@RequestBody Map<String, String> request) {
+        String refreshToken = request.get("refreshToken");
+
+        try {
+            // 验证 Refresh Token 格式
+            if (!jwtUtil.isRefreshToken(refreshToken)) {
+                return Result.error("无效的 Refresh Token");
+            }
+
+            if (jwtUtil.isTokenExpired(refreshToken)) {
+                return Result.error("Refresh Token 已过期，请重新登录");
+            }
+
+            String username = jwtUtil.getUsername(refreshToken);
+
+            // 验证 Refresh Token 是否是当前登录用户的有效 Token（单点登录验证）
+            if (!tokenService.isValidRefreshToken(username, refreshToken)) {
+                return Result.error("账号已在其他设备登录，请重新登录");
+            }
+
+            // 查询用户获取角色信息
+            Account user = adminService.loginByUsername(username);
+            if (user == null) {
+                user = studentService.loginByUsername(username);
+            }
+            if (user == null) {
+                user = teacherService.loginByUsername(username);
+            }
+
+            if (user == null) {
+                return Result.error("用户不存在");
+            }
+
+            // 获取当前登录版本号
+            long loginVersion = tokenService.getLoginVersion(username);
+
+            // 生成新的 Access Token（包含当前版本号）
+            String newAccessToken = jwtUtil.generateAccessToken(username, user.getRole(), loginVersion);
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("accessToken", newAccessToken);
+            result.put("tokenType", "Bearer");
+            result.put("expiresIn", jwtConfig.getAccessExpire() * 60);
+
+            return Result.success(result);
+
+        } catch (Exception e) {
+            return Result.error("Token 刷新失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 登出
+     */
+    @PostMapping("/logout")
+    public Result logout(@RequestBody Map<String, String> request) {
+        String username = request.get("username");
+
+        if (username != null && !username.isEmpty()) {
+            tokenService.logout(username);
+            activityLogService.recordLog("登出", username, "用户 " + username + " 登出系统", "SYSTEM");
+        }
+
+        return Result.success("登出成功");
     }
 
 }

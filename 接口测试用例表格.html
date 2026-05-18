@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生成绩管理系统接口测试用例</title>
+    <style>
+        body {
+            font-family: "微软雅黑", "Microsoft YaHei", sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h2 {
+            color: #1a5fb4;
+            border-bottom: 2px solid #1a5fb4;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        .code {
+            font-family: "Consolas", "Monaco", monospace;
+            background-color: #f8f8f8;
+            padding: 5px;
+            border-radius: 3px;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>学生成绩管理系统接口测试用例</h1>
+    <p>服务器地址：http://116.62.162.156/api</p>
+
+    <h2>表1 用户登录接口测试用例表</h2>
+    <table>
+        <tr><th>说明</th><td>用户登录（支持管理员、学生、教师三种角色登录）</td></tr>
+        <tr><th>URL</th><td>http://116.62.162.156/api/login</td></tr>
+        <tr><th>HTTP方法</th><td>POST</td></tr>
+        <tr>
+            <th>请求body</th>
+            <td>
+                <div class="code"><pre>// 1. 管理员登录
+{"username": "admin", "password": "123456", "role": "ADMIN"}
+
+// 2. 学生登录（张梓萱）
+{"username": "20240101001", "password": "123456", "role": "STUDENT"}
+
+// 3. 教师登录（张明）
+{"username": "T2024001", "password": "123456", "role": "TEACHER"}
+
+// 4. 密码错误（异常测试）
+{"username": "admin", "password": "wrong", "role": "ADMIN"}</pre></div>
+            </td>
+        </tr>
+        <tr>
+            <th>预期结果</th>
+            <td>
+                <div class="code"><pre>// 1. 成功登录
+{"code": "0", "msg": "操作成功", "data": {"user": {...}, "accessToken": "..."}}
+
+// 2. 密码错误
+{"code": "-1", "msg": "用户名或密码错误", "data": null}</pre></div>
+            </td>
+        </tr>
+    </table>
+
+    <h2>表2 课程管理接口测试用例表</h2>
+    <table>
+        <tr><th>说明</th><td>课程管理（添加、查询、修改、删除课程）</td></tr>
+        <tr><th>URL</th><td>http://116.62.162.156/api/course/add<br>http://116.62.162.156/api/course/selectPage<br>http://116.62.162.156/api/course/update<br>http://116.62.162.156/api/course/delete/{id}</td></tr>
+        <tr><th>HTTP方法</th><td>POST / GET / PUT / DELETE</td></tr>
+        <tr><th>请求头</th><td>Authorization: Bearer {{accessToken}}（管理员权限）</td></tr>
+        <tr>
+            <th>请求body</th>
+            <td>
+                <div class="code"><pre>// 1. 添加课程
+{"course_name": "机器学习", "course_code": "CS405", "credit": 3, "description": "机器学习基础课程"}
+
+// 2. 修改课程
+{"id": 1, "course_name": "C语言程序设计(修订版)", "course_code": "CS101", "credit": 4, "description": "修订后的课程描述"}</pre></div>
+            </td>
+        </tr>
+        <tr>
+            <th>预期结果</th>
+            <td>
+                <div class="code"><pre>// 成功
+{"code": "0", "msg": "操作成功", "data": {...}}
+
+// 查询分页
+{"code": "0", "msg": "操作成功", "data": {"total": 18, "list": [...], "pageNum": 1, "pageSize": 10}}</pre></div>
+            </td>
+        </tr>
+    </table>
+
+    <h2>表3 成绩管理接口测试用例表</h2>
+    <table>
+        <tr><th>说明</th><td>成绩管理（添加、查询、修改成绩）</td></tr>
+        <tr><th>URL</th><td>http://116.62.162.156/api/scoreDetail/add<br>http://116.62.162.156/api/scoreDetail/selectByStudentId/{student_id}<br>http://116.62.162.156/api/scoreDetail/update</td></tr>
+        <tr><th>HTTP方法</th><td>POST / GET / PUT</td></tr>
+        <tr><th>请求头</th><td>Authorization: Bearer {{accessToken}}（教师/管理员权限）</td></tr>
+        <tr>
+            <th>请求body</th>
+            <td>
+                <div class="code"><pre>// 1. 添加成绩
+{"student_id": "20240101001", "course_id": 17, "teaching_class_id": 7, "usual_score": 80, "midterm_score": 90, "final_score": 85}
+
+// 2. 修改成绩
+{"id": 1, "usual_score": 85, "midterm_score": 92, "final_score": 88}</pre></div>
+            </td>
+        </tr>
+        <tr>
+            <th>预期结果</th>
+            <td>
+                <div class="code"><pre>// 成功
+{"code": "0", "msg": "操作成功", "data": {...}}
+
+// 查询学生成绩
+{"code": "0", "msg": "操作成功", "data": [{"course_name": "云计算与大数据", "total_score": 84.50}]}</pre></div>
+            </td>
+        </tr>
+    </table>
+
+    <h2>表4 选课管理接口测试用例表</h2>
+    <table>
+        <tr><th>说明</th><td>选课管理（选课申请、审批、退课）</td></tr>
+        <tr><th>URL</th><td>http://116.62.162.156/api/courseSelection/add<br>http://116.62.162.156/api/courseSelection/approve/{id}<br>http://116.62.162.156/api/courseWithdrawal/add</td></tr>
+        <tr><th>HTTP方法</th><td>POST / PUT / POST</td></tr>
+        <tr><th>请求头</th><td>Authorization: Bearer {{accessToken}}</td></tr>
+        <tr>
+            <th>请求body</th>
+            <td>
+                <div class="code"><pre>// 1. 选课申请
+{"user_id": "20240101001", "course_id": 17, "teaching_class_id": 6}
+
+// 2. 退课申请
+{"student_id": "20240101001", "course_id": "5", "reason": "时间冲突"}</pre></div>
+            </td>
+        </tr>
+        <tr>
+            <th>预期结果</th>
+            <td>
+                <div class="code"><pre>// 申请成功
+{"code": "0", "msg": "申请成功，等待审批", "data": null}
+
+// 审批成功
+{"code": "0", "msg": "审批成功", "data": null}</pre></div>
+            </td>
+        </tr>
+    </table>
+
+    <h2>表5 用户管理接口测试用例表</h2>
+    <table>
+        <tr><th>说明</th><td>用户管理（添加、查询学生/教师）</td></tr>
+        <tr><th>URL</th><td>http://116.62.162.156/api/student/add<br>http://116.62.162.156/api/teacher/add<br>http://116.62.162.156/api/student/selectPage</td></tr>
+        <tr><th>HTTP方法</th><td>POST / POST / GET</td></tr>
+        <tr><th>请求头</th><td>Authorization: Bearer {{accessToken}}（管理员权限）</td></tr>
+        <tr>
+            <th>请求body</th>
+            <td>
+                <div class="code"><pre>// 1. 添加学生
+{"username": "20250101003", "name": "赵小明", "password": "123456", "role": "STUDENT", "gender": "男", "profession": "计算机科学与技术"}
+
+// 2. 添加教师
+{"username": "T2026002", "name": "王教授", "password": "123456", "role": "TEACHER", "gender": "男"}</pre></div>
+            </td>
+        </tr>
+        <tr>
+            <th>预期结果</th>
+            <td>
+                <div class="code"><pre>// 成功
+{"code": "0", "msg": "操作成功", "data": {...}}
+
+// 查询分页
+{"code": "0", "msg": "操作成功", "data": {"total": 24, "list": [...]}}</pre></div>
+            </td>
+        </tr>
+    </table>
+
+    <h2>表6 教学班管理接口测试用例表</h2>
+    <table>
+        <tr><th>说明</th><td>教学班管理（添加、查询、修改教学班）</td></tr>
+        <tr><th>URL</th><td>http://116.62.162.156/api/teachingClass/add<br>http://116.62.162.156/api/teachingClass/selectPage<br>http://116.62.162.156/api/teachingClass/update</td></tr>
+        <tr><th>HTTP方法</th><td>POST / GET / PUT</td></tr>
+        <tr><th>请求头</th><td>Authorization: Bearer {{accessToken}}（管理员权限）</td></tr>
+        <tr>
+            <th>请求body</th>
+            <td>
+                <div class="code"><pre>// 添加教学班
+{"class_code": "CS101-2025-1-01", "course_id": 1, "academic_year_id": 1, "capacity": 50, "location": "教学楼A101", "day_of_week": 1, "period_start": 1, "period_end": 2, "teacher_id": "T2024001", "teacher_name": "张明"}</pre></div>
+            </td>
+        </tr>
+        <tr>
+            <th>预期结果</th>
+            <td>
+                <div class="code"><pre>// 成功
+{"code": "0", "msg": "操作成功", "data": {...}}</pre></div>
+            </td>
+        </tr>
+    </table>
+
+    <h2>表7 补考管理接口测试用例表</h2>
+    <table>
+        <tr><th>说明</th><td>补考管理（添加、查询、审批、录入成绩）</td></tr>
+        <tr><th>URL</th><td>http://116.62.162.156/api/makeupExam/add<br>http://116.62.162.156/api/makeupExam/approve/{id}<br>http://116.62.162.156/api/makeupExam/updateScore</td></tr>
+        <tr><th>HTTP方法</th><td>POST / PUT / PUT</td></tr>
+        <tr><th>请求头</th><td>Authorization: Bearer {{accessToken}}</td></tr>
+        <tr>
+            <th>请求body</th>
+            <td>
+                <div class="code"><pre>// 1. 添加补考申请
+{"student_id": "20240101003", "course_id": 17, "teaching_class_id": 12, "exam_type": "补考", "original_score": 49, "reason": "挂科申请补考"}
+
+// 2. 录入补考成绩
+{"id": 1, "makeup_score": 60}</pre></div>
+            </td>
+        </tr>
+        <tr>
+            <th>预期结果</th>
+            <td>
+                <div class="code"><pre>// 成功
+{"code": "0", "msg": "操作成功", "data": null}</pre></div>
+            </td>
+        </tr>
+    </table>
+
+    <h2>表8 课程评价接口测试用例表</h2>
+    <table>
+        <tr><th>说明</th><td>课程评价（保存和查询评价）</td></tr>
+        <tr><th>URL</th><td>http://116.62.162.156/api/courseEvaluation/saveOrUpdate<br>http://116.62.162.156/api/courseEvaluation/selectByCourse/{course_id}</td></tr>
+        <tr><th>HTTP方法</th><td>POST / GET</td></tr>
+        <tr><th>请求头</th><td>Authorization: Bearer {{accessToken}}（学生权限）</td></tr>
+        <tr>
+            <th>请求body</th>
+            <td>
+                <div class="code"><pre>// 保存评价
+{"student_id": "20240101001", "course_id": 17, "teaching_class_id": 7, "score": 5, "content": "课程内容丰富", "teacher_score": 5}</pre></div>
+            </td>
+        </tr>
+        <tr>
+            <th>预期结果</th>
+            <td>
+                <div class="code"><pre>// 成功
+{"code": "0", "msg": "评价成功", "data": null}</pre></div>
+            </td>
+        </tr>
+    </table>
+
+    <h2>测试账号信息</h2>
+    <table>
+        <tr><th>角色</th><th>用户名</th><th>密码</th><th>状态</th></tr>
+        <tr><td>管理员</td><td>admin</td><td>123456</td><td>已启用</td></tr>
+        <tr><td>学生</td><td>20240101001</td><td>123456</td><td>已启用</td></tr>
+        <tr><td>学生</td><td>20240101002</td><td>123456</td><td>已启用</td></tr>
+        <tr><td>学生</td><td>20240101003</td><td>123456</td><td>已启用</td></tr>
+        <tr><td>教师</td><td>T2024001</td><td>123456</td><td>已启用</td></tr>
+        <tr><td>教师</td><td>T2024004</td><td>123456</td><td>已启用</td></tr>
+    </table>
+
+    <h2>数据库核心数据</h2>
+    <table>
+        <tr><th>课程ID</th><th>课程名称</th><th>课程代码</th><th>学分</th></tr>
+        <tr><td>1</td><td>C语言程序设计</td><td>CS101</td><td>4</td></tr>
+        <tr><td>2</td><td>数据结构</td><td>CS102</td><td>4</td></tr>
+        <tr><td>5</td><td>离散数学</td><td>CS103</td><td>3</td></tr>
+        <tr><td>11</td><td>计算机组成原理</td><td>CS104</td><td>4</td></tr>
+        <tr><td>17</td><td>云计算与大数据</td><td>CS403</td><td>3</td></tr>
+        <tr><td>18</td><td>计算机图形学</td><td>CS304</td><td>3</td></tr>
+    </table>
+
+    <table>
+        <tr><th>教学班ID</th><th>教学班编号</th><th>课程ID</th><th>教师</th></tr>
+        <tr><td>5</td><td>CS104-2024-1-01</td><td>11</td><td>林丽</td></tr>
+        <tr><td>6</td><td>CS403-2024-2-01</td><td>17</td><td>宋丽</td></tr>
+        <tr><td>7</td><td>CS403-2024-2-02</td><td>17</td><td>刘芳</td></tr>
+        <tr><td>10</td><td>CS304-2024-2-01</td><td>18</td><td>陈明亮</td></tr>
+        <tr><td>12</td><td>CS403-2024-2-03</td><td>17</td><td>刘芳</td></tr>
+    </table>
+</body>
+</html>
