@@ -7,9 +7,13 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.lgs.common.PasswordUtil;
 import com.lgs.entity.Account;
+import com.lgs.entity.CourseTeacher;
 import com.lgs.entity.Teacher;
+import com.lgs.entity.TeachingClass;
 import com.lgs.exception.CustomException;
 import com.lgs.mapper.TeacherMapper;
+import com.lgs.mapper.CourseTeacherMapper;
+import com.lgs.mapper.TeachingClassMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +25,12 @@ public class TeacherService {
 
     @Resource
     private TeacherMapper teacherMapper;
+
+    @Resource
+    private CourseTeacherMapper courseTeacherMapper;
+
+    @Resource
+    private TeachingClassMapper teachingClassMapper;
 
     public void add(Teacher teacher) {
         Teacher dbTeacher = teacherMapper.selectByUsername(teacher.getUsername());
@@ -60,6 +70,28 @@ public class TeacherService {
      * 删除
      */
     public void deleteById(Integer id) {
+        // 先查询教师信息获取工号
+        Teacher teacher = teacherMapper.selectById(id);
+        if (teacher == null) {
+            throw new CustomException("教师不存在");
+        }
+        String username = teacher.getUsername();
+        
+        // 1. 检查是否有教学班
+        TeachingClass teachingClass = new TeachingClass();
+        teachingClass.setTeacher_id(username);
+        List<TeachingClass> teachingClasses = teachingClassMapper.selectAll(teachingClass);
+        if (!teachingClasses.isEmpty()) {
+            throw new CustomException("该教师已有教学班，无法删除");
+        }
+        
+        // 2. 检查是否有课程关联
+        List<CourseTeacher> courseTeachers = courseTeacherMapper.selectByTeacherId(username);
+        if (!courseTeachers.isEmpty()) {
+            throw new CustomException("该教师已有课程关联，无法删除");
+        }
+        
+        // 3. 删除教师
         teacherMapper.deleteById(id);
     }
 

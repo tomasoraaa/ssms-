@@ -14,6 +14,9 @@ public interface StudentMapper {
 
     List<Student> selectAll(Student student);
 
+    @Select("select * from student where id=#{id} ")
+    Student selectById(Integer id);
+
     void updateById(Student student);
 
     /**

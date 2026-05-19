@@ -11,4 +11,5 @@ public interface CourseSelectionService {
     void deleteById(Integer id);
     void approve(Integer id);
     void reject(Integer id);
+    List<CourseSelection> selectByTeachingClassId(Integer teachingClassId);
 }

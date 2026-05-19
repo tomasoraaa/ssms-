@@ -1,7 +1,9 @@
 package com.lgs.service.impl;
 
 import com.lgs.entity.StudentCourse;
+import com.lgs.entity.TeachingClass;
 import com.lgs.mapper.StudentCourseMapper;
+import com.lgs.mapper.TeachingClassMapper;
 import com.lgs.service.StudentCourseService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -14,12 +16,24 @@ public class StudentCourseServiceImpl implements StudentCourseService {
     @Resource
     private StudentCourseMapper studentCourseMapper;
 
+    @Resource
+    private TeachingClassMapper teachingClassMapper;
+
     @Override
     public void add(StudentCourse studentCourse) {
         // 先检查是否已存在关联
         List<StudentCourse> existing = studentCourseMapper.selectAll(studentCourse);
         if (existing.isEmpty()) {
             studentCourseMapper.insert(studentCourse);
+            
+            // 如果指定了教学班，更新教学班人数
+            if (studentCourse.getTeaching_class_id() != null) {
+                TeachingClass teachingClass = teachingClassMapper.selectById(studentCourse.getTeaching_class_id());
+                if (teachingClass != null) {
+                    teachingClass.setSelected_count(teachingClass.getSelected_count() + 1);
+                    teachingClassMapper.updateById(teachingClass);
+                }
+            }
         }
     }
 
@@ -39,12 +53,52 @@ public class StudentCourseServiceImpl implements StudentCourseService {
 
     @Override
     public void deleteById(Integer id) {
-        studentCourseMapper.deleteById(id);
+        // 获取要删除的选课记录
+        StudentCourse studentCourse = new StudentCourse();
+        studentCourse.setId(id);
+        List<StudentCourse> existing = studentCourseMapper.selectAll(studentCourse);
+        if (!existing.isEmpty()) {
+            StudentCourse sc = existing.get(0);
+            // 如果有关联教学班，先记录教学班ID
+            Integer teachingClassId = sc.getTeaching_class_id();
+            
+            studentCourseMapper.deleteById(id);
+            
+            // 更新教学班人数
+            if (teachingClassId != null) {
+                TeachingClass teachingClass = teachingClassMapper.selectById(teachingClassId);
+                if (teachingClass != null && teachingClass.getSelected_count() > 0) {
+                    teachingClass.setSelected_count(teachingClass.getSelected_count() - 1);
+                    teachingClassMapper.updateById(teachingClass);
+                }
+            }
+        } else {
+            studentCourseMapper.deleteById(id);
+        }
     }
 
     @Override
     public void deleteByStudentIdAndCourseId(StudentCourse studentCourse) {
-        studentCourseMapper.deleteByStudentIdAndCourseId(studentCourse);
+        // 先查询要删除的记录
+        List<StudentCourse> existing = studentCourseMapper.selectAll(studentCourse);
+        if (!existing.isEmpty()) {
+            StudentCourse sc = existing.get(0);
+            // 如果有关联教学班，先记录教学班ID
+            Integer teachingClassId = sc.getTeaching_class_id();
+            
+            studentCourseMapper.deleteByStudentIdAndCourseId(studentCourse);
+            
+            // 更新教学班人数
+            if (teachingClassId != null) {
+                TeachingClass teachingClass = teachingClassMapper.selectById(teachingClassId);
+                if (teachingClass != null && teachingClass.getSelected_count() > 0) {
+                    teachingClass.setSelected_count(teachingClass.getSelected_count() - 1);
+                    teachingClassMapper.updateById(teachingClass);
+                }
+            }
+        } else {
+            studentCourseMapper.deleteByStudentIdAndCourseId(studentCourse);
+        }
     }
 
     @Override

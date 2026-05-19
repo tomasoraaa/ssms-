@@ -7,10 +7,14 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.lgs.common.PasswordUtil;
 import com.lgs.entity.Account;
+import com.lgs.entity.ScoreDetail;
 import com.lgs.entity.Student;
+import com.lgs.entity.StudentCourse;
 import com.lgs.exception.CustomException;
 import java.util.ArrayList;
 import com.lgs.mapper.StudentMapper;
+import com.lgs.mapper.StudentCourseMapper;
+import com.lgs.mapper.ScoreDetailMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +26,12 @@ public class StudentService {
 
     @Resource
     private StudentMapper studentMapper;
+
+    @Resource
+    private StudentCourseMapper studentCourseMapper;
+
+    @Resource
+    private ScoreDetailMapper scoreDetailMapper;
 
     public void add(Student student) {
         Student dbStudent = studentMapper.selectByUsername(student.getUsername());
@@ -61,6 +71,28 @@ public class StudentService {
      * 删除
      */
     public void deleteById(Integer id) {
+        // 先查询学生信息获取学号
+        Student student = studentMapper.selectById(id);
+        if (student == null) {
+            throw new CustomException("学生不存在");
+        }
+        String username = student.getUsername();
+        
+        // 1. 检查是否有成绩记录
+        List<ScoreDetail> scoreDetails = scoreDetailMapper.selectByStudentId(username);
+        if (!scoreDetails.isEmpty()) {
+            throw new CustomException("该学生已有成绩记录，无法删除");
+        }
+        
+        // 2. 检查是否有选课记录
+        StudentCourse studentCourse = new StudentCourse();
+        studentCourse.setStudent_id(username);
+        List<StudentCourse> studentCourses = studentCourseMapper.selectAll(studentCourse);
+        if (!studentCourses.isEmpty()) {
+            throw new CustomException("该学生已有选课记录，无法删除");
+        }
+        
+        // 3. 删除学生
         studentMapper.deleteById(id);
     }
 

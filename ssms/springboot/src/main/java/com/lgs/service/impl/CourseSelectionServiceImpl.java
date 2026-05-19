@@ -139,4 +139,11 @@ public class CourseSelectionServiceImpl implements CourseSelectionService {
         courseSelection.setStatus(2);
         courseSelectionMapper.updateById(courseSelection);
     }
+
+    @Override
+    public List<CourseSelection> selectByTeachingClassId(Integer teachingClassId) {
+        CourseSelection courseSelection = new CourseSelection();
+        courseSelection.setTeaching_class_id(teachingClassId);
+        return courseSelectionMapper.selectAll(courseSelection);
+    }
 }

@@ -42,7 +42,8 @@ public class FileController {
         } catch (IOException e) {
             System.out.println("文件上传错误");
         }
-        String url = fileBaseUrl + "/files/download/" + fileName;
+        // 返回相对路径，前端根据当前协议自动拼接
+        String url = "/api/files/download/" + fileName;
         return Result.success(url);
     }
 

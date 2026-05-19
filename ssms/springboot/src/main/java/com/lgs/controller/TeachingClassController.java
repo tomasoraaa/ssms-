@@ -49,7 +49,6 @@ public class TeachingClassController {
     @DeleteMapping("/delete/{id}")
     public Result delete(@PathVariable Integer id) {
         TeachingClass teachingClass = teachingClassService.selectById(id);
-        courseTeacherService.deleteByTeachingClassId(id);
         teachingClassService.deleteById(id);
         if (teachingClass != null) {
             activityLogService.recordLog("系统", "admin", "删除教学班 " + teachingClass.getClass_code(), "ADMIN");

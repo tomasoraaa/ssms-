@@ -3,7 +3,10 @@ package com.lgs.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.lgs.entity.AdminClass;
+import com.lgs.entity.StudentAdminClass;
+import com.lgs.exception.CustomException;
 import com.lgs.mapper.AdminClassMapper;
+import com.lgs.mapper.StudentAdminClassMapper;
 import com.lgs.service.AdminClassService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,9 @@ public class AdminClassServiceImpl implements AdminClassService {
 
     @Resource
     private AdminClassMapper adminClassMapper;
+
+    @Resource
+    private StudentAdminClassMapper studentAdminClassMapper;
 
     @Override
     public void add(AdminClass adminClass) {
@@ -27,6 +33,15 @@ public class AdminClassServiceImpl implements AdminClassService {
 
     @Override
     public void deleteById(Integer id) {
+        // 1. 检查是否有学生属于该班级
+        StudentAdminClass studentAdminClass = new StudentAdminClass();
+        studentAdminClass.setAdmin_class_id(id);
+        List<StudentAdminClass> studentAdminClasses = studentAdminClassMapper.selectAll(studentAdminClass);
+        if (!studentAdminClasses.isEmpty()) {
+            throw new CustomException("该班级已有学生，无法删除");
+        }
+        
+        // 2. 删除班级
         adminClassMapper.deleteById(id);
     }
 

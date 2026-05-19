@@ -11,6 +11,7 @@
             <if test="user_id != null"> and user_id = #{user_id}</if>
             <if test="user_type != null and user_type != ''"> and user_type = #{user_type}</if>
             <if test="status != null and status != ''"> and status = #{status}</if>
+            <if test="teaching_class_id != null"> and teaching_class_id = #{teaching_class_id}</if>
         </where>
         order by create_time desc
     </select>

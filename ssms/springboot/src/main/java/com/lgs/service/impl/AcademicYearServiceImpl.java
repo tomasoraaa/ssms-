@@ -3,8 +3,12 @@ package com.lgs.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.lgs.entity.AcademicYear;
+import com.lgs.entity.TeachingClass;
+import com.lgs.exception.CustomException;
 import com.lgs.mapper.AcademicYearMapper;
+import com.lgs.mapper.TeachingClassMapper;
 import com.lgs.service.AcademicYearService;
+import com.lgs.service.TeachingClassService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -14,6 +18,9 @@ public class AcademicYearServiceImpl implements AcademicYearService {
 
     @Resource
     private AcademicYearMapper academicYearMapper;
+
+    @Resource
+    private TeachingClassService teachingClassService;
 
     @Override
     public void add(AcademicYear academicYear) {
@@ -27,6 +34,13 @@ public class AcademicYearServiceImpl implements AcademicYearService {
 
     @Override
     public void deleteById(Integer id) {
+        // 1. 检查是否有教学班
+        List<TeachingClass> teachingClasses = teachingClassService.selectByAcademicYearId(id);
+        if (!teachingClasses.isEmpty()) {
+            throw new CustomException("该学年学期已设置教学班，无法删除");
+        }
+        
+        // 2. 删除学年学期
         academicYearMapper.deleteById(id);
     }
 

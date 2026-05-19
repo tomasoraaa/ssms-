@@ -14,6 +14,9 @@ public interface TeacherMapper {
 
     List<Teacher> selectAll(Teacher teacher);
 
+    @Select("select * from teacher where id=#{id} ")
+    Teacher selectById(Integer id);
+
     void updateById(Teacher teacher);
 
     /**

@@ -4,13 +4,18 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.lgs.entity.Course;
 import com.lgs.entity.CourseTeacher;
+import com.lgs.entity.ScoreDetail;
+import com.lgs.entity.ScoreRule;
 import com.lgs.entity.StudentCourse;
 import com.lgs.entity.TeachingClass;
+import com.lgs.exception.CustomException;
 import com.lgs.mapper.CourseMapper;
 import com.lgs.mapper.CourseTeacherMapper;
 import com.lgs.mapper.StudentCourseMapper;
 import com.lgs.service.AcademicYearService;
 import com.lgs.service.CourseService;
+import com.lgs.service.ScoreDetailService;
+import com.lgs.service.ScoreRuleService;
 import com.lgs.service.TeachingClassService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -40,12 +45,18 @@ public class CourseServiceImpl implements CourseService {
     @Resource
     private TeachingClassService teachingClassService;
 
+    @Resource
+    private ScoreRuleService scoreRuleService;
+
+    @Resource
+    private ScoreDetailService scoreDetailService;
+
     @Override
     public void add(Course course) {
         // 检查课程代码是否已存在
         Course existingCourse = courseMapper.selectByCourseCode(course.getCourse_code());
         if (existingCourse != null) {
-            throw new RuntimeException("课程代码已存在，请重新输入");
+            throw new CustomException("课程代码已存在，请重新输入");
         }
         courseMapper.insert(course);
     }
@@ -62,13 +73,43 @@ public class CourseServiceImpl implements CourseService {
         // 检查课程代码是否已存在（排除当前记录）
         Course existingCourse = courseMapper.selectByCourseCode(course.getCourse_code());
         if (existingCourse != null && !existingCourse.getId().equals(course.getId())) {
-            throw new RuntimeException("课程代码已存在，请重新输入");
+            throw new CustomException("课程代码已存在，请重新输入");
         }
         courseMapper.updateById(course);
     }
 
     @Override
     public void deleteById(Integer id) {
+        // 1. 检查是否有教学班
+        List<TeachingClass> teachingClasses = teachingClassService.selectByCourseId(id);
+        if (!teachingClasses.isEmpty()) {
+            throw new CustomException("该课程已设置教学班，无法删除");
+        }
+        
+        // 2. 检查是否有成绩规则
+        ScoreRule scoreRule = scoreRuleService.selectByCourseId(id);
+        if (scoreRule != null) {
+            throw new CustomException("该课程已设置成绩规则，无法删除");
+        }
+        
+        // 3. 检查是否有成绩记录
+        List<ScoreDetail> scoreDetails = scoreDetailService.selectByCourseId(id);
+        if (!scoreDetails.isEmpty()) {
+            throw new CustomException("该课程已有成绩记录，无法删除");
+        }
+        
+        // 4. 检查是否有选课记录
+        StudentCourse studentCourse = new StudentCourse();
+        studentCourse.setCourse_id(id.toString());
+        List<StudentCourse> studentCourses = studentCourseMapper.selectAll(studentCourse);
+        if (!studentCourses.isEmpty()) {
+            throw new CustomException("该课程已有学生选课，无法删除");
+        }
+        
+        // 5. 删除课程之前，先删除课程与教师的关联记录
+        courseTeacherMapper.deleteByCourseId(id);
+        
+        // 6. 删除课程
         courseMapper.deleteById(id);
     }
 

@@ -52,6 +52,12 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public void deleteById(Integer id) {
+        // 检查是否是最后一个管理员
+        List<Admin> admins = adminMapper.selectAll(new Admin());
+        if (admins.size() <= 1) {
+            throw new CustomException("至少保留一个管理员账号");
+        }
+        
         adminMapper.deleteById(id);
     }
 
