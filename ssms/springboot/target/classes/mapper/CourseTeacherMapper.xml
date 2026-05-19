@@ -16,25 +16,12 @@
         ORDER BY course_id
     </select>
 
-    <select id="selectByTeachingClassId" parameterType="java.lang.Integer" resultType="com.lgs.entity.CourseTeacher">
-        SELECT ct.* FROM course_teacher ct 
-        JOIN teaching_class tc ON ct.course_id = tc.course_id 
-        WHERE tc.id = #{teaching_class_id}
-        ORDER BY is_main_teacher DESC, id ASC
-    </select>
-
     <delete id="deleteByCourseId" parameterType="java.lang.Integer">
         DELETE FROM course_teacher WHERE course_id = #{course_id}
     </delete>
 
     <delete id="deleteByCourseIdAndTeacherId" parameterType="java.util.Map">
         DELETE FROM course_teacher WHERE course_id = #{course_id} AND teacher_id = #{teacher_id}
-    </delete>
-
-    <delete id="deleteByTeachingClassId" parameterType="java.lang.Integer">
-        DELETE ct FROM course_teacher ct 
-        JOIN teaching_class tc ON ct.course_id = tc.course_id 
-        WHERE tc.id = #{teaching_class_id}
     </delete>
 
     <update id="updateById" parameterType="com.lgs.entity.CourseTeacher">

@@ -27,9 +27,9 @@ public class CourseTeacherController {
         return Result.success();
     }
 
-    @DeleteMapping("/delete/{id}")
-    public Result delete(@PathVariable Integer id) {
-        courseTeacherService.deleteByTeachingClassId(id);
+    @DeleteMapping("/delete")
+    public Result delete(@RequestParam Integer courseId, @RequestParam String teacherId) {
+        courseTeacherService.deleteByCourseIdAndTeacherId(courseId, teacherId);
         return Result.success();
     }
 
@@ -42,12 +42,6 @@ public class CourseTeacherController {
     @GetMapping("/selectByTeacherId/{teacherId}")
     public Result selectByTeacherId(@PathVariable String teacherId) {
         List<CourseTeacher> list = courseTeacherService.selectByTeacherId(teacherId);
-        return Result.success(list);
-    }
-
-    @GetMapping("/selectByTeachingClassId/{teachingClassId}")
-    public Result selectByTeachingClassId(@PathVariable Integer teachingClassId) {
-        List<CourseTeacher> list = courseTeacherService.selectByTeachingClassId(teachingClassId);
         return Result.success(list);
     }
 }

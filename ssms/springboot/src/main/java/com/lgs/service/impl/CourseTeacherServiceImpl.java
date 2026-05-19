@@ -29,18 +29,8 @@ public class CourseTeacherServiceImpl implements CourseTeacherService {
     }
 
     @Override
-    public List<CourseTeacher> selectByTeachingClassId(Integer teachingClassId) {
-        return courseTeacherMapper.selectByTeachingClassId(teachingClassId);
-    }
-
-    @Override
     public void deleteByCourseIdAndTeacherId(Integer courseId, String teacherId) {
         courseTeacherMapper.deleteByCourseIdAndTeacherId(courseId, teacherId);
-    }
-
-    @Override
-    public void deleteByTeachingClassId(Integer teachingClassId) {
-        courseTeacherMapper.deleteByTeachingClassId(teachingClassId);
     }
 
     @Override
